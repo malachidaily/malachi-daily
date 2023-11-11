@@ -87,17 +87,17 @@ const scriptureRef = 'Colossians 3:17 (NIV)';
 				}`}
 				id="scripture" 
 				x-init="fidelity = fidelityOfTheDay"
-				class="relative z-10 max-w-2xl p-4 rounded-md text-center"
+				class="relative z-10 max-w-2xl rounded-md text-start"
 			>
-				<h1 x-text="scriptureRef" class="text-2xl font-normal mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
-				</h1>
-				<h2 
-					x-text="scriptureText" 
-					class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600 font-mono tracking-tighter"
-				>
-				</h2>
-				<p x-text="scriptureRef" class="text-2xl font-normal mt-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
-				</p>
+				<div class="bg-white shadow-xl p-6 rounded-xl">
+					<h1 x-text="scriptureRef" class="text-2xl font-normal mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
+					</h1>
+					<h2 
+						x-text="scriptureText" 
+						class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600 font-mono tracking-tighter"
+					>
+					</h2>
+				</div>
 
 				<!-- Scrubbing Input -->
 				<input x-model="fidelity" type="range" min="0" max="60" value="0" class="range mt-16 range-sm" step="10" />
