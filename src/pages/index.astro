@@ -4,8 +4,8 @@ import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import logoImgUrl from '../../public/logo.png';
 
-const scriptureText = 'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.';
-const scriptureRef = 'John 3:16';
+const scriptureText = 'And whatever you do, whether in word or deed, do it all in the name of the Lord Jesus, giving thanks to God the Father through him.';
+const scriptureRef = 'Colossians 3:17 (NIV)';
 ---
 
 <Layout title="Malachi Daily | Simple Scripture Memorization, Together">
@@ -71,7 +71,10 @@ const scriptureRef = 'John 3:16';
 								}
 
 								if (indicesToReplace.includes(index)) {
-									return '_'.repeat(word.length);
+									const wordToBeReplaced = word.match(/([A-Za-z]+)/ig)?.[0] || ''
+									const restOfWord = word.replace(wordToBeReplaced, '')
+									const wordToReturn = "_".repeat(wordToBeReplaced.length) + restOfWord
+									return wordToReturn
 								}
 
 								return word;
