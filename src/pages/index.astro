@@ -60,7 +60,7 @@ const scriptureRef = 'Colossians 3:17 (NIV)';
 								if (fidelityAsNumber === 60) {
 									const wordToBeReplaced = word.match(/([A-Za-z]+)/ig)?.[0] || ''
 									const restOfWord = word.replace(wordToBeReplaced, '')
-									const wordToReturn = "_".repeat(wordToBeReplaced.length) + restOfWord
+									const wordToReturn = word[0] + "_".repeat(wordToBeReplaced.length - 1) + restOfWord
 									return wordToReturn
 								}
 
@@ -76,7 +76,7 @@ const scriptureRef = 'Colossians 3:17 (NIV)';
 								if (indicesToReplace.includes(index)) {
 									const wordToBeReplaced = word.match(/([A-Za-z]+)/ig)?.[0] || ''
 									const restOfWord = word.replace(wordToBeReplaced, '')
-									const wordToReturn = "_".repeat(wordToBeReplaced.length) + restOfWord
+									const wordToReturn = word[0] + "_".repeat(wordToBeReplaced.length - 1) + restOfWord
 									return wordToReturn
 								}
 
