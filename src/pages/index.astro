@@ -96,13 +96,15 @@ const scriptureRef = 'Philippians 3:8 (NIV)';
 				x-init="fidelity = fidelityOfTheDay"
 				class="rounded-md text-start"
 			>
-				<h1 x-text="scriptureRef" class="text-xl font-medium mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700">
-				</h1>
-				<h2 
-					x-text="scriptureText" 
-					class="word-spacing-tight text-3xl max-sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 font-source-code-pro-mono tracking-tight leading-normal"
-				>
-				</h2>
+				<div class="bg-white p-6 rounded-xl shadow-xl">
+					<h1 x-text="scriptureRef" class="text-xl font-medium mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700">
+					</h1>
+					<h2 
+						x-text="scriptureText" 
+						class="word-spacing-tight text-3xl max-sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 font-source-code-pro-mono tracking-tight leading-normal"
+					>
+					</h2>
+				</div>
 
 				<!-- Scrubbing Input -->
 				<input x-model="fidelity" type="range" min="0" max="60" value="0" class="range mt-12 range-sm" step="10" />
