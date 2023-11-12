@@ -86,6 +86,12 @@ const scriptureRef = 'Philippians 3:8 (NIV)';
 		</div>
 	</main>
 	<script>
+		import { type Alpine as AlpineType } from 'alpinejs'
+
+		declare global {
+			var Alpine: AlpineType
+		}
+		
 		document.addEventListener('alpine:init', () => {
 			const Alpine = window['Alpine'] || {}
 			Alpine.data('malachi', () => ({
