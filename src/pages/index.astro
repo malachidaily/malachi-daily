@@ -74,7 +74,15 @@ const scriptureRef = 'Philippians 3:8 (NIV)';
 				<!-- Toggle Show First Letter -->
 				<div class="form-control w-fit mt-6">
 					<label class="label cursor-pointer flex gap-2 items-center" for="show-first-letter">
-						<input x-model="showFirstLetter" type="checkbox" checked="checked" class="checkbox" name="show-first-letter" id="show-first-letter"/>
+						<input 
+							x-model="showFirstLetter" 
+							type="checkbox" 
+							checked="checked" 
+							class="checkbox" 
+							name="show-first-letter" 
+							id="show-first-letter"
+							x-on:click="localStorage.setItem('showFirstLetter', JSON.stringify($el.checked));"
+						/>
 					  	<span class="label-text">Show the first letter in each hidden word</span> 
 					</label>
 				</div>				  
@@ -100,6 +108,17 @@ const scriptureRef = 'Philippians 3:8 (NIV)';
 			var Alpine: AlpineType
 		}
 
+		// create a function that gets "showFirstLetter" from localStorage
+		// if it doesn't exist, set it to true
+		const getShowFirstLetter = () => {
+			const showFirstLetter = localStorage.getItem('showFirstLetter');
+			if (showFirstLetter === null) {
+				return true;
+			} else {
+				return JSON.parse(showFirstLetter);
+			}
+		}
+		
 		document.addEventListener('alpine:init', () => {
 			const Alpine = window['Alpine'] || {}
 			Alpine.data('malachi', () => ({
@@ -119,7 +138,7 @@ const scriptureRef = 'Philippians 3:8 (NIV)';
 						return dayOfWeekAsNumber * 10;	
 					},
 					fidelity: 0,
-					showFirstLetter: true,
+					showFirstLetter: getShowFirstLetter(),
 					get scriptureText() {
 						// Replace some words from the original with underscores for each character
 						// but do so where we replace more and more words as fidelity grows
