@@ -12,7 +12,7 @@ const scriptureRef = 'Colossians 3:17 (NIV)';
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&display=swap" rel="stylesheet">
-	<main class="w-screen h-screen px-6 flex justify-center bg-gray-100">
+	<main class="w-screen h-full min-h-screen px-6 flex justify-center bg-gray-100">
 		<div class="max-w-[600px] w-full flex flex-col py-12 gap-12">
 			<!-- LOGO -->
 			<div class="w-full flex gap-4 items-center">
@@ -25,7 +25,7 @@ const scriptureRef = 'Colossians 3:17 (NIV)';
 			</div>
 
 			<!-- SCRIPTURE TO MEMORIZE -->
-			<div
+			<section
 				x-data={`{
 					scriptureTextOriginal: '${scriptureText}',
 					scriptureRef: '${scriptureRef}',
@@ -137,7 +137,19 @@ const scriptureRef = 'Colossians 3:17 (NIV)';
 					  	<span class="label-text">Show the first letter in each hidden word</span> 
 					</label>
 				</div>				  
-			</div>
+			</section>
+
+			<!-- Subscribe -->
+			<iframe 
+				src="https://embeds.beehiiv.com/c8ce3263-a472-44d8-a911-db5da1e572e2" 
+				data-test-id="beehiiv-embed" 
+				class="w-full rounded-xl"
+				height="320" 
+				frameborder="0" 
+				scrolling="no" 
+				style="margin: 0; background-color: transparent;"
+				loading="lazy"
+			></iframe>
 		</div>
 	</main>
 </Layout>
