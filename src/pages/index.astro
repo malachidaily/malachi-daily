@@ -43,12 +43,28 @@ const scriptureRef = 'Colossians 3:17 (NIV)';
 						return dayOfWeekAsNumber * 10;	
 					},
 					fidelity: this.fidelityOfTheDay || 0,
+					showFirstLetter: false,
 					get scriptureText() {
 						// Replace some words from the original with underscores for each character
 						// but do so where we replace more and more words as fidelity grows
 						// when fideltiy is at 0, we just return the original
 						// when fidelity is at 60, we return every word with underscores for each character
 						const words = this.scriptureTextOriginal.split(' ');
+
+						function convertWordToUnderscores(word, showFirstCharacter = false) {
+							const wordToBeReplaced = word.match(/([A-Za-z]+)/ig)?.[0] || ''
+							const restOfWord = word.replace(wordToBeReplaced, '')
+							let wordToReturn = '';
+
+							if (showFirstCharacter) {
+								wordToReturn = word[0] + "_".repeat(wordToBeReplaced.length - 1) + restOfWord
+							} else {
+								wordToReturn = "_".repeat(wordToBeReplaced.length) + restOfWord
+							}
+
+							return wordToReturn
+						}
+
 						return words
 							.map((word, index) => {
 								const fidelityAsNumber = Number(this.fidelity);
@@ -58,10 +74,7 @@ const scriptureRef = 'Colossians 3:17 (NIV)';
 								}
 
 								if (fidelityAsNumber === 60) {
-									const wordToBeReplaced = word.match(/([A-Za-z]+)/ig)?.[0] || ''
-									const restOfWord = word.replace(wordToBeReplaced, '')
-									const wordToReturn = word[0] + "_".repeat(wordToBeReplaced.length - 1) + restOfWord
-									return wordToReturn
+									return convertWordToUnderscores(word, this.showFirstLetter)
 								}
 
 								const percentOfWordsHidden = fidelityAsNumber / 60;
@@ -74,10 +87,7 @@ const scriptureRef = 'Colossians 3:17 (NIV)';
 								}
 
 								if (indicesToReplace.includes(index)) {
-									const wordToBeReplaced = word.match(/([A-Za-z]+)/ig)?.[0] || ''
-									const restOfWord = word.replace(wordToBeReplaced, '')
-									const wordToReturn = word[0] + "_".repeat(wordToBeReplaced.length - 1) + restOfWord
-									return wordToReturn
+									return convertWordToUnderscores(word, this.showFirstLetter)
 								}
 
 								return word;
@@ -87,7 +97,7 @@ const scriptureRef = 'Colossians 3:17 (NIV)';
 				}`}
 				id="scripture" 
 				x-init="fidelity = fidelityOfTheDay"
-				class="relative z-10 max-w-2xl rounded-md text-start"
+				class="rounded-md text-start"
 			>
 				<div class="bg-white shadow-xl p-6 rounded-xl">
 					<h1 x-text="scriptureRef" class="text-2xl font-normal mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
@@ -119,6 +129,14 @@ const scriptureRef = 'Colossians 3:17 (NIV)';
 					<span>Fri</span>
 					<span>Sat</span>
 				</div>
+
+				<!-- Toggle Show First Letter -->
+				<div class="form-control w-fit mt-6">
+					<label class="label cursor-pointer flex gap-2 items-center">
+						<input x-model="showFirstLetter" type="checkbox" checked="checked" class="checkbox" />
+					  	<span class="label-text">Show the first letter in each hidden word</span> 
+					</label>
+				</div>				  
 			</div>
 		</div>
 	</main>
