@@ -141,7 +141,7 @@ const scriptureRef = 'Philippians 3:8 (NIV)';
 							// TODO - maybe one day allow for users to type in the words
 							return `
 								<span 
-									class="align-bottom overflow-hidden inline-block whitespace-nowrap rounded-md focus:outline-2 focus:outline-blue-400" 
+									class="cursor-default align-bottom overflow-hidden inline-block whitespace-nowrap rounded-md focus:outline-2 focus:outline-blue-400" 
 									x-data="{ originalWord: '${wordToBeReplaced}', replacedWord: '${wordToReturn}', wordToShow: '${wordToReturn}${commaOrPeriod}', commaOrPeriod: '${commaOrPeriod}' }"
 									x-on:mouseover="wordToShow = originalWord + commaOrPeriod"
 									x-on:mouseleave="wordToShow = replacedWord + commaOrPeriod"
