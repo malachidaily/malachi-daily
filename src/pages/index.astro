@@ -91,7 +91,7 @@ const scriptureRef = 'Philippians 3:8 (NIV)';
 		declare global {
 			var Alpine: AlpineType
 		}
-		
+
 		document.addEventListener('alpine:init', () => {
 			const Alpine = window['Alpine'] || {}
 			Alpine.data('malachi', () => ({
@@ -111,7 +111,7 @@ const scriptureRef = 'Philippians 3:8 (NIV)';
 						return dayOfWeekAsNumber * 10;	
 					},
 					fidelity: 0,
-					showFirstLetter: false,
+					showFirstLetter: true,
 					get scriptureText() {
 						// Replace some words from the original with underscores for each character
 						// but do so where we replace more and more words as fidelity grows
