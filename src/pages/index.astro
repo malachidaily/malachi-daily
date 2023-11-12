@@ -115,19 +115,32 @@ const scriptureRef = 'Philippians 3:8 (NIV)';
 
 						function convertWordToUnderscores(word: string, showFirstCharacter: boolean = false): string {
 							const wordToBeReplaced = word.match(/([A-Za-z]+)/ig)?.[0] || ''
-							const restOfWord = word.replace(wordToBeReplaced, '')
+							const underscores = showFirstCharacter ? "_".repeat(wordToBeReplaced.length - 1) : "_".repeat(wordToBeReplaced.length)
+							const commaOrPeriod = word.replace(wordToBeReplaced, '')
+							const firstCharacter = word[0] || ''
 							let wordToReturn = '';
 
 							if (showFirstCharacter) {
-								wordToReturn = word[0] + "_".repeat(wordToBeReplaced.length - 1) + restOfWord
+								if (word.length === 1) {
+									wordToReturn = firstCharacter
+								} else {
+									wordToReturn = firstCharacter + underscores
+								}
 							} else {
-								wordToReturn = "_".repeat(wordToBeReplaced.length) + restOfWord
+								wordToReturn = underscores
 							}
 
-							// const styleMaxWidth = "width: " + wordToReturn.length + "ch";
-
-							// return '<span class="align-bottom overflow-hidden inline-block whitespace-nowrap" contenteditable style="' + styleMaxWidth + '"' + '>' + wordToReturn + '</span>'
 							return wordToReturn
+
+							// TODO - maybe one day allow for users to type in the words
+							// return `
+							// 	<span 
+							// 		class="select-all align-bottom overflow-hidden inline-block whitespace-nowrap rounded-md focus:outline-2 focus:outline-blue-400" 
+							// 	>
+							// 		${wordToReturn}
+							// 	</span>
+							// 	<span>${commaOrPeriod}</span>
+							// `;
 						}
 
 						return words
