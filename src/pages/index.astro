@@ -4,8 +4,8 @@ import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import logoImgUrl from '../../public/logo.png';
 
-const scriptureText = 'And whatever you do, whether in word or deed, do it all in the name of the Lord Jesus, giving thanks to God the Father through him.';
-const scriptureRef = 'Colossians 3:17 (NIV)';
+const scriptureText = 'What is more, I consider everything a loss because of the surpassing worth of knowing Christ Jesus my Lord, for whose sake I have lost all things. I consider them garbage, that I may gain Christ';
+const scriptureRef = 'Philippians 3:8 (NIV)';
 ---
 
 <Layout title="Malachi Daily | Simple Scripture Memorization, Together">
@@ -24,7 +24,7 @@ const scriptureRef = 'Colossians 3:17 (NIV)';
 			<!-- SCRIPTURE TO MEMORIZE -->
 			<section
 				x-data={`{
-					scriptureTextOriginal: '${scriptureText}',
+					scriptureTextOriginal: \`${scriptureText}\`,
 					scriptureRef: '${scriptureRef}',
 					// TODO fix this and make it show fidelity per day of week
 					get fidelityOfTheDay() {
@@ -96,16 +96,16 @@ const scriptureRef = 'Colossians 3:17 (NIV)';
 				x-init="fidelity = fidelityOfTheDay"
 				class="rounded-md text-start"
 			>
-				<h1 x-text="scriptureRef" class="text-2xl font-normal mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
+				<h1 x-text="scriptureRef" class="text-xl font-medium mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700">
 				</h1>
 				<h2 
 					x-text="scriptureText" 
-					class="word-spacing-tight text-4xl max-sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600 font-source-code-pro-mono tracking-tight leading-tight"
+					class="word-spacing-tight text-4xl max-sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 font-source-code-pro-mono tracking-tight leading-tight"
 				>
 				</h2>
 
 				<!-- Scrubbing Input -->
-				<input x-model="fidelity" type="range" min="0" max="60" value="0" class="range mt-16 range-sm" step="10" />
+				<input x-model="fidelity" type="range" min="0" max="60" value="0" class="range mt-12 range-sm" step="10" />
 				<div class="w-full flex justify-between text-xs px-2">
 					<span>|</span>
 					<span>|</span>
