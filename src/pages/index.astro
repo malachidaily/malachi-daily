@@ -23,84 +23,20 @@ const scriptureRef = 'Philippians 3:8 (NIV)';
 
 			<!-- SCRIPTURE TO MEMORIZE -->
 			<section
-				x-data={`{
-					scriptureTextOriginal: \`${scriptureText}\`,
-					scriptureRef: '${scriptureRef}',
-					// TODO fix this and make it show fidelity per day of week
-					get fidelityOfTheDay() {
-						// Get day of the week as a number from 0 to 6
-						const dayOfWeek = new Date().getDay();
-						// Turn that into a number from 0 to 6
-						let dayOfWeekAsNumber = 0;
-						if (dayOfWeek === 7) {
-							dayOfWeekAsNumber = 0;
-						} else {
-							dayOfWeekAsNumber = dayOfWeek;
-						}
-						return dayOfWeekAsNumber * 10;	
-					},
-					fidelity: this.fidelityOfTheDay || 0,
-					showFirstLetter: false,
-					get scriptureText() {
-						// Replace some words from the original with underscores for each character
-						// but do so where we replace more and more words as fidelity grows
-						// when fideltiy is at 0, we just return the original
-						// when fidelity is at 60, we return every word with underscores for each character
-						const words = this.scriptureTextOriginal.split(' ');
-
-						function convertWordToUnderscores(word, showFirstCharacter = false) {
-							const wordToBeReplaced = word.match(/([A-Za-z]+)/ig)?.[0] || ''
-							const restOfWord = word.replace(wordToBeReplaced, '')
-							let wordToReturn = '';
-
-							if (showFirstCharacter) {
-								wordToReturn = word[0] + "_".repeat(wordToBeReplaced.length - 1) + restOfWord
-							} else {
-								wordToReturn = "_".repeat(wordToBeReplaced.length) + restOfWord
-							}
-
-							return wordToReturn
-						}
-
-						return words
-							.map((word, index) => {
-								const fidelityAsNumber = Number(this.fidelity);
-								
-								if (fidelityAsNumber === 0) {
-									return word
-								}
-
-								if (fidelityAsNumber === 60) {
-									return convertWordToUnderscores(word, this.showFirstLetter)
-								}
-
-								const percentOfWordsHidden = fidelityAsNumber / 60;
-								const numOfWordsToReplace = Math.round(percentOfWordsHidden * words.length)
-
-								const indicesToReplace = []
-								for (let i = 0; i < words.length; i += 1) {
-									const index = Math.floor(i * words.length / numOfWordsToReplace);
-    								indicesToReplace.push(index);
-								}
-
-								if (indicesToReplace.includes(index)) {
-									return convertWordToUnderscores(word, this.showFirstLetter)
-								}
-
-								return word;
-							})
-							.join(' ');
-					},
-				}`}
+				x-data="malachi"
 				id="scripture" 
-				x-init="fidelity = fidelityOfTheDay"
+				x-init={`
+					scriptureTextOriginal = '${scriptureText}';
+					scriptureRef = '${scriptureRef}';
+					fidelity = fidelityOfTheDay;
+				`}
 				class="rounded-md text-start"
 			>
 				<div class="bg-white p-6 rounded-xl shadow-xl">
 					<h1 x-text="scriptureRef" class="text-xl font-medium mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700">
 					</h1>
 					<h2 
-						x-text="scriptureText" 
+						x-html="scriptureText" 
 						class="word-spacing-tight text-3xl max-sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 font-source-code-pro-mono tracking-tight leading-normal"
 					>
 					</h2>
@@ -149,4 +85,81 @@ const scriptureRef = 'Philippians 3:8 (NIV)';
 			></iframe>
 		</div>
 	</main>
+	<script>
+		document.addEventListener('alpine:init', () => {
+			const Alpine = window['Alpine'] || {}
+			Alpine.data('malachi', () => ({
+					scriptureTextOriginal: '',
+					scriptureRef: '',
+					// TODO fix this and make it show fidelity per day of week
+					get fidelityOfTheDay() {
+						// Get day of the week as a number from 0 to 6
+						const dayOfWeek = new Date().getDay();
+						// Turn that into a number from 0 to 6
+						let dayOfWeekAsNumber = 0;
+						if (dayOfWeek === 7) {
+							dayOfWeekAsNumber = 0;
+						} else {
+							dayOfWeekAsNumber = dayOfWeek;
+						}
+						return dayOfWeekAsNumber * 10;	
+					},
+					fidelity: 0,
+					showFirstLetter: false,
+					get scriptureText() {
+						// Replace some words from the original with underscores for each character
+						// but do so where we replace more and more words as fidelity grows
+						// when fideltiy is at 0, we just return the original
+						// when fidelity is at 60, we return every word with underscores for each character
+						const words = this.scriptureTextOriginal.split(' ');
+
+						function convertWordToUnderscores(word: string, showFirstCharacter: boolean = false): string {
+							const wordToBeReplaced = word.match(/([A-Za-z]+)/ig)?.[0] || ''
+							const restOfWord = word.replace(wordToBeReplaced, '')
+							let wordToReturn = '';
+
+							if (showFirstCharacter) {
+								wordToReturn = word[0] + "_".repeat(wordToBeReplaced.length - 1) + restOfWord
+							} else {
+								wordToReturn = "_".repeat(wordToBeReplaced.length) + restOfWord
+							}
+
+							// const styleMaxWidth = "width: " + wordToReturn.length + "ch";
+
+							// return '<span class="align-bottom overflow-hidden inline-block whitespace-nowrap" contenteditable style="' + styleMaxWidth + '"' + '>' + wordToReturn + '</span>'
+							return wordToReturn
+						}
+
+						return words
+							.map((word, index) => {
+								const fidelityAsNumber = Number(this.fidelity);
+								
+								if (fidelityAsNumber === 0) {
+									return word
+								}
+
+								if (fidelityAsNumber === 60) {
+									return convertWordToUnderscores(word, this.showFirstLetter)
+								}
+
+								const percentOfWordsHidden = fidelityAsNumber / 60;
+								const numOfWordsToReplace = Math.round(percentOfWordsHidden * words.length)
+
+								const indicesToReplace = []
+								for (let i = 0; i < words.length; i += 1) {
+									const index = Math.floor(i * words.length / numOfWordsToReplace);
+    								indicesToReplace.push(index);
+								}
+
+								if (indicesToReplace.includes(index)) {
+									return convertWordToUnderscores(word, this.showFirstLetter)
+								}
+
+								return word;
+							})
+							.join(' ');
+					},
+			}))
+		})
+	</script>
 </Layout>
