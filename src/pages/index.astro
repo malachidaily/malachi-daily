@@ -130,17 +130,20 @@ const scriptureRef = 'Philippians 3:8 (NIV)';
 								wordToReturn = underscores
 							}
 
-							return wordToReturn
+							// return wordToReturn
 
 							// TODO - maybe one day allow for users to type in the words
-							// return `
-							// 	<span 
-							// 		class="select-all align-bottom overflow-hidden inline-block whitespace-nowrap rounded-md focus:outline-2 focus:outline-blue-400" 
-							// 	>
-							// 		${wordToReturn}
-							// 	</span>
-							// 	<span>${commaOrPeriod}</span>
-							// `;
+							return `
+								<span 
+									class="align-bottom overflow-hidden inline-block whitespace-nowrap rounded-md focus:outline-2 focus:outline-blue-400" 
+									x-data="{ originalWord: '${wordToBeReplaced}', replacedWord: '${wordToReturn}', wordToShow: '${wordToReturn}${commaOrPeriod}', commaOrPeriod: '${commaOrPeriod}' }"
+									x-on:mouseover="wordToShow = originalWord + commaOrPeriod"
+									x-on:mouseleave="wordToShow = replacedWord + commaOrPeriod"
+									x-text="wordToShow"
+								>
+									${wordToReturn}
+								</span>
+							`;
 						}
 
 						return words
