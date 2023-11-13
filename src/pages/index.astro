@@ -37,19 +37,33 @@ const scriptureRef = 'Philippians 3:8 (NIV)';
 			>
 				<div class="bg-white p-6 rounded-xl shadow-xl">
 					<h1 x-text="scriptureRef" class="text-xl font-medium mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700">
+						{scriptureRef}
 					</h1>
 					<div class="relative" x-data="{ timeItTakesToReadVerse: 5000 }">
-						<h2 
+						<h2
+							x-init={`
+								setTimeout(() => {
+									$el.classList.remove('animate-pulse')
+								}, timeItTakesToReadVerse)
+							`.trim()}
+							id="verse-current"
 							x-html="scriptureText" 
-							class="transition word-spacing-tight text-4xl max-sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 font-scripture tracking-tight leading-tight"
+							class="animate-pulse transition word-spacing-tight text-4xl max-sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 font-scripture tracking-tight leading-tight"
 						>
+							{scriptureText}
 						</h2>
-						<h2 
-							x-init="setTimeout(() => $el.classList.add('opacity-0'), timeItTakesToReadVerse)"
+						<p
+							x-init={`
+								setTimeout(() => {
+									$el.classList.add('opacity-0')
+								}, timeItTakesToReadVerse)
+							`.trim()}
+							id="verse-original"
 							x-text="scriptureTextOriginal" 
 							class="transition absolute top-0 left-0 word-spacing-tight text-4xl max-sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 font-scripture tracking-tight leading-tight pointer-events-none"
 						>
-						</h2>
+							{scriptureText}
+						</p>
 					</div>
 				</div>
 
@@ -173,8 +187,8 @@ const scriptureRef = 'Philippians 3:8 (NIV)';
 								<span 
 									class="cursor-default align-bottom overflow-hidden inline-block whitespace-nowrap rounded-md focus:outline-2 focus:outline-blue-400" 
 									x-data="{ originalWord: '${wordToBeReplaced}', replacedWord: '${wordToReturn}', wordToShow: '${wordToReturn}${commaOrPeriod}', commaOrPeriod: '${commaOrPeriod}' }"
-									x-on:mouseover="wordToShow = originalWord + commaOrPeriod"
-									x-on:mouseleave="wordToShow = replacedWord + commaOrPeriod"
+									x-on:mouseover="wordToShow = originalWord + commaOrPeriod;"
+									x-on:mouseleave="wordToShow = replacedWord + commaOrPeriod;"
 									x-text="wordToShow"
 								>
 									${wordToReturn}
