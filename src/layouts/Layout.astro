@@ -20,14 +20,15 @@ const { title } = Astro.props;
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@900&display=swap" rel="stylesheet">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>	
+		<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 		<style is:global>
-			.font-source-code-pro-mono {
-				font-family: 'Source Code Pro', monospace;
+			.font-scripture {
+				font-family: 'IBM Plex Mono', monospace;
+				font-style: italic;
 			}
 
-			.font-source-code-pro-mono.word-spacing-tight {
+			.font-scripture.word-spacing-tight {
 				word-spacing: -6px;
 			}
 		</style>
