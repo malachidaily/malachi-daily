@@ -19,8 +19,12 @@ if (scriptureTextFromParams) {
 	});
 }
 
-const scriptureText = scriptureTextFromParams || '-';
-const scriptureRef = scriptureRefFromParams || '-';
+const scriptureText = scriptureTextFromParams;
+const scriptureRef = scriptureRefFromParams;
+
+if (!scriptureText || !scriptureRef) {
+	return Astro.redirect('/');
+}
 ---
 
 <Layout title="Malachi Daily | Simple Scripture Memorization, Together">
