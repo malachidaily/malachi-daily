@@ -35,7 +35,23 @@ import logoImgUrl from '../../../public/logo.png';
                 }`.trim()}
                 class="flex flex-col gap-4"
             >
-                <h1 class="text-3xl max-sm:text-2xl font-bold">Create scripture link</h1>
+                <div>
+                    <div class="w-full text-sm breadcrumbs">
+                        <ul>
+                            <li>
+                                <a class="link" href="/">Home</a>
+                            </li>
+                            <li>
+                                <a class="link" x-bind:href="linkToNewVerse">Embed</a>
+                            </li>
+                            <li>
+                                <a class="link" href="/embed/admin">Admin</a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <h1 class="text-3xl max-sm:text-2xl font-bold">Create scripture link</h1>
+                </div>
 
                 <form class="flex flex-col gap-4">
                     <!-- Scripture Reference Input -->
@@ -59,7 +75,7 @@ import logoImgUrl from '../../../public/logo.png';
                         <textarea
                             x-model="scriptureText"
                             style="height: 100px"
-                            class="textarea textarea-bordered p-4 rounded-lg" 
+                            class="textarea textarea-md textarea-bordered p-4 rounded-lg" 
                             placeholder="What is more, I consider everything a loss because of the surpassing worth of knowing Christ Jesus my Lord, for whose sake I have lost all things. I consider them garbage, that I may gain Christ"
                         ></textarea>
                     </div>
