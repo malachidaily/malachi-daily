@@ -1,11 +1,26 @@
 ---
 import { Image } from 'astro:assets';
 
-import Layout from '../layouts/Layout.astro';
-import logoImgUrl from '../../public/logo.png';
+import Layout from '../../layouts/Layout.astro';
+import logoImgUrl from '../../../public/logo.png';
 
-const scriptureText = 'What is more, I consider everything a loss because of the surpassing worth of knowing Christ Jesus my Lord, for whose sake I have lost all things. I consider them garbage, that I may gain Christ';
-const scriptureRef = 'Philippians 3:8 (NIV)';
+// Get 'scripture-text' and 'scripture-ref' from url params
+const urlParams = new URLSearchParams(Astro.url.searchParams);
+const scriptureTextFromParams = decodeURIComponent(urlParams.get('scripture-text') || '');
+const scriptureRefFromParams = decodeURIComponent(urlParams.get('scripture-ref') || '');
+
+const bannedUrlWords = ['<script', ':javascript'];
+// If someone tries to be sneaky and adds some weird <script or :javascript, return 404
+if (scriptureTextFromParams) {
+	bannedUrlWords.forEach((word) => {
+		if (scriptureTextFromParams.includes(word)) {
+			return Astro.redirect('/404');
+		}
+	});
+}
+
+const scriptureText = scriptureTextFromParams || '-';
+const scriptureRef = scriptureRefFromParams || '-';
 ---
 
 <Layout title="Malachi Daily | Simple Scripture Memorization, Together">
