@@ -1,4 +1,6 @@
 ---
+import "@fontsource/inconsolata/900.css"; // Specify weight
+
 interface Props {
 	title: string;
 }
@@ -19,13 +21,9 @@ const { title } = Astro.props;
 		<link rel="manifest" href="/site.webmanifest">
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>	
-		<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 		<style is:global>
 			.font-scripture {
-				font-family: 'IBM Plex Mono', monospace;
-				font-style: italic;
+				font-family: "Inconsolata";
 			}
 
 			.font-scripture.word-spacing-tight {
