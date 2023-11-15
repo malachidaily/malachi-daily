@@ -41,19 +41,22 @@ export const prerender = true;
 					class="bg-white p-6 flex justify-center items-center rounded-xl shadow-xl transition-[height] duration-300" 
 					x-ref="scriptureCard"
 					x-init={`
-						document.body.classList.add('transition');
+						// https://alpinejs.dev/directives/init#next-tick
+						$nextTick(() => {
+							document.body.classList.add('transition');
 
-						// I have to manually listen to resizes so that I can get and set 
-						// the scripture card's dimensions for animation's sake.
-						window.addEventListener('resize', () => {
-							getAndSetCardWidth($el)
-						}, { passive: true });
+							// I have to manually listen to resizes so that I can get and set 
+							// the scripture card's dimensions for animation's sake.
+							window.addEventListener('resize', () => {
+								getAndSetCardWidth($el)
+							}, { passive: true });
 
-						getAndSetCardWidth($el);
+							getAndSetCardWidth($el);
 
-						// When the showSerifFont state changes, update the localStorage
-						$watch('showSerifFont', () => {
-							localStorage.setItem('showSerifFont', showSerifFont);
+							// When the showSerifFont state changes, update the localStorage
+							$watch('showSerifFont', () => {
+								localStorage.setItem('showSerifFont', showSerifFont);
+							})
 						})
 					`.trim()}
 					x-data={`{ 
