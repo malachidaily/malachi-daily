@@ -66,6 +66,10 @@ export const prerender = true;
 							document.body.classList.toggle('overflow-hidden');
 						},
 						getAndSetCardWidth(cardElement) {
+							if (this.isFullscreen) {
+								return;
+							}
+							
 							cardElement.style.height = '';
 							cardElement.style.width = '';
 
@@ -80,24 +84,25 @@ export const prerender = true;
 						},
 						handleShowFullscreen() {
 							this.toggleAllowDocumentScroll();
-							setTimeout(() => {
-								$el.classList.add('!h-screen');
-								$el.classList.add('!w-screen');
-								window.scrollTo({
-									top: 0,
-									behavior: "smooth",
-								})
-								this.isFullscreen = true;
-							}, 300)
+							$el.classList.add('!h-screen');
+							$el.classList.add('!w-screen');
+							window.scrollTo({
+								top: 0,
+								behavior: "smooth",
+							})
+							this.isFullscreen = true;
 						},
 						handleHideFullscreen() {
+							const ANIMATION_DURATION = 300
 							this.toggleAllowDocumentScroll();
+							$el.classList.remove('!h-screen');
+							$el.classList.remove('!w-screen');
+							this.isFullscreen = false;
+
+							// Allow the close animation to play fully
 							setTimeout(() => {
-								$el.classList.remove('!h-screen');
-								$el.classList.remove('!w-screen');
-								this.isFullscreen = false;
-								getAndSetCardWidth($el);
-							}, 300)
+								this.getAndSetCardWidth($el); 
+							}, ANIMATION_DURATION)
 						},
 					}`}
 					x-bind:class="{ 'absolute top-0 left-0 bottom-0 right-0 z-10': isFullscreen }"
