@@ -122,7 +122,7 @@ export const prerender = true;
 								`.trim()}
 								id="verse-current"
 								x-html="scriptureText" 
-								class="animate-pulse transition  text-4xl max-sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 leading-tight"
+								class="animate-pulse transition font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 leading-tight"
 							>
 								{scriptureText}
 							</h2>
@@ -134,7 +134,7 @@ export const prerender = true;
 								`.trim()}
 								id="verse-original"
 								x-text="scriptureTextOriginal" 
-								class="transition absolute top-0 left-0  text-4xl max-sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 leading-tight pointer-events-none"
+								class="transition absolute top-0 left-0 font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 leading-tight pointer-events-none"
 							>
 								{scriptureText}
 							</p>
@@ -271,7 +271,7 @@ export const prerender = true;
 
 						if (showFirstCharacter) {
 							if (word.length === 1) {
-								wordToReturn = firstCharacter
+								wordToReturn = "_"
 							} else {
 								wordToReturn = firstCharacter + underscores
 							}
@@ -279,20 +279,31 @@ export const prerender = true;
 							wordToReturn = underscores
 						}
 
-						// return wordToReturn
+						const makeUnderscoresVisible = () => {
+							return `
+								<span
+									x-data="{ 
+										resetText() {
+											$el.innerText = '${underscores}'
+											$el.classList.remove('opacity-80')
+										},
+									}"
+									class="opacity-40 animate-pulse text-blue-700"
+									x-on:mouseover="
+										$el.innerText = '${showFirstCharacter ? wordToBeReplaced.slice(1) : wordToBeReplaced}'
+										$el.classList.add('opacity-80')
+									"
+									x-on:mouseleave="resetText()"
+									x-on:click.outside="resetText()"
+								>${underscores}</span>
+							`.trim()
+						}
 
-						// TODO - maybe one day allow for users to type in the words
 						return `
-							<span 
-								class="cursor-default align-bottom overflow-hidden inline-block whitespace-nowrap rounded-md focus:outline-2 focus:outline-blue-400" 
-								x-data="{ originalWord: '${wordToBeReplaced}', replacedWord: '${wordToReturn}', wordToShow: '${wordToReturn}${commaOrPeriod}', commaOrPeriod: '${commaOrPeriod}' }"
-								x-on:mouseover="wordToShow = originalWord + commaOrPeriod;"
-								x-on:mouseleave="wordToShow = replacedWord + commaOrPeriod;"
-								x-text="wordToShow"
-							>
-								${wordToReturn}
+							<span class="text-[inherit] cursor-default align-bottom overflow-hidden inline-block whitespace-nowrap rounded-md focus:outline-2 focus:outline-blue-400">
+								${showFirstCharacter ? firstCharacter : ''}${makeUnderscoresVisible()}${commaOrPeriod || ''}
 							</span>
-						`;
+						`.trim();
 					}
 
 					return words
