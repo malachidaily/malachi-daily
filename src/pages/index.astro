@@ -311,7 +311,7 @@ export const prerender = true;
 						Notification.requestPermission().then((permission) => {
 							if (permission === 'granted') {
 								// Permission has been granted
-								showNotification('Notification Title', 'Notification Body');
+								showNotification(this.scriptureRef, this.scriptureWithUnderscores);
 							} else if (permission === 'denied') {
 								// Permission has been denied
 								console.log('Notification permission has been denied.');
@@ -326,6 +326,9 @@ export const prerender = true;
 						// Create and show a notification
 						new Notification(title, { body });
 					}
+				},
+				get scriptureWithUnderscores() {
+					return document.getElementById('verse-current')?.innerText || ''
 				},
 				get scriptureText() {
 					// Replace some words from the original with underscores for each character
