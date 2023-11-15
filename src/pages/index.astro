@@ -270,6 +270,7 @@ export const prerender = true;
 				},
 				fidelity: 0,
 				showFirstLetter: getShowFirstLetter(),
+				hideWordsUpFrontVersusDispersed: true,
 				get scriptureText() {
 					// Replace some words from the original with underscores for each character
 					// but do so where we replace more and more words as fidelity grows
@@ -279,7 +280,12 @@ export const prerender = true;
 
 					function convertWordToUnderscores(word: string, showFirstCharacter: boolean = false): string {
 						const wordToBeReplaced = word.match(/([A-Za-z]+)/ig)?.[0] || ''
-						const underscores = showFirstCharacter ? "_".repeat(wordToBeReplaced.length - 1) : "_".repeat(wordToBeReplaced.length)
+						let underscores = "_".repeat(wordToBeReplaced.length)
+						if (showFirstCharacter) {
+							underscores = "_".repeat(wordToBeReplaced.length - 1) 
+						} else if (wordToBeReplaced.length === 1) {
+							underscores = "_"
+						}
 						const commaOrPeriod = word.replace(wordToBeReplaced, '')
 						const firstCharacter = word[0] || ''
 
@@ -326,10 +332,21 @@ export const prerender = true;
 							const numOfWordsToReplace: number = Math.round(percentOfWordsHidden * words.length)
 
 							const indicesToReplace: number[] = []
-							for (let i = 0; i < words.length; i += 1) {
-								const index: number = Math.floor(i * words.length / numOfWordsToReplace);
-								indicesToReplace.push(index);
+
+							if (this.hideWordsUpFrontVersusDispersed) {
+								for (let i = 0; i < words.length; i += 1) {
+									if (i < numOfWordsToReplace) {
+										indicesToReplace.push(i);
+									}
+								}
+							} else {
+								// This function evenly disperses the hidden words
+								for (let i = 0; i < words.length; i += 1) {
+									const index: number = Math.floor(i * words.length / numOfWordsToReplace);
+									indicesToReplace.push(index);
+								}
 							}
+
 
 							if (indicesToReplace.includes(index)) {
 								return convertWordToUnderscores(word, this.showFirstLetter)
