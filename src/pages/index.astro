@@ -14,14 +14,19 @@ export const prerender = true;
 	<main x-data="malachi" class="w-screen h-full min-h-screen px-6 flex justify-center bg-gray-100">
 		<div class="max-w-[600px] w-full flex flex-col py-12 max-sm:py-6 gap-12 max-sm:gap-6">
 			<!-- LOGO -->
-			<div class="w-full flex flex-col gap-2 items-center justify-center">
-				<div class="w-full flex gap-2 items-center justify-center">
-					<Image 
-						src={logoImgUrl}
-						alt="Malachi Daily Logo | shows hands praying" 
-						class={`aspect-[${logoImgUrl.height}/${logoImgUrl.width}] h-[32px] w-fit`}
-					/>
-					<h2 class="max-sm:text-xl text-3xl text-gray-800 font-bold whitespace-nowrap">Malachi Daily</h2>
+			<div class="w-full flex flex-col gap-2 items-start justify-start">
+				<div class="w-full flex gap-2 items-center">
+					<div class="flex gap-2 items-center justify-start">
+						<Image
+							src={logoImgUrl}
+							alt="Malachi Daily Logo | shows hands praying" 
+							class={`aspect-[${logoImgUrl.height}/${logoImgUrl.width}] h-[32px] w-fit`}
+						/>
+						<h2 class="max-sm:text-xl text-3xl text-gray-800 font-bold whitespace-nowrap">Malachi Daily</h2>
+					</div>
+					<svg role="button" x-on:click="handleAskForNotificationPermissions" class="text-gray-600" width="24" height="24" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+						<path fill="currentColor" d="M225.29 165.93C216.61 151 212 129.57 212 104a84 84 0 0 0-168 0c0 25.58-4.59 47-13.27 61.93a20.08 20.08 0 0 0-.07 20.07A19.77 19.77 0 0 0 48 196h36.18a44 44 0 0 0 87.64 0H208a19.77 19.77 0 0 0 17.31-10a20.08 20.08 0 0 0-.02-20.07ZM128 212a20 20 0 0 1-19.6-16h39.2a20 20 0 0 1-19.6 16Zm-73.34-40C63.51 154 68 131.14 68 104a60 60 0 0 1 120 0c0 27.13 4.48 50 13.33 68Z"/>
+					</svg>
 				</div>
 				<p class="text-gray-500 text-center max-sm:hidden">Scripture memorization, together. New verse every week.</p>
 			</div>
@@ -297,6 +302,29 @@ export const prerender = true;
 					const subscribeSection = this.$refs.subscribeSection;
 					subscribeSection.style.display = 'none';
 					localStorage.setItem('showSubscribeSection', 'false');
+				},
+				handleAskForNotificationPermissions() {
+					// Check if the browser supports the Notification API
+					if ('Notification' in window) {
+						// Request permission for notifications
+						Notification.requestPermission().then((permission) => {
+							if (permission === 'granted') {
+								// Permission has been granted
+								showNotification('Notification Title', 'Notification Body');
+							} else if (permission === 'denied') {
+								// Permission has been denied
+								console.log('Notification permission has been denied.');
+							} else {
+								// Permission request was dismissed by the user
+								console.log('Notification permission request was dismissed.');
+							}
+						});
+					}
+
+					function showNotification(title: string, body: string) {
+						// Create and show a notification
+						new Notification(title, { body });
+					}
 				},
 				get scriptureText() {
 					// Replace some words from the original with underscores for each character

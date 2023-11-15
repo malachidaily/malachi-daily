@@ -44,6 +44,11 @@ const { title } = Astro.props;
 				@apply hidden;
 			}
 		</style>
+		<script>
+			if ('serviceWorker' in navigator) {
+				navigator.serviceWorker.register('/service-worker.js');
+			}
+		</script>
 	</head>
 	<body>
 		<slot />
