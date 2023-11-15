@@ -282,17 +282,6 @@ export const prerender = true;
 						const underscores = showFirstCharacter ? "_".repeat(wordToBeReplaced.length - 1) : "_".repeat(wordToBeReplaced.length)
 						const commaOrPeriod = word.replace(wordToBeReplaced, '')
 						const firstCharacter = word[0] || ''
-						let wordToReturn = '';
-
-						if (showFirstCharacter) {
-							if (word.length === 1) {
-								wordToReturn = "_"
-							} else {
-								wordToReturn = firstCharacter + underscores
-							}
-						} else {
-							wordToReturn = underscores
-						}
 
 						const makeUnderscoresVisible = () => {
 							return `
