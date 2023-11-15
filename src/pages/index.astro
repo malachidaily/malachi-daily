@@ -38,7 +38,7 @@ export const prerender = true;
 				class="rounded-md text-start"
 			>
 				<div 
-					class="bg-white p-6 flex justify-center items-center rounded-xl shadow-xl transition-all duration-300" 
+					class="bg-white p-6 flex justify-center items-center rounded-xl shadow-xl transition-[height] duration-300" 
 					x-ref="scriptureCard"
 					x-init={`
 						document.body.classList.add('transition');
@@ -49,8 +49,8 @@ export const prerender = true;
 
 						// Setting the height and width of the element allow for it
 						// to animate properly using CSS transitions.
-						$el.classList.add("h-\[" + height + "px\]");
-						$el.classList.add("w-\[" + width + "px\]");
+						$el.style.height = height + 'px';
+						$el.style.width = width + 'px';
 					`.trim()}
 					x-data={`{ 
 						isFullscreen: false,
@@ -62,6 +62,7 @@ export const prerender = true;
 							this.toggleAllowDocumentScroll();
 							setTimeout(() => {
 								$el.classList.add('!h-screen');
+								$el.classList.add('!w-screen');
 								window.scrollTo({
 									top: 0,
 									behavior: "smooth",
@@ -73,13 +74,14 @@ export const prerender = true;
 							this.toggleAllowDocumentScroll();
 							setTimeout(() => {
 								$el.classList.remove('!h-screen');
+								$el.classList.remove('!w-screen');
 								this.isFullscreen = false;
 							}, 300)
 						}
 					}`}
-					x-bind:class="{ 'absolute top-0 left-0 bottom-0 right-0 z-10 h-screen w-screen': isFullscreen }"
+					x-bind:class="{ 'absolute top-0 left-0 bottom-0 right-0 z-10': isFullscreen }"
 				>
-					<div class="max-w-[552px] w-full">
+					<div class="max-w-[calc(600px-24px*2)] w-full">
 						<div class="w-full flex justify-between gap-6 flex-grow-1">
 							<h1 x-text="scriptureRef" class="text-xl font-medium mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700">
 								{scriptureRef}
