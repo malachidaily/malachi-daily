@@ -46,19 +46,23 @@ export const prerender = true;
 						timeItTakesToReadVerse: 5000,
 						handleShowFullscreen() {
 							document.body.classList.add('overflow-hidden');
-							document.body.classList.add('blur');
+							document.body.classList.add('blur-md');
 							setTimeout(() => {
 								this.isFullscreen = true;
-								document.body.classList.remove('blur');
 							}, 300)
+							setTimeout(() => {
+								document.body.classList.remove('blur-md');
+							}, 450)
 						},
 						handleHideFullscreen() {
 							document.body.classList.remove('overflow-hidden');
-							document.body.classList.add('blur');
+							document.body.classList.add('blur-md');
 							setTimeout(() => {
 								this.isFullscreen = false;
-								document.body.classList.remove('blur');
 							}, 300)
+							setTimeout(() => {
+								document.body.classList.remove('blur-md');
+							}, 450)
 						}
 					}`}
 					x-bind:class="{ 'absolute top-0 left-0 z-10 h-screen w-screen': isFullscreen }"
