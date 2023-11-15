@@ -38,34 +38,46 @@ export const prerender = true;
 				class="rounded-md text-start"
 			>
 				<div 
-					class="bg-white p-6 rounded-xl shadow-xl flex flex-col items-center justify-center" 
+					class="bg-white p-6 flex justify-center items-center rounded-xl shadow-xl transition-all duration-300" 
 					x-ref="scriptureCard"
-					x-init="document.body.classList.add('transition')"
+					x-init={`
+						document.body.classList.add('transition');
+
+						// Get height of element
+						const height = $el.offsetHeight;
+						const width = $el.offsetWidth;
+
+						// Setting the height and width of the element allow for it
+						// to animate properly using CSS transitions.
+						$el.classList.add("h-[" + height + "px]");
+						$el.classList.add("w-[" + width + "px]");
+					`.trim()}
 					x-data={`{ 
 						isFullscreen: false,
 						timeItTakesToReadVerse: 5000,
+						toggleAllowDocumentScroll() {
+							document.body.classList.toggle('overflow-hidden');
+						},
 						handleShowFullscreen() {
-							document.body.classList.add('overflow-hidden');
-							document.body.classList.add('blur-md');
+							this.toggleAllowDocumentScroll();
 							setTimeout(() => {
+								$el.classList.add('!h-screen');
+								window.scrollTo({
+									top: 0,
+									behavior: "smooth",
+								})
 								this.isFullscreen = true;
 							}, 300)
-							setTimeout(() => {
-								document.body.classList.remove('blur-md');
-							}, 450)
 						},
 						handleHideFullscreen() {
-							document.body.classList.remove('overflow-hidden');
-							document.body.classList.add('blur-md');
+							this.toggleAllowDocumentScroll();
 							setTimeout(() => {
+								$el.classList.remove('!h-screen');
 								this.isFullscreen = false;
 							}, 300)
-							setTimeout(() => {
-								document.body.classList.remove('blur-md');
-							}, 450)
 						}
 					}`}
-					x-bind:class="{ 'absolute top-0 left-0 z-10 h-screen w-screen': isFullscreen }"
+					x-bind:class="{ 'absolute top-0 left-0 bottom-0 right-0 z-10': isFullscreen }"
 				>
 					<div class="max-w-[552px] w-full">
 						<div class="w-full flex justify-between gap-6 flex-grow-1">
