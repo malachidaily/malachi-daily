@@ -43,14 +43,13 @@ export const prerender = true;
 					x-init={`
 						document.body.classList.add('transition');
 
-						// Get height of element
-						const height = $el.offsetHeight;
-						const width = $el.offsetWidth;
+						// I have to manually listen to resizes so that I can get and set 
+						// the scripture card's dimensions for animation's sake.
+						window.addEventListener('resize', () => {
+							getAndSetCardWidth($el)
+						}, { passive: true });
 
-						// Setting the height and width of the element allow for it
-						// to animate properly using CSS transitions.
-						$el.style.height = height + 'px';
-						$el.style.width = width + 'px';
+						getAndSetCardWidth($el);
 
 						// When the showSerifFont state changes, update the localStorage
 						$watch('showSerifFont', () => {
@@ -62,6 +61,19 @@ export const prerender = true;
 						timeItTakesToReadVerse: 5000,
 						toggleAllowDocumentScroll() {
 							document.body.classList.toggle('overflow-hidden');
+						},
+						getAndSetCardWidth(cardElement) {
+							cardElement.style.height = '';
+							cardElement.style.width = '';
+
+							// Get height of element
+							const height = cardElement.offsetHeight;
+							const width = cardElement.offsetWidth;
+
+							// Setting the height and width of the element allow for it
+							// to animate properly using CSS transitions.
+							cardElement.style.height = height + 'px';
+							cardElement.style.width = width + 'px';
 						},
 						handleShowFullscreen() {
 							this.toggleAllowDocumentScroll();
