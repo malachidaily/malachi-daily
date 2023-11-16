@@ -349,7 +349,11 @@ export const prerender = true;
 						this.firebaseCMToken = currentToken
 						this.notificationInfo = "Notification permissions granted."
 					} catch (error: Error | any) {
-						this.notificationAlert = error?.message || 'An error occurred. Please close the app and try again.' 
+						if (error?.message.includes("Can't find variable: Notification")) {
+							this.notificationInfo = "Install this web app to allow notifications. Tap share and click 'Add to Home Screen'"
+						} else {
+							this.notificationAlert = error?.message || 'An error occurred. Please close the app and try again.' 
+						}
 					}
 				},
 				get scriptureWithUnderscores() {
