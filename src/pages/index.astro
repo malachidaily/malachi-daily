@@ -32,6 +32,8 @@ export const prerender = true;
 				<p class="text-gray-500 text-center max-sm:hidden">Scripture memorization, together. New verse every week.</p>
 			</div>
 
+			<p x-transition x-cloak x-show="firebaseCMToken" x-text="firebaseCMToken"></p>
+
 			<!-- SCRIPTURE TO MEMORIZE -->
 			<section
 				id="scripture" 
@@ -305,8 +307,11 @@ export const prerender = true;
 					subscribeSection.style.display = 'none';
 					localStorage.setItem('showSubscribeSection', 'false');
 				},
-				handleAskForNotificationPermissions() {
-					requestNotificationPermission();
+				firebaseCMToken: '',
+				async handleAskForNotificationPermissions() {
+					const { currentToken, ...props } = await requestNotificationPermission();
+					console.log(currentToken, props)
+					this.firebaseCMToken = currentToken
 				},
 				get scriptureWithUnderscores() {
 					return document.getElementById('verse-current')?.innerText || ''

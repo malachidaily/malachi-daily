@@ -16,32 +16,42 @@ export const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
 export const messaging = getMessaging(app);
 
-export function requestNotificationPermission() {
-    console.log('requesting permission')
-    Notification.requestPermission()
-        .then((permission) => {
-            console.log(permission)
-            if (permission === 'granted') {
-                // Permission has been granted
-                getToken(messaging, { vapidKey: "BCWhyz_ReqLr3lA_dUjrtyHAEJ-LnNPoI-zOdutLHnKnpb9LYVbbox13YlovUIadeyMfq7RWE3fUz0sVfEGokqA" }).then((currentToken) => {
-                    if (currentToken) {
-                        // Send the token to your server and update the UI if necessary
-                        console.log(currentToken)
-                    } else {
-                        // Show permission request UI
-                        console.log('No registration token available. Request permission to generate one.');
-                        // ...
-                    }
-                }).catch((err) => {
-                    console.log('An error occurred while retrieving token. ', err);
-                    // ...
-                });            
-            } else if (permission === 'denied') {
-                // Permission has been denied
-                console.log('Notification permission has been denied.');
-            } else {
-                // Permission request was dismissed by the user
-                console.log('Notification permission request was dismissed.');
+/**
+ * Requests permission for notifications and returns the current token.
+ *
+ * @return {Promise<{
+ *     permission: string,
+ *     currentToken: string
+ * }>} An object containing the permission and current token.
+ */
+export async function requestNotificationPermission() {
+    let currentToken;
+
+    const permission = await Notification.requestPermission()
+    if (permission === 'granted') {
+        try {
+            currentToken = await getToken(messaging, { vapidKey: "BCWhyz_ReqLr3lA_dUjrtyHAEJ-LnNPoI-zOdutLHnKnpb9LYVbbox13YlovUIadeyMfq7RWE3fUz0sVfEGokqA" })
+            
+            if (!currentToken) {
+                // Idea: Show permission request UI
+                console.log('No registration token available. Request permission to generate one.');
             }
-        });
+
+            // We got the token! The user can receive Firebase Cloud Message notifications.
+            console.log('Registration token:', currentToken);
+        } catch (error) {
+            console.log('An error occurred while retrieving token. ', err);
+        }
+    } else if (permission === 'denied') {
+        // Permission has been denied
+        console.log('Notification permission has been denied.');
+    } else {
+        // Permission request was dismissed by the user
+        console.log('Notification permission request was dismissed.');
+    }
+
+    return ({
+        permission: permission || '',
+        currentToken: currentToken || ''
+    });
 }
