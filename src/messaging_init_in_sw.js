@@ -23,33 +23,13 @@ export const messagingFromSW = getMessagingFromSW(app);
 /**
  * Requests permission for notifications and returns the current token.
  *
- * @return {Promise<{
- *     permission: string,
- *     currentToken: string
- * }>} An object containing the permission and current token.
+ * @return {Promise<void>}
  */
 export async function requestNotificationPermission() {
-    let currentToken;
-
     const permission = await Notification.requestPermission()
     if (permission === 'granted') {
-        try {
-            currentToken = await getToken(messaging, { vapidKey: "BCWhyz_ReqLr3lA_dUjrtyHAEJ-LnNPoI-zOdutLHnKnpb9LYVbbox13YlovUIadeyMfq7RWE3fUz0sVfEGokqA" })
-            
-            if (!currentToken) {
-                // Idea: Show permission request UI
-                console.log('No registration token available. Request permission to generate one.');
-            }
-
-            // We got the token! The user can receive Firebase Cloud Message notifications.
-            console.log('Registration token:', currentToken);
-        } catch (error) {
-            let errorMessage = 'An error occurred while retrieving token.';
-            if (error?.message) {
-                errorMessage += ' (' + error.message; ')'
-            }
-            throw new Error(errorMessage);
-        }
+        // User can receive messages
+        console.log('Notification permissions granted!')
     } else if (permission === 'denied') {
         // Permission has been denied
         console.log('Notification permission has been denied.');
@@ -57,10 +37,6 @@ export async function requestNotificationPermission() {
     } else {
         // Permission request was dismissed by the user
         console.log('Notification permission request was dismissed.');
+        throw new Error('Notifications must be allowed to get notification updates. Please try again.');
     }
-
-    return ({
-        permission: permission || '',
-        currentToken: currentToken || ''
-    });
 }

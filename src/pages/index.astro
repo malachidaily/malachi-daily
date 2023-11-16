@@ -32,8 +32,6 @@ export const prerender = true;
 				<p class="text-gray-500 text-center max-sm:hidden">Scripture memorization, together. New verse every week.</p>
 			</div>
 
-			<p x-transition x-cloak x-show="firebaseCMToken" x-text="firebaseCMToken"></p>
-
 			<!-- SCRIPTURE TO MEMORIZE -->
 			<section
 				id="scripture" 
@@ -325,11 +323,9 @@ export const prerender = true;
 					subscribeSection.style.display = 'none';
 					localStorage.setItem('showSubscribeSection', 'false');
 				},
-				firebaseCMToken: '',
 				async handleAskForNotificationPermissions() {
 					try {
-						const { currentToken } = await requestNotificationPermission();
-						this.firebaseCMToken = currentToken
+						await requestNotificationPermission();
 						this.notificationInfo = "Notification permissions granted."
 					} catch (error: Error | any) {
 						this.notificationAlert = error?.message || 'An error occurred. Please close the app and try again.' 
