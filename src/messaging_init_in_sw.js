@@ -40,11 +40,12 @@ export async function requestNotificationPermission() {
             // We got the token! The user can receive Firebase Cloud Message notifications.
             console.log('Registration token:', currentToken);
         } catch (error) {
-            console.log('An error occurred while retrieving token. ', err);
+            throw new Error('An error occurred while retrieving token.');
         }
     } else if (permission === 'denied') {
         // Permission has been denied
         console.log('Notification permission has been denied.');
+        throw new Error('Notification permission has been denied.');
     } else {
         // Permission request was dismissed by the user
         console.log('Notification permission request was dismissed.');

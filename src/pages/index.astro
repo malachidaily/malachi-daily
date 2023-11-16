@@ -209,6 +209,18 @@ export const prerender = true;
 				</div>				  
 			</section>
 
+			<!-- Notification Alert -->
+			<div x-cloak x-transition x-show="notificationAlert" class="alert alert-warning fixed z-10 bottom-4 right-4 shadow-xl w-fit max-w-[400px]">
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+				<span x-text="notificationAlert"></span>
+			</div>
+
+			<!-- Notification Info -->
+			<div x-cloak x-transition x-show="notificationInfo" class="alert alert-info fixed z-10 bottom-4 right-4 shadow-xl w-fit max-w-[400px]">
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+				<span x-text="notificationInfo"></span>
+			</div>
+
 			<!-- Listen to this as a song -->
 			<iframe 
 				style="border-radius:12px" 
@@ -282,6 +294,8 @@ export const prerender = true;
 		document.addEventListener('alpine:init', () => {
 			const Alpine = window['Alpine'] || {}
 			Alpine.data('malachi', () => ({
+				notificationAlert: '',
+				notificationInfo: '',
 				scriptureTextOriginal: '',
 				scriptureRef: '',
 				showSerifFont: getShowSerifFont(),
@@ -309,9 +323,13 @@ export const prerender = true;
 				},
 				firebaseCMToken: '',
 				async handleAskForNotificationPermissions() {
-					const { currentToken, ...props } = await requestNotificationPermission();
-					console.log(currentToken, props)
-					this.firebaseCMToken = currentToken
+					try {
+						const { currentToken, ...props } = await requestNotificationPermission();
+						this.firebaseCMToken = currentToken
+						this.notificationInfo = "Notification permissions granted."
+					} catch (error: Error | any) {
+						this.notificationAlert = error?.message || 'An error occurred. Please close the app and try again.' 
+					}
 				},
 				get scriptureWithUnderscores() {
 					return document.getElementById('verse-current')?.innerText || ''
