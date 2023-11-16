@@ -29,7 +29,7 @@ export async function requestNotificationPermission() {
         console.log('Notification permissions granted!')
 
         // Now, tell Firebase that we want to get notification updates.
-        currentToken = await getToken({
+        currentToken = await getToken(messaging, {
             vapidKey: "BCWhyz_ReqLr3lA_dUjrtyHAEJ-LnNPoI-zOdutLHnKnpb9LYVbbox13YlovUIadeyMfq7RWE3fUz0sVfEGokqA",
         });
     } else if (permission === 'denied') {
