@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getMessaging, getToken } from "firebase/messaging";
+import { getMessaging as getMessagingFromSW } from "firebase/messaging/sw";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAB5bk5DBxwgUibsYBYz2_NGk0OaBFhP_4",
@@ -15,6 +16,9 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
 export const messaging = getMessaging(app);
+// Retrieve an instance of Firebase Messaging so that it can handle background
+// messages.
+export const messagingFromSW = getMessagingFromSW(app);
 
 /**
  * Requests permission for notifications and returns the current token.

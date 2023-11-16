@@ -45,10 +45,10 @@ const { title } = Astro.props;
 			}
 		</style>
 		<script>
-			import '../messaging_init_in_sw.js'
-			
 			if ('serviceWorker' in navigator) {
-				navigator.serviceWorker.register('/service-worker.js')
+				navigator
+					.serviceWorker
+					.register('/service-worker.js')
 			}
 		</script>
 	</head>
