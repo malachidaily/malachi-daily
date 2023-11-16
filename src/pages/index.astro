@@ -303,6 +303,15 @@ export const prerender = true;
 			}
 		}
 
+		const getIsSubscribedToNotifications = () => {
+			const isSubscribedToNotifications = localStorage.getItem('isSubscribedToNotifications');
+			if (isSubscribedToNotifications === null) {
+				return false;
+			} else {
+				return JSON.parse(isSubscribedToNotifications);
+			}
+		}
+
 		document.addEventListener('alpine:init', () => {
 			const Alpine = window['Alpine'] || {}
 			Alpine.data('malachi', () => ({
@@ -344,11 +353,23 @@ export const prerender = true;
 					localStorage.setItem('showSubscribeSection', 'false');
 				},
 				firebaseCMToken: '',
+				isSubscribedToNotifications: getIsSubscribedToNotifications(),
 				async handleAskForNotificationPermissions() {
+					if (this.isSubscribedToNotifications) {
+						// Instead, show a test notification from the web push api
+						const notification = new Notification('Test Notification', {
+							body: this.scriptureWithUnderscores,
+							icon: '/logo.png',
+						});
+						return;
+					}
+
 					try {
 						const currentToken = await requestNotificationPermission();
 						this.firebaseCMToken = currentToken
 						this.notificationInfo = "Notification permissions granted."
+						this.isSubscribedToNotifications = true;
+						localStorage.setItem('isSubscribedToNotifications', 'true');
 					} catch (error: Error | any) {
 						if (error?.message.includes("Can't find variable: Notification")) {
 							this.notificationInfo = "Install this web app to allow notifications. Tap share and click 'Add to Home Screen'"
