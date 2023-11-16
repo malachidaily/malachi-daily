@@ -14,7 +14,7 @@
 // Names of the two caches used in this version of the service worker.
 // Change to v2, etc. when you update any of the local resources, which will
 // in turn trigger the install event again.
-const PRECACHE = 'precache-v2.2.1';
+const PRECACHE = 'precache-v2.2.2';
 const RUNTIME = 'runtime';
 
 // A list of local resources we always want to be cached.
@@ -82,19 +82,19 @@ self.addEventListener('fetch', event => {
   }
 });
 
-self.addEventListener('push', (event) => {
-  const options = {
-    body: event.data.text(),
-    icon: 'icon.png',
-    badge: 'badge.png'
-  };
+// self.addEventListener('push', (event) => {
+//   const options = {
+//     body: event.data.text(),
+//     icon: 'icon.png',
+//     badge: 'badge.png'
+//   };
 
-  event.waitUntil(
-    self.registration.showNotification('Push Notification', options)
-  );
-});
+//   event.waitUntil(
+//     self.registration.showNotification('Push Notification', options)
+//   );
+// });
 
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  // Add custom behavior when the notification is clicked
-});
+// self.addEventListener('notificationclick', (event) => {
+//   event.notification.close();
+//   // Add custom behavior when the notification is clicked
+// });
