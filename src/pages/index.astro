@@ -328,7 +328,7 @@ export const prerender = true;
 				firebaseCMToken: '',
 				async handleAskForNotificationPermissions() {
 					try {
-						const { currentToken, ...props } = await requestNotificationPermission();
+						const { currentToken } = await requestNotificationPermission();
 						this.firebaseCMToken = currentToken
 						this.notificationInfo = "Notification permissions granted."
 					} catch (error: Error | any) {
