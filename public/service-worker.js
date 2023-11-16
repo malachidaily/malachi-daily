@@ -82,19 +82,19 @@ self.addEventListener('fetch', event => {
   }
 });
 
-// self.addEventListener('push', (event) => {
-//   const options = {
-//     body: event.data.text(),
-//     icon: 'icon.png',
-//     badge: 'badge.png'
-//   };
+self.addEventListener('push', (event) => {
+  const options = {
+    body: event.data.text(),
+    icon: 'logo.png',
+    // badge: 'badge.png'
+  };
 
-//   event.waitUntil(
-//     self.registration.showNotification('Push Notification', options)
-//   );
-// });
+  event.waitUntil(
+    self.registration.showNotification('Push Notification', options)
+  );
+});
 
-// self.addEventListener('notificationclick', (event) => {
-//   event.notification.close();
-//   // Add custom behavior when the notification is clicked
-// });
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  // Idea: Add custom behavior when the notification is clicked
+});
