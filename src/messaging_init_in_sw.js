@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getMessaging, getToken } from "firebase/messaging";
-import { getMessaging as getMessagingFromSW } from "firebase/messaging/sw";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAB5bk5DBxwgUibsYBYz2_NGk0OaBFhP_4",
@@ -16,20 +15,23 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
 export const messaging = getMessaging(app);
-// Retrieve an instance of Firebase Messaging so that it can handle background
-// messages.
-export const messagingFromSW = getMessagingFromSW(app);
 
 /**
  * Requests permission for notifications and returns the current token.
  *
- * @return {Promise<void>}
+ * @return {Promise<string>}
  */
 export async function requestNotificationPermission() {
+    let currentToken = '';
     const permission = await Notification.requestPermission()
     if (permission === 'granted') {
         // User can receive messages
         console.log('Notification permissions granted!')
+
+        // Now, tell Firebase that we want to get notification updates.
+        currentToken = await getToken({
+            vapidKey: "BCWhyz_ReqLr3lA_dUjrtyHAEJ-LnNPoI-zOdutLHnKnpb9LYVbbox13YlovUIadeyMfq7RWE3fUz0sVfEGokqA",
+        });
     } else if (permission === 'denied') {
         // Permission has been denied
         console.log('Notification permission has been denied.');
@@ -39,4 +41,6 @@ export async function requestNotificationPermission() {
         console.log('Notification permission request was dismissed.');
         throw new Error('Notifications must be allowed to get notification updates. Please try again.');
     }
+
+    return currentToken
 }
