@@ -240,6 +240,7 @@ export const prerender = true;
 	</main>
 	<script>
 		import { type Alpine as AlpineType } from 'alpinejs'
+		import { requestNotificationPermission } from '../messaging_init_in_sw.js'
 
 		declare global {
 			var Alpine: AlpineType
@@ -305,27 +306,7 @@ export const prerender = true;
 					localStorage.setItem('showSubscribeSection', 'false');
 				},
 				handleAskForNotificationPermissions() {
-					// Check if the browser supports the Notification API
-					if ('Notification' in window) {
-						// Request permission for notifications
-						Notification.requestPermission().then((permission) => {
-							if (permission === 'granted') {
-								// Permission has been granted
-								showNotification(this.scriptureRef, this.scriptureWithUnderscores);
-							} else if (permission === 'denied') {
-								// Permission has been denied
-								console.log('Notification permission has been denied.');
-							} else {
-								// Permission request was dismissed by the user
-								console.log('Notification permission request was dismissed.');
-							}
-						});
-					}
-
-					function showNotification(title: string, body: string) {
-						// Create and show a notification
-						new Notification(title, { body });
-					}
+					requestNotificationPermission();
 				},
 				get scriptureWithUnderscores() {
 					return document.getElementById('verse-current')?.innerText || ''

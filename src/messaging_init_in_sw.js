@@ -16,7 +16,7 @@ export const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
 export const messaging = getMessaging(app);
 
-function requestNotificationPermission() {
+export function requestNotificationPermission() {
     console.log('requesting permission')
     Notification.requestPermission()
         .then((permission) => {
@@ -45,5 +45,3 @@ function requestNotificationPermission() {
             }
         });
 }
-
-requestNotificationPermission();
