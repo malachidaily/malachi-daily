@@ -25,7 +25,16 @@ export const prerender = true;
 						<h2 class="max-sm:text-xl text-3xl text-gray-800 font-bold whitespace-nowrap">Malachi Daily</h2>
 					</div>
 					<!-- Ask For Notification Permissions Button -->
-					<svg role="button" x-on:click="handleAskForNotificationPermissions" class="text-gray-600 flex-shrink-0" width="24" height="24" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+					<svg 
+						x-on:click="handleAskForNotificationPermissions" 
+						x-data="{ showAnimation: true }"
+						x-init="setTimeout(() => showAnimation = false, 2500)"
+						x-transition
+						x-cloak
+						x-bind:class="{ 'animate-bounce': showAnimation && !isSubscribedToNotifications }"
+						role="button" 
+						class="text-gray-600 flex-shrink-0" 
+						width="24" height="24" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
 						<path fill="currentColor" d="M225.29 165.93C216.61 151 212 129.57 212 104a84 84 0 0 0-168 0c0 25.58-4.59 47-13.27 61.93a20.08 20.08 0 0 0-.07 20.07A19.77 19.77 0 0 0 48 196h36.18a44 44 0 0 0 87.64 0H208a19.77 19.77 0 0 0 17.31-10a20.08 20.08 0 0 0-.02-20.07ZM128 212a20 20 0 0 1-19.6-16h39.2a20 20 0 0 1-19.6 16Zm-73.34-40C63.51 154 68 131.14 68 104a60 60 0 0 1 120 0c0 27.13 4.48 50 13.33 68Z"/>
 					</svg>
 				</div>
@@ -239,7 +248,7 @@ export const prerender = true;
 
 			<!-- Notification Alert -->
 			<div x-on:click="notificationAlert = ''" x-cloak x-transition x-show="notificationAlert" class="alert alert-warning fixed z-10 bottom-4 right-4 shadow-xl w-fit max-w-[400px]">
-				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6">
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
 				</svg>
 				<span x-text="notificationAlert"></span>
