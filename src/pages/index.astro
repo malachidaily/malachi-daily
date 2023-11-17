@@ -391,6 +391,8 @@ export const prerender = true;
 					if (iOSVersion < IOS_VERSION_WITH_NOTIFICATIONS) {
 						return false;
 					}
+
+					window.alert('Can get notifications!')
 					
 					return true;
 				},
