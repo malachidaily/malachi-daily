@@ -324,17 +324,12 @@ export const prerender = true;
 		const getiOSVersion = () => {
 			let iOSVersionNumber: number = 0;
 			const iOS = window.navigator.userAgent.toLowerCase().match(/(iphone|ipad|ipod)/);
-			const iOSVersion = window.navigator.userAgent.toLowerCase().match(/(iphone os|cpu os|ios)\s+(\d+)_*/);
+			const iOSVersionMatch = /CPU iPhone OS (\d+_\d+)/.exec(window.navigator.userAgent);
+			iOSVersionNumber = parseFloat(iOSVersionMatch?.[1]?.replace('_', '.') || '0.0');
 			
 			if (!iOS) {
 				// iOS is not detected. Must be using something else.
 				return iOSVersionNumber
-			}
-
-			if (iOSVersion !== null && iOSVersion?.[2]) {
-				iOSVersionNumber = parseFloat(iOSVersion[2]);
-			} else {
-				// No iOS version detected.
 			}
 
 			return iOSVersionNumber
