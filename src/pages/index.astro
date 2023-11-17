@@ -32,25 +32,35 @@ export const prerender = true;
 				<p class="text-gray-500 text-center max-sm:hidden">Scripture memorization, together. New verse every week.</p>
 			</div>
 
-			<!-- FIREBASE CLOUD MESSAGING TOKEN -->
-			<!-- <p 
-				x-transition
-				x-cloak
-				x-show="firebaseCMToken"
-				x-text="firebaseCMToken"
-				class="whitespace-wrap text-gray-500 text-start break-all"
-			></p> -->
+			<div x-show="showDebug" x-transition x-cloak>
+				<!-- FIREBASE CLOUD MESSAGING TOKEN -->
+				<p 
+					x-transition
+					x-cloak
+					x-show="firebaseCMToken"
+					x-text="firebaseCMToken"
+					class="whitespace-wrap text-gray-500 text-start break-all"
+				></p>
 
-			<p 
-				x-transition
-				x-cloak
-				x-show="iOSVersion"
-				x-text="iOSVersion"
-				class="whitespace-wrap text-gray-500 text-start break-all"
-			></p>
+				<!-- IOS VERSION -->
+				<p 
+					x-transition
+					x-cloak
+					x-show="iOSVersion"
+					x-text="iOSVersion"
+					class="whitespace-wrap text-gray-500 text-start break-all"
+				></p>
 
-			<p x-data="{ userAgent: '' }" x-init="userAgent = window.navigator.userAgent" x-text="userAgent" x-cloak x-transition>
-			</p>
+				<p 
+					x-data="{ userAgent: '' }" 
+					x-init="userAgent = window.navigator.userAgent" 
+					x-text="userAgent" 
+					x-cloak 
+					x-show="userAgent"
+					x-transition
+				>
+				</p>
+			</div>
 
 			<!-- SCRIPTURE TO MEMORIZE -->
 			<section
@@ -379,6 +389,16 @@ export const prerender = true;
 						this.notificationInfo = payload?.data?.message || '';
 					});
 				},
+				showDebug: (() => {
+					// Get url param debug = true
+					const url = new URL(window.location.href);
+					const urlParams = url.searchParams
+					const debug = urlParams.get('debug');
+					if (debug === 'true') {
+						return true
+					}
+					return false
+				})(),
 				notificationAlert: '',
 				notificationInfo: '',
 				scriptureTextOriginal: '',
