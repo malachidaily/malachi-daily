@@ -49,6 +49,9 @@ export const prerender = true;
 				class="whitespace-wrap text-gray-500 text-start break-all"
 			></p>
 
+			<p x-data="{ userAgent: '' }" x-init="userAgent = window.navigator.userAgent" x-text="userAgent" x-cloak x-transition>
+			</p>
+
 			<!-- SCRIPTURE TO MEMORIZE -->
 			<section
 				id="scripture" 
