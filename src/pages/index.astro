@@ -3,9 +3,10 @@ import { Image } from 'astro:assets';
 
 import Layout from '../layouts/Layout.astro';
 import logoImgUrl from '../../public/logo.png';
+import { SCRIPTURE_TEXT , SCRIPTURE_REF } from '../utils/constants';
 
-const scriptureText = 'But Jesus told him, “No! The Scriptures say, ‘People do not live by bread alone, but by every word that comes from the mouth of God.’”';
-const scriptureRef = 'Matthew 4:4 NLT';
+const scriptureText = SCRIPTURE_TEXT;
+const scriptureRef = SCRIPTURE_REF;
 
 export const prerender = true;
 ---
