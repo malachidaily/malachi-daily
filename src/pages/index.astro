@@ -495,7 +495,11 @@ export const prerender = true;
 									this.notificationInfo = "Notifications are not supported on this device."
 								}
 							} else {
-								this.notificationAlert = error?.message || 'An error occurred. Please close the app and try again.' 
+								if (isUserAgentOniOS()) {
+									this.notificationInfo = "Please update to the latest iOS version to get notifications."
+								}  else {
+									this.notificationAlert = error?.message || 'An error occurred. Please close the app and try again.' 
+								}
 							}
 						}
 					}
