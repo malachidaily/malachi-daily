@@ -4,8 +4,8 @@ import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import logoImgUrl from '../../public/logo.png';
 
-const scriptureText = 'The LORD is my shepherd; I shall not want. He makes me lie down in green pastures. He leads me beside still waters.';
-const scriptureRef = 'Psalms 23:1-2 ESV';
+const scriptureText = 'But Jesus told him, “No! The Scriptures say, ‘People do not live by bread alone, but by every word that comes from the mouth of God.’”';
+const scriptureRef = 'Matthew 4:4 NLT';
 
 export const prerender = true;
 ---
@@ -502,15 +502,14 @@ export const prerender = true;
 					const words = this.scriptureTextOriginal.split(' ');
 
 					function convertWordToUnderscores(word: string, showFirstCharacter: boolean = false): string {
-						const wordToBeReplaced = word.match(/([A-Za-z]+)/ig)?.[0] || ''
+						const wordToBeReplaced = word.match(/([A-Za-z]+)/ig)?.[0] || ''						
+						
 						let underscores = "_".repeat(wordToBeReplaced.length)
 						if (showFirstCharacter) {
 							underscores = "_".repeat(wordToBeReplaced.length - 1) 
 						} else if (wordToBeReplaced.length === 1) {
 							underscores = "_"
 						}
-						const commaOrPeriod = word.replace(wordToBeReplaced, '')
-						const firstCharacter = word[0] || ''
 
 						const makeUnderscoresVisible = () => {
 							return `
@@ -532,9 +531,13 @@ export const prerender = true;
 							`.trim()
 						}
 
+						const bookendsOfTheWord = word.replace(wordToBeReplaced, '{INSERT_UNDERSCORES}')
+						const firstCharacter = showFirstCharacter ? (wordToBeReplaced[0] || '') : ''
+						const replacedWord = bookendsOfTheWord.replace('{INSERT_UNDERSCORES}', firstCharacter + makeUnderscoresVisible())
+
 						return `
-							<span class="text-[inherit] cursor-default align-bottom overflow-hidden inline-block whitespace-nowrap rounded-md focus:outline-2 focus:outline-blue-400">
-								${showFirstCharacter ? firstCharacter : ''}${makeUnderscoresVisible()}${commaOrPeriod || ''}
+							<span class="text-[inherit] cursor-default align-bottom inline-block whitespace-nowrap rounded-md focus:outline-2 focus:outline-blue-400">
+								${replacedWord}
 							</span>
 						`.trim();
 					}
