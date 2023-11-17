@@ -41,6 +41,14 @@ export const prerender = true;
 				class="whitespace-wrap text-gray-500 text-start break-all"
 			></p> -->
 
+			<p 
+				x-transition
+				x-cloak
+				x-show="iOSVersion"
+				x-text="iOSVersion"
+				class="whitespace-wrap text-gray-500 text-start break-all"
+			></p>
+
 			<!-- SCRIPTURE TO MEMORIZE -->
 			<section
 				id="scripture" 
@@ -303,13 +311,30 @@ export const prerender = true;
 			}
 		}
 
-		const getIsSubscribedToNotifications = () => {
-			const isSubscribedToNotifications = localStorage.getItem('isSubscribedToNotifications');
-			if (isSubscribedToNotifications === null) {
-				return false;
-			} else {
-				return JSON.parse(isSubscribedToNotifications);
+		const isUserAgentOniOS = (): boolean => {
+			const iOS = window.navigator.userAgent.toLowerCase().match(/(iphone|ipad|ipod)/);
+			console.log(iOS)
+			// return boolean
+			return iOS ? true : false
+		}
+
+		const getiOSVersion = () => {
+			let iOSVersionNumber: number = 0;
+			const iOS = window.navigator.userAgent.toLowerCase().match(/(iphone|ipad|ipod)/);
+			const iOSVersion = window.navigator.userAgent.toLowerCase().match(/(iphone os|cpu os|ios)\s+(\d+)_*/);
+			
+			if (!iOS) {
+				// iOS is not detected. Must be using something else.
+				return iOSVersionNumber
 			}
+
+			if (iOSVersion !== null && iOSVersion?.[2]) {
+				iOSVersionNumber = parseFloat(iOSVersion[2]);
+			} else {
+				// No iOS version detected.
+			}
+
+			return iOSVersionNumber
 		}
 
 		document.addEventListener('alpine:init', () => {
@@ -330,6 +355,20 @@ export const prerender = true;
 				scriptureTextOriginal: '',
 				scriptureRef: '',
 				showSerifFont: getShowSerifFont(),
+				get isEligibleForNotificationPermission() {
+					const IOS_VERSION_WITH_NOTIFICATIONS = 16.4;
+					const iOSVersion = getiOSVersion();
+					
+					if (!iOSVersion) {
+						return true;
+					}
+
+					if (iOSVersion < IOS_VERSION_WITH_NOTIFICATIONS) {
+						return false;
+					}
+					
+					return true;
+				},
 				// TODO fix this and make it show fidelity per day of week
 				get fidelityOfTheDay() {
 					// Get day of the week as a number from 0 to 6
@@ -353,28 +392,50 @@ export const prerender = true;
 					localStorage.setItem('showSubscribeSection', 'false');
 				},
 				firebaseCMToken: '',
-				isSubscribedToNotifications: getIsSubscribedToNotifications(),
+				get isSubscribedToNotifications() {
+					return Boolean(('Notification' in window && Notification?.permission === 'granted') || false)
+				},
 				async handleAskForNotificationPermissions() {
 					if (this.isSubscribedToNotifications) {
 						// Instead, show a test notification from the web push api
-						const notification = new Notification('Test Notification', {
-							body: this.scriptureWithUnderscores,
+						const notification = new Notification('This is a Test Notification', {
+							body: `
+								${this.scriptureWithUnderscores}
+								— ${this.scriptureRef}
+							`.trim(),
 							icon: '/logo.png',
 						});
 						return;
 					}
 
-					try {
-						const currentToken = await requestNotificationPermission();
-						this.firebaseCMToken = currentToken
-						this.notificationInfo = "Notification permissions granted."
-						this.isSubscribedToNotifications = true;
-						localStorage.setItem('isSubscribedToNotifications', 'true');
-					} catch (error: Error | any) {
-						if (error?.message.includes("Can't find variable: Notification")) {
-							this.notificationInfo = "Install this web app to allow notifications. Tap share and click 'Add to Home Screen'"
-						} else {
-							this.notificationAlert = error?.message || 'An error occurred. Please close the app and try again.' 
+					if (this.isEligibleForNotificationPermission) {
+						// Check if the browser supports notifications
+						if (!('Notification' in window)) {
+							this.notificationInfo = "Install this web app to allow notifications. Tap share and click 'Add to Home Screen'";
+							return;
+						}
+
+						// Check if notification permissions have already been granted
+						if (Notification.permission === 'granted') {
+							return;
+						}
+
+						// Request notification permissions
+						try {
+							const currentToken = await requestNotificationPermission();
+							this.firebaseCMToken = currentToken
+							this.notificationInfo = "Notification permissions granted."
+						} catch (error: Error | any) {
+							if (error?.message.includes("Can't find variable: Notification")) {
+								const isUserOniOS = isUserAgentOniOS()
+								if (isUserOniOS) {
+									this.notificationInfo = "Install this web app to allow notifications. Tap share and click 'Add to Home Screen'"
+								} else {
+									this.notificationInfo = "Notifications are not supported on this device."
+								}
+							} else {
+								this.notificationAlert = error?.message || 'An error occurred. Please close the app and try again.' 
+							}
 						}
 					}
 				},
