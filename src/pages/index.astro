@@ -263,7 +263,7 @@ export const prerender = true;
 			</div>
 
 			<!-- Listen to this as a song -->
-			<iframe 
+			<!-- <iframe 
 				style="border-radius:12px" 
 				src="https://open.spotify.com/embed/track/133ihRulr32OF5ydWZP61g?utm_source=generator&theme=0" 
 				width="100%" 
@@ -272,7 +272,7 @@ export const prerender = true;
 				allowfullscreen="" 
 				allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
 				loading="lazy"
-			></iframe>
+			></iframe> -->
 
 			<!-- Subscribe -->
 			<div class="relative w-full" x-ref="subscribeSection" x-cloak x-show="showSubscribeSection">
@@ -291,39 +291,38 @@ export const prerender = true;
 					<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m7 7l10 10M7 17L17 7"/>
 				</svg>
 			</div>
-
-			<div class="w-full flex justify-center gap-4 flex-wrap">
-				<a 
-					class="link text-gray-500 whitespace-nowrap"
-					x-data={`{
-						createEmailLink() {
-							// Set up the email link for getting help
-							const helpEmailLink = new URL('mailto:cameronandrewpak+malachidaily@gmail.com');
-							helpEmailLink.searchParams.set('cc', 'hello@malachidaily.com');
-							helpEmailLink.searchParams.set('subject', encodeURIComponent('Malachi Daily Help Request'));
-							let emailBody = '';
-							emailBody += 'I want help with the following:\\n\\n';
-							emailBody += '{Write about what you need help with here}\\n\\n';
-							emailBody += '—Below is some necessary data to help debug any issues:—'
-							emailBody += '\\n• Scripture Ref: ' + scriptureRef;
-							emailBody += '\\n• Scripture: ' + scriptureTextOriginal;
-							emailBody += '\\n• User Agent: ' + window.navigator.userAgent;
-							helpEmailLink.searchParams.set('body', encodeURIComponent(emailBody));
-							return decodeURIComponent(helpEmailLink.href)
-						},
-						emailLink: ''
-					}`}
-					x-init="emailLink = createEmailLink()"
-					x-bind:href="emailLink"
-					target="_blank"
-				>
-					Need help?
-				</a>
-				<a class="link text-gray-500 whitespace-nowrap" href="mailto:hello@malachidaily.com" target="_blank">Contact Us</a>
-				<a class="link text-gray-500 whitespace-nowrap" href="https://malachidaily.com" target="_blank">Visit Main Website</a>
-			</div>
 		</div>
 	</main>
+	<div class="w-full flex justify-center gap-4 flex-wrap py-2 text-gray-400">
+		<a 
+			class="link whitespace-nowrap"
+			x-data={`{
+				createEmailLink() {
+					// Set up the email link for getting help
+					const helpEmailLink = new URL('mailto:cameronandrewpak+malachidaily@gmail.com');
+					helpEmailLink.searchParams.set('cc', 'hello@malachidaily.com');
+					helpEmailLink.searchParams.set('subject', encodeURIComponent('Malachi Daily Help Request'));
+					let emailBody = '';
+					emailBody += 'I want help with the following:\\n\\n';
+					emailBody += '{Write about what you need help with here}\\n\\n';
+					emailBody += '—Below is some necessary data to help debug any issues:—'
+					emailBody += '\\n• Scripture Ref: ' + scriptureRef;
+					emailBody += '\\n• Scripture: ' + scriptureTextOriginal;
+					emailBody += '\\n• User Agent: ' + window.navigator.userAgent;
+					helpEmailLink.searchParams.set('body', encodeURIComponent(emailBody));
+					return decodeURIComponent(helpEmailLink.href)
+				},
+				emailLink: ''
+			}`}
+			x-init="emailLink = createEmailLink()"
+			x-bind:href="emailLink"
+			target="_blank"
+		>
+			Need help?
+		</a>
+		<a class="link whitespace-nowrap" href="mailto:hello@malachidaily.com" target="_blank">Contact Us</a>
+		<a class="link whitespace-nowrap" href="https://malachidaily.com" target="_blank">Visit Main Website</a>
+	</div>
 	<script>
 		import { type Alpine as AlpineType } from 'alpinejs'
 		import { onMessage } from "firebase/messaging";
