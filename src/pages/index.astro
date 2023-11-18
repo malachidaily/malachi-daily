@@ -6,10 +6,10 @@ import logoImgUrl from '../../public/logo.png';
 import { SCRIPTURE_TEXT , SCRIPTURE_REF } from '../utils/constants';
 import NativeFeelingDrawer from '../components/react/NativeFeelingDrawer';
 import { getVerse, type Verse } from '../api/bible'
-import { books } from '../api/bible/static/books';
+import { books, type bibleVersion } from '../api/bible/static/books';
 
-const translation = 'ESV'
-const chapterName = 'Genesis';
+const translation: bibleVersion = 'NIV'
+const chapterName =  books.John.name;
 const bookId = books[chapterName].bookid;
 const chapter = 1;
 const verseNum = 1;
@@ -26,6 +26,7 @@ try {
 	});
 } catch (error) {
 	// User backup verse, instead
+	console.log(error)
 }
 
 const scriptureText = verse?.text || SCRIPTURE_TEXT;

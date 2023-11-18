@@ -2,6 +2,20 @@
 const bibleApiOrigin = 'https://bolls.life'
 const cache: { [key: string]: Verse } = {}
 
+async function fetchAndCache(url: string, options?: RequestInit): Promise<Verse> {
+    const cachedResponse: Verse = cache[url]
+
+    if (cachedResponse) {
+        console.log('loaded from cache', cachedResponse)
+        return cachedResponse;
+    } else {
+        const response = await fetch(url);
+        const data = await response.json()
+        cache[url] = data
+        return data;
+    }
+}
+
 type GetVerses = {
     bookId: number;
     chapter: number;
@@ -30,7 +44,7 @@ export async function getBibleVersesFromMultipleTranslations({
     verses,
     translations = ['NIV', 'ESV', 'NLT', 'MSG', 'KJV']
 } : GetVerses) {
-    const response = await fetch(`${bibleApiOrigin}/get-paralel-verses/`, {
+    const data = await fetchAndCache(`${bibleApiOrigin}/get-paralel-verses/`, {
         method: "POST",
         cache: 'default',
         headers: {
@@ -43,8 +57,6 @@ export async function getBibleVersesFromMultipleTranslations({
             chapter
         }),
     })
-    
-    const data = await response.json()
 
     return data
 }
@@ -56,17 +68,14 @@ export async function getVerse({
     chapter,
     verse
 } : GetVerse): Promise<Verse> {
-    // Return cache if it exists
-    if (cache[`${translation}/${bookId}/${chapter}/${verse}`]) {
-        console.log('retrieved Verse from cache')
-        return cache[`${translation}/${bookId}/${chapter}/${verse}`]
+    const data = await fetchAndCache(`${bibleApiOrigin}/get-verse/${translation}/${bookId}/${chapter}/${verse}/`)
+
+    // Remove the title from the scripture.
+    // (Usually this happens for the first verse in teh chapter)
+    if (data.text.includes('<br/>')) {
+        // Remove br and everything before
+        data.text = data.text.split('<br/>')[1]
     }
-
-    const response = await fetch(`${bibleApiOrigin}/get-verse/${translation}/${bookId}/${chapter}/${verse}/`)
-    const data = await response.json()
-
-    // Add to cache
-    cache[`${translation}/${bookId}/${chapter}/${verse}`] = data
 
     return data
 }
