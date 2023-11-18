@@ -12,318 +12,322 @@ export const prerender = true;
 ---
 
 <Layout title="Malachi Daily | Simple Scripture Memorization, Together">
-	<main x-data="malachi" class="w-screen h-full min-h-screen px-6 flex justify-center bg-gray-100">
-		<div class="max-w-[600px] w-full flex flex-col py-12 max-sm:py-6 gap-12 max-sm:gap-6">
-			<!-- LOGO -->
-			<div class="w-full flex flex-col gap-2 items-start justify-start">
-				<div class="w-full flex gap-2 items-center">
-					<div class="flex gap-2 items-center justify-start">
-						<Image
-							src={logoImgUrl}
-							alt="Malachi Daily Logo | shows hands praying" 
-							class={`aspect-[${logoImgUrl.height}/${logoImgUrl.width}] h-[32px] w-fit`}
-						/>
-						<h2 class="max-sm:text-xl text-3xl text-gray-800 font-bold whitespace-nowrap">Malachi Daily</h2>
+	<div x-data="malachi">
+		<main class="w-screen h-full min-h-screen px-6 flex justify-center bg-gray-100">
+			<div class="max-w-[600px] w-full flex flex-col py-12 max-sm:py-6 gap-12 max-sm:gap-6">
+				<!-- LOGO -->
+				<div class="w-full flex flex-col gap-2 items-start justify-start">
+					<div class="w-full flex gap-2 items-center">
+						<div class="flex gap-2 items-center justify-start">
+							<Image
+								src={logoImgUrl}
+								alt="Malachi Daily Logo | shows hands praying" 
+								class={`aspect-[${logoImgUrl.height}/${logoImgUrl.width}] h-[32px] w-fit`}
+							/>
+							<h2 class="max-sm:text-xl text-3xl text-gray-800 font-bold whitespace-nowrap">Malachi Daily</h2>
+						</div>
+						<!-- Ask For Notification Permissions Button -->
+						<svg 
+							x-on:click="handleAskForNotificationPermissions" 
+							x-data="{ showAnimation: true }"
+							x-init="setTimeout(() => showAnimation = false, 2500)"
+							x-transition
+							x-cloak
+							x-bind:class="{ 'animate-bounce': showAnimation && !isSubscribedToNotifications }"
+							role="button" 
+							class="text-gray-600 flex-shrink-0" 
+							width="24" height="24" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+							<path fill="currentColor" d="M225.29 165.93C216.61 151 212 129.57 212 104a84 84 0 0 0-168 0c0 25.58-4.59 47-13.27 61.93a20.08 20.08 0 0 0-.07 20.07A19.77 19.77 0 0 0 48 196h36.18a44 44 0 0 0 87.64 0H208a19.77 19.77 0 0 0 17.31-10a20.08 20.08 0 0 0-.02-20.07ZM128 212a20 20 0 0 1-19.6-16h39.2a20 20 0 0 1-19.6 16Zm-73.34-40C63.51 154 68 131.14 68 104a60 60 0 0 1 120 0c0 27.13 4.48 50 13.33 68Z"/>
+						</svg>
 					</div>
-					<!-- Ask For Notification Permissions Button -->
-					<svg 
-						x-on:click="handleAskForNotificationPermissions" 
-						x-data="{ showAnimation: true }"
-						x-init="setTimeout(() => showAnimation = false, 2500)"
+					<p class="text-gray-500 text-center max-sm:hidden">Scripture memorization, together. New verse every week.</p>
+				</div>
+
+				<div x-show="showDebug" x-transition x-cloak>
+					<!-- FIREBASE CLOUD MESSAGING TOKEN -->
+					<p 
 						x-transition
 						x-cloak
-						x-bind:class="{ 'animate-bounce': showAnimation && !isSubscribedToNotifications }"
-						role="button" 
-						class="text-gray-600 flex-shrink-0" 
-						width="24" height="24" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-						<path fill="currentColor" d="M225.29 165.93C216.61 151 212 129.57 212 104a84 84 0 0 0-168 0c0 25.58-4.59 47-13.27 61.93a20.08 20.08 0 0 0-.07 20.07A19.77 19.77 0 0 0 48 196h36.18a44 44 0 0 0 87.64 0H208a19.77 19.77 0 0 0 17.31-10a20.08 20.08 0 0 0-.02-20.07ZM128 212a20 20 0 0 1-19.6-16h39.2a20 20 0 0 1-19.6 16Zm-73.34-40C63.51 154 68 131.14 68 104a60 60 0 0 1 120 0c0 27.13 4.48 50 13.33 68Z"/>
-					</svg>
+						x-show="firebaseCMToken"
+						x-text="firebaseCMToken"
+						class="whitespace-wrap text-gray-500 text-start break-all"
+					></p>
+
+					<!-- IOS VERSION -->
+					<p 
+						x-transition
+						x-cloak
+						x-show="iOSVersion"
+						x-text="iOSVersion"
+						class="whitespace-wrap text-gray-500 text-start break-all"
+					></p>
+
+					<p 
+						x-data="{ userAgent: '' }" 
+						x-init="userAgent = window.navigator.userAgent" 
+						x-text="userAgent" 
+						x-cloak 
+						x-show="userAgent"
+						x-transition
+					>
+					</p>
 				</div>
-				<p class="text-gray-500 text-center max-sm:hidden">Scripture memorization, together. New verse every week.</p>
-			</div>
 
-			<div x-show="showDebug" x-transition x-cloak>
-				<!-- FIREBASE CLOUD MESSAGING TOKEN -->
-				<p 
-					x-transition
-					x-cloak
-					x-show="firebaseCMToken"
-					x-text="firebaseCMToken"
-					class="whitespace-wrap text-gray-500 text-start break-all"
-				></p>
-
-				<!-- IOS VERSION -->
-				<p 
-					x-transition
-					x-cloak
-					x-show="iOSVersion"
-					x-text="iOSVersion"
-					class="whitespace-wrap text-gray-500 text-start break-all"
-				></p>
-
-				<p 
-					x-data="{ userAgent: '' }" 
-					x-init="userAgent = window.navigator.userAgent" 
-					x-text="userAgent" 
-					x-cloak 
-					x-show="userAgent"
-					x-transition
-				>
-				</p>
-			</div>
-
-			<!-- SCRIPTURE TO MEMORIZE -->
-			<section
-				id="scripture" 
-				x-init={`
-					scriptureTextOriginal = '${scriptureText}';
-					scriptureRef = '${scriptureRef}';
-					fidelity = fidelityOfTheDay;
-				`}
-				class="rounded-md text-start"
-			>
-				<div 
-					class="bg-white p-6 flex justify-center items-center rounded-xl shadow-xl transition-[height] duration-300" 
-					x-ref="scriptureCard"
+				<!-- SCRIPTURE TO MEMORIZE -->
+				<section
+					id="scripture" 
 					x-init={`
-						// https://alpinejs.dev/directives/init#next-tick
-						$nextTick(() => {
-							document.body.classList.add('transition');
-
-							// I have to manually listen to resizes so that I can get and set 
-							// the scripture card's dimensions for animation's sake.
-							window.addEventListener('resize', () => {
-								getAndSetCardWidth($el)
-							}, { passive: true });
-
-							getAndSetCardWidth($el);
-
-							// When the showSerifFont state changes, update the localStorage
-							$watch('showSerifFont', () => {
-								localStorage.setItem('showSerifFont', showSerifFont);
-								getAndSetCardWidth($el);
-							})
-						})
-					`.trim()}
-					x-data={`{ 
-						isFullscreen: false,
-						timeItTakesToReadVerse: 5000,
-						toggleAllowDocumentScroll() {
-							document.body.classList.toggle('overflow-hidden');
-						},
-						getAndSetCardWidth(cardElement) {
-							if (this.isFullscreen) {
-								return;
-							}
-							
-							cardElement.style.height = '';
-							cardElement.style.width = '';
-
-							// Get height of element
-							const height = cardElement.offsetHeight;
-							const width = cardElement.offsetWidth;
-
-							// Setting the height and width of the element allow for it
-							// to animate properly using CSS transitions.
-							cardElement.style.height = height + 'px';
-							cardElement.style.width = width + 'px';
-						},
-						handleShowFullscreen() {
-							this.toggleAllowDocumentScroll();
-							$el.classList.add('!h-screen');
-							$el.classList.add('!w-screen');
-							window.scrollTo({
-								top: 0,
-								behavior: "smooth",
-							})
-							this.isFullscreen = true;
-						},
-						handleHideFullscreen() {
-							const ANIMATION_DURATION = 300
-							this.toggleAllowDocumentScroll();
-							$el.classList.remove('!h-screen');
-							$el.classList.remove('!w-screen');
-							this.isFullscreen = false;
-
-							// Allow the close animation to play fully
-							setTimeout(() => {
-								this.getAndSetCardWidth($el); 
-							}, ANIMATION_DURATION)
-						},
-					}`}
-					x-bind:class="{ 'absolute top-0 left-0 bottom-0 right-0 z-10': isFullscreen }"
+						scriptureTextOriginal = '${scriptureText}';
+						scriptureRef = '${scriptureRef}';
+						fidelity = fidelityOfTheDay;
+					`}
+					class="rounded-md text-start"
 				>
-					<div class="max-w-[calc(600px-24px*2)] w-full flex flex-col gap-4">
-						<div class="w-full flex justify-between gap-6 flex-grow-1">
-							<h1 x-text="scriptureRef" class="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700">
-								{scriptureRef}
-							</h1>
+					<div 
+						class="bg-white p-6 flex justify-center items-center rounded-xl shadow-xl transition-[height] duration-300" 
+						x-ref="scriptureCard"
+						x-init={`
+							// https://alpinejs.dev/directives/init#next-tick
+							$nextTick(() => {
+								document.body.classList.add('transition');
 
-							<!-- Scripture Action Buttons -->
-							<div class="text-gray-500 flex gap-3 items-center">
-								<!-- Change Font Button -->
-								<svg role="button" x-show="!isFullscreen" x-on:click="showSerifFont = !showSerifFont" class="cursor-pointer" width="28px" height="28px" stroke-width="2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor">
-									<path d="M3.46875 18.3744L4.53321 16.0325M14.1134 18.3744L13.0489 16.0325M13.0489 16.0325L8.79105 6.66528L4.53321 16.0325M13.0489 16.0325H4.53321" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-									<path d="M15.1777 8.79421C15.1777 5.06857 21.0323 5.0686 21.0323 8.79421C21.0323 11.4554 18.3711 10.9231 18.3711 14.1164" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18.3711 18.385L18.3817 18.3732" stroke="#000000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-								</svg>
-								<!-- Show Fullscreen Button -->
-								<svg role="button" x-show="!isFullscreen" x-on:click="handleShowFullscreen" class="cursor-pointer"  width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-									<g fill="none" fill-rule="evenodd">
-										<path d="M24 0v24H0V0h24ZM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018Zm.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022Zm-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01l-.184-.092Z"/>
-										<path fill="currentColor" d="M18.5 5.5H16a1.5 1.5 0 0 1 0-3h3A2.5 2.5 0 0 1 21.5 5v3a1.5 1.5 0 0 1-3 0V5.5ZM8 5.5H5.5V8a1.5 1.5 0 1 1-3 0V5A2.5 2.5 0 0 1 5 2.5h3a1.5 1.5 0 1 1 0 3Zm0 13H5.5V16a1.5 1.5 0 0 0-3 0v3A2.5 2.5 0 0 0 5 21.5h3a1.5 1.5 0 0 0 0-3Zm8 0h2.5V16a1.5 1.5 0 0 1 3 0v3a2.5 2.5 0 0 1-2.5 2.5h-3a1.5 1.5 0 0 1 0-3Z"/>
-									</g>
-								</svg>
-								<!-- Hide Fullscreen Button -->
-								<svg role="button" x-cloak x-show="isFullscreen" x-on:click="handleHideFullscreen" class="cursor-pointer" width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-									<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m7 7l10 10M7 17L17 7"/>
-								</svg>
+								// I have to manually listen to resizes so that I can get and set 
+								// the scripture card's dimensions for animation's sake.
+								window.addEventListener('resize', () => {
+									getAndSetCardWidth($el)
+								}, { passive: true });
+
+								getAndSetCardWidth($el);
+
+								// When the showSerifFont state changes, update the localStorage
+								$watch('showSerifFont', () => {
+									localStorage.setItem('showSerifFont', showSerifFont);
+									getAndSetCardWidth($el);
+								})
+							})
+						`.trim()}
+						x-data={`{ 
+							isFullscreen: false,
+							timeItTakesToReadVerse: 5000,
+							toggleAllowDocumentScroll() {
+								document.body.classList.toggle('overflow-hidden');
+							},
+							getAndSetCardWidth(cardElement) {
+								if (this.isFullscreen) {
+									return;
+								}
+								
+								cardElement.style.height = '';
+								cardElement.style.width = '';
+
+								// Get height of element
+								const height = cardElement.offsetHeight;
+								const width = cardElement.offsetWidth;
+
+								// Setting the height and width of the element allow for it
+								// to animate properly using CSS transitions.
+								cardElement.style.height = height + 'px';
+								cardElement.style.width = width + 'px';
+							},
+							handleShowFullscreen() {
+								this.toggleAllowDocumentScroll();
+								$el.classList.add('!h-screen');
+								$el.classList.add('!w-screen');
+								window.scrollTo({
+									top: 0,
+									behavior: "smooth",
+								})
+								this.isFullscreen = true;
+							},
+							handleHideFullscreen() {
+								const ANIMATION_DURATION = 300
+								this.toggleAllowDocumentScroll();
+								$el.classList.remove('!h-screen');
+								$el.classList.remove('!w-screen');
+								this.isFullscreen = false;
+
+								// Allow the close animation to play fully
+								setTimeout(() => {
+									this.getAndSetCardWidth($el); 
+								}, ANIMATION_DURATION)
+							},
+						}`}
+						x-bind:class="{ 'absolute top-0 left-0 bottom-0 right-0 z-10': isFullscreen }"
+					>
+						<div class="max-w-[calc(600px-24px*2)] w-full flex flex-col gap-4">
+							<div class="w-full flex justify-between gap-6 flex-grow-1">
+								<h1 x-text="scriptureRef" class="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700">
+									{scriptureRef}
+								</h1>
+
+								<!-- Scripture Action Buttons -->
+								<div class="text-gray-500 flex gap-3 items-center">
+									<!-- Change Font Button -->
+									<svg role="button" x-show="!isFullscreen" x-on:click="showSerifFont = !showSerifFont" class="cursor-pointer" width="28px" height="28px" stroke-width="2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor">
+										<path d="M3.46875 18.3744L4.53321 16.0325M14.1134 18.3744L13.0489 16.0325M13.0489 16.0325L8.79105 6.66528L4.53321 16.0325M13.0489 16.0325H4.53321" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+										<path d="M15.1777 8.79421C15.1777 5.06857 21.0323 5.0686 21.0323 8.79421C21.0323 11.4554 18.3711 10.9231 18.3711 14.1164" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18.3711 18.385L18.3817 18.3732" stroke="#000000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+									</svg>
+									<!-- Show Fullscreen Button -->
+									<svg role="button" x-show="!isFullscreen" x-on:click="handleShowFullscreen" class="cursor-pointer"  width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+										<g fill="none" fill-rule="evenodd">
+											<path d="M24 0v24H0V0h24ZM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018Zm.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022Zm-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01l-.184-.092Z"/>
+											<path fill="currentColor" d="M18.5 5.5H16a1.5 1.5 0 0 1 0-3h3A2.5 2.5 0 0 1 21.5 5v3a1.5 1.5 0 0 1-3 0V5.5ZM8 5.5H5.5V8a1.5 1.5 0 1 1-3 0V5A2.5 2.5 0 0 1 5 2.5h3a1.5 1.5 0 1 1 0 3Zm0 13H5.5V16a1.5 1.5 0 0 0-3 0v3A2.5 2.5 0 0 0 5 21.5h3a1.5 1.5 0 0 0 0-3Zm8 0h2.5V16a1.5 1.5 0 0 1 3 0v3a2.5 2.5 0 0 1-2.5 2.5h-3a1.5 1.5 0 0 1 0-3Z"/>
+										</g>
+									</svg>
+									<!-- Hide Fullscreen Button -->
+									<svg role="button" x-cloak x-show="isFullscreen" x-on:click="handleHideFullscreen" class="cursor-pointer" width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+										<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m7 7l10 10M7 17L17 7"/>
+									</svg>
+								</div>
+							</div>
+
+							<div x-ref="scriptureText" class="relative transition font-scripture" x-bind:class="{ 'font-scripture-serif': showSerifFont }">
+								<h2
+									x-init={`
+										setTimeout(() => {
+											$el.classList.remove('animate-pulse')
+										}, timeItTakesToReadVerse)
+									`.trim()}
+									id="verse-current"
+									x-html="scriptureText" 
+									class="animate-pulse transition font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 leading-tight"
+								>
+									{scriptureText}
+								</h2>
+								<p
+									x-init={`
+										setTimeout(() => {
+											$el.classList.add('opacity-0')
+										}, timeItTakesToReadVerse)
+									`.trim()}
+									id="verse-original"
+									x-text="scriptureTextOriginal" 
+									class="transition absolute top-0 left-0 font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 leading-tight pointer-events-none"
+								>
+									{scriptureText}
+								</p>
 							</div>
 						</div>
-
-						<div x-ref="scriptureText" class="relative transition font-scripture" x-bind:class="{ 'font-scripture-serif': showSerifFont }">
-							<h2
-								x-init={`
-									setTimeout(() => {
-										$el.classList.remove('animate-pulse')
-									}, timeItTakesToReadVerse)
-								`.trim()}
-								id="verse-current"
-								x-html="scriptureText" 
-								class="animate-pulse transition font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 leading-tight"
-							>
-								{scriptureText}
-							</h2>
-							<p
-								x-init={`
-									setTimeout(() => {
-										$el.classList.add('opacity-0')
-									}, timeItTakesToReadVerse)
-								`.trim()}
-								id="verse-original"
-								x-text="scriptureTextOriginal" 
-								class="transition absolute top-0 left-0 font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 leading-tight pointer-events-none"
-							>
-								{scriptureText}
-							</p>
-						</div>
 					</div>
+
+					<!-- Scrubbing Input -->
+					<input x-model="fidelity" type="range" min="0" max="60" value="0" class="range mt-12 range-md" step="10" />
+					<div class="w-full flex justify-between text-xs px-2">
+						<span>|</span>
+						<span>|</span>
+						<span>|</span>
+						<span>|</span>
+						<span>|</span>
+						<span>|</span>
+						<span>|</span>
+					</div>
+					<div class="w-full flex justify-between text-xs mt-1 font-mono">
+						<span>Sun</span>
+						<span>Mon</span>
+						<span>Tue</span>
+						<span>Wed</span>
+						<span>Thu</span>
+						<span>Fri</span>
+						<span>Sat</span>
+					</div>
+
+					<!-- Toggle Show First Letter -->
+					<div class="form-control w-fit mt-6">
+						<label class="label cursor-pointer flex gap-2 items-center" for="show-first-letter">
+							<input 
+								x-model="showFirstLetter" 
+								type="checkbox" 
+								checked="checked" 
+								class="checkbox" 
+								name="show-first-letter" 
+								id="show-first-letter"
+								x-on:click="localStorage.setItem('showFirstLetter', JSON.stringify($el.checked));"
+							/>
+							<span class="label-text">Show the first letter in each hidden word</span> 
+						</label>
+					</div>				  
+				</section>
+
+				<!-- Notification Alert -->
+				<div x-on:click="notificationAlert = ''" x-cloak x-transition x-show="notificationAlert" class="alert alert-warning flex-wrap-none fixed z-10 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+					</svg>
+					<span x-text="notificationAlert"></span>
 				</div>
 
-				<!-- Scrubbing Input -->
-				<input x-model="fidelity" type="range" min="0" max="60" value="0" class="range mt-12 range-md" step="10" />
-				<div class="w-full flex justify-between text-xs px-2">
-					<span>|</span>
-					<span>|</span>
-					<span>|</span>
-					<span>|</span>
-					<span>|</span>
-					<span>|</span>
-					<span>|</span>
-				</div>
-				<div class="w-full flex justify-between text-xs mt-1 font-mono">
-					<span>Sun</span>
-					<span>Mon</span>
-					<span>Tue</span>
-					<span>Wed</span>
-					<span>Thu</span>
-					<span>Fri</span>
-					<span>Sat</span>
+				<!-- Notification Info -->
+				<div x-on:click="notificationInfo = ''" x-cloak x-transition x-show="notificationInfo" class="alert alert-info flex-wrap-none fixed z-10 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+					</svg>
+					<span x-text="notificationInfo"></span>
 				</div>
 
-				<!-- Toggle Show First Letter -->
-				<div class="form-control w-fit mt-6">
-					<label class="label cursor-pointer flex gap-2 items-center" for="show-first-letter">
-						<input 
-							x-model="showFirstLetter" 
-							type="checkbox" 
-							checked="checked" 
-							class="checkbox" 
-							name="show-first-letter" 
-							id="show-first-letter"
-							x-on:click="localStorage.setItem('showFirstLetter', JSON.stringify($el.checked));"
-						/>
-					  	<span class="label-text">Show the first letter in each hidden word</span> 
-					</label>
-				</div>				  
-			</section>
-
-			<!-- Notification Alert -->
-			<div x-on:click="notificationAlert = ''" x-cloak x-transition x-show="notificationAlert" class="alert alert-warning flex-wrap-none fixed z-10 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]">
-				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-				</svg>
-				<span x-text="notificationAlert"></span>
-			</div>
-
-			<!-- Notification Info -->
-			<div x-on:click="notificationInfo = ''" x-cloak x-transition x-show="notificationInfo" class="alert alert-info flex-wrap-none fixed z-10 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]">
-				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-				</svg>
-				<span x-text="notificationInfo"></span>
-			</div>
-
-			<!-- Listen to this as a song -->
-			<!-- <iframe 
-				style="border-radius:12px" 
-				src="https://open.spotify.com/embed/track/133ihRulr32OF5ydWZP61g?utm_source=generator&theme=0" 
-				width="100%" 
-				height="152" 
-				frameborder="0" 
-				allowfullscreen="" 
-				allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-				loading="lazy"
-			></iframe> -->
-
-			<!-- Subscribe -->
-			<div class="relative w-full" x-ref="subscribeSection" x-cloak x-show="showSubscribeSection">
-				<iframe 
-					src="https://embeds.beehiiv.com/c8ce3263-a472-44d8-a911-db5da1e572e2" 
-					data-test-id="beehiiv-embed" 
-					class="w-full rounded-xl"
-					height="320" 
+				<!-- Listen to this as a song -->
+				<!-- <iframe 
+					style="border-radius:12px" 
+					src="https://open.spotify.com/embed/track/133ihRulr32OF5ydWZP61g?utm_source=generator&theme=0" 
+					width="100%" 
+					height="152" 
 					frameborder="0" 
-					scrolling="no" 
-					style="margin: 0; background-color: transparent;"
+					allowfullscreen="" 
+					allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
 					loading="lazy"
-				></iframe>
-				<!-- Stop Showing Subscribe -->
-				<svg role="button" x-on:click="handleHideSubscribeSection" class="cursor-pointer top-6 right-6 absolute" width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-					<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m7 7l10 10M7 17L17 7"/>
-				</svg>
+				></iframe> -->
+
+				<!-- Subscribe -->
+				<div class="relative w-full" x-ref="subscribeSection" x-cloak x-show="showSubscribeSection">
+					<iframe 
+						src="https://embeds.beehiiv.com/c8ce3263-a472-44d8-a911-db5da1e572e2" 
+						data-test-id="beehiiv-embed" 
+						class="w-full rounded-xl"
+						height="320" 
+						frameborder="0" 
+						scrolling="no" 
+						style="margin: 0; background-color: transparent;"
+						loading="lazy"
+					></iframe>
+					<!-- Stop Showing Subscribe -->
+					<svg role="button" x-on:click="handleHideSubscribeSection" class="cursor-pointer top-6 right-6 absolute" width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m7 7l10 10M7 17L17 7"/>
+					</svg>
+				</div>
 			</div>
-		</div>
-	</main>
-	<div class="w-full flex justify-center gap-4 flex-wrap py-2 text-gray-400">
-		<a 
-			class="link whitespace-nowrap"
-			x-data={`{
-				createEmailLink() {
-					// Set up the email link for getting help
-					const helpEmailLink = new URL('mailto:cameronandrewpak+malachidaily@gmail.com');
-					helpEmailLink.searchParams.set('cc', 'hello@malachidaily.com');
-					helpEmailLink.searchParams.set('subject', encodeURIComponent('Malachi Daily Help Request'));
-					let emailBody = '';
-					emailBody += 'I want help with the following:\\n\\n';
-					emailBody += '{Write about what you need help with here}\\n\\n';
-					emailBody += '—Below is some necessary data to help debug any issues:—'
-					emailBody += '\\n• Scripture Ref: ' + scriptureRef;
-					emailBody += '\\n• Scripture: ' + scriptureTextOriginal;
-					emailBody += '\\n• User Agent: ' + window.navigator.userAgent;
-					helpEmailLink.searchParams.set('body', encodeURIComponent(emailBody));
-					return decodeURIComponent(helpEmailLink.href)
-				},
-				emailLink: ''
-			}`}
-			x-init="emailLink = createEmailLink()"
-			x-bind:href="emailLink"
-			target="_blank"
-		>
-			Need help?
-		</a>
-		<a class="link whitespace-nowrap" href="mailto:hello@malachidaily.com" target="_blank">Contact Us</a>
-		<a class="link whitespace-nowrap" href="https://malachidaily.com" target="_blank">Visit Main Website</a>
+		</main>
+
+		<footer class="w-full flex justify-center gap-4 flex-wrap py-2 text-gray-400">
+			<a 
+				class="link whitespace-nowrap"
+				x-data={`{
+					createEmailLink() {
+						// Set up the email link for getting help
+						const helpEmailLink = new URL('mailto:cameronandrewpak+malachidaily@gmail.com');
+						helpEmailLink.searchParams.set('cc', 'hello@malachidaily.com');
+						helpEmailLink.searchParams.set('subject', encodeURIComponent('Malachi Daily Help Request'));
+						let emailBody = '';
+						emailBody += 'I want help with the following:\\n\\n';
+						emailBody += '{Write about what you need help with here}\\n\\n';
+						emailBody += '—Below is some necessary data to help debug any issues:—'
+						emailBody += '\\n• Scripture Ref: ' + scriptureRef;
+						emailBody += '\\n• Scripture: ' + scriptureTextOriginal;
+						emailBody += '\\n• User Agent: ' + window.navigator.userAgent;
+						helpEmailLink.searchParams.set('body', encodeURIComponent(emailBody));
+						return decodeURIComponent(helpEmailLink.href)
+					},
+					emailLink: ''
+				}`}
+				x-init="emailLink = createEmailLink()"
+				x-bind:href="emailLink"
+				target="_blank"
+			>
+				Need help?
+			</a>
+			<a class="link whitespace-nowrap" href="mailto:hello@malachidaily.com" target="_blank">Contact Us</a>
+			<a class="link whitespace-nowrap" href="https://malachidaily.com" target="_blank">Visit Main Website</a>
+		</footer>
 	</div>
+	
 	<script>
 		import { type Alpine as AlpineType } from 'alpinejs'
 		import { onMessage } from "firebase/messaging";
