@@ -9,10 +9,10 @@ import { getVerse, type Verse } from '../api/bible'
 import { books, type bibleVersion } from '../api/bible/static/books';
 
 const translation: bibleVersion = 'NIV'
-const chapterName =  books.John.name;
+const chapterName =  books.Matthew.name;
 const bookId = books[chapterName].bookid;
-const chapter = 1;
-const verseNum = 1;
+const chapter = 4;
+const verseNum = 4;
 
 const verseRef = `${chapterName} ${chapter}:${verseNum} ${translation}`
 
