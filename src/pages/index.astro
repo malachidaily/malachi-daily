@@ -5,9 +5,38 @@ import Layout from '../layouts/Layout.astro';
 import logoImgUrl from '../../public/logo.png';
 import { SCRIPTURE_TEXT , SCRIPTURE_REF } from '../utils/constants';
 import NativeFeelingDrawer from '../components/react/NativeFeelingDrawer';
+import { getVerse, type Verse } from '../api/bible'
+import { books } from '../api/bible/static/books';
 
-const scriptureText = SCRIPTURE_TEXT;
-const scriptureRef = SCRIPTURE_REF;
+const translation = 'ESV'
+const chapterName = 'Genesis';
+const bookId = books[chapterName].bookid;
+const chapter = 1;
+const verseNum = 1;
+
+const verseRef = `${chapterName} ${chapter}:${verseNum} ${translation}`
+
+let verse = {} as Verse
+try {
+	verse = await getVerse({
+		translation: translation,
+		bookId: bookId,
+		chapter,
+		verse: verseNum
+	});
+} catch (error) {
+	// User backup verse, instead
+}
+
+const scriptureText = verse?.text || SCRIPTURE_TEXT;
+const scriptureRef = verseRef || SCRIPTURE_REF;
+
+// const getTranslations = await getBibleVersesFromMultipleTranslations({
+//     bookId: 43,
+//     chapterId: 1,
+//     verses: [3, 4, 5],
+//     translations: ['NIV', 'ESV', 'NLT']
+// })
 
 export const prerender = true;
 ---
