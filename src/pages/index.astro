@@ -44,7 +44,7 @@ export const prerender = true;
 
 <Layout title="Malachi Daily: Memorize Bible Verses & Learn Their Context">
 	<div vaul-drawer-wrapper="">
-		<main class="w-screen h-[100svh] h-full min-h-screen px-6 flex justify-center bg-gray-100">
+		<main class="w-screen h-full min-h-screen px-6 flex justify-center bg-gray-100 pb-24">
 			<div class="max-w-[600px] w-full flex flex-col py-12 max-sm:py-6 gap-12 max-sm:gap-6">
 				<!-- LOGO -->
 				<div class="w-full flex flex-col gap-2 items-start justify-start">
@@ -146,10 +146,10 @@ export const prerender = true;
 						scriptureRef = '${scriptureRef}';
 						fidelity = fidelityOfTheDay;
 					`}
-					class="rounded-md text-start"
+					class="rounded-md text-start max-sm:mx-[-24px]"
 				>
 					<div 
-						class="bg-white p-6 flex justify-center items-center rounded-xl shadow-xl transition-[height] duration-300" 
+						class="bg-white p-6 flex justify-center items-center rounded-xl shadow-xl max-sm:shadow-sm max-sm:rounded-3xl transition-[height] duration-300" 
 						x-ref="scriptureCard"
 						x-init={`
 							// https://alpinejs.dev/directives/init#next-tick
@@ -217,7 +217,7 @@ export const prerender = true;
 								}, ANIMATION_DURATION)
 							},
 						}`}
-						x-bind:class="{ 'absolute top-0 left-0 bottom-0 right-0 z-10': isFullscreen }"
+						x-bind:class="{ 'absolute top-0 left-0 bottom-0 right-0 z-30': isFullscreen }"
 					>
 						<div class="max-w-[calc(600px-24px*2)] w-full flex flex-col gap-4">
 							<div class="w-full flex justify-between gap-6 flex-grow-1">
@@ -267,8 +267,11 @@ export const prerender = true;
 					</div>
 
 					<!-- Scrubbing Input -->
-					<div class="w-full max-sm:w-auto max-sm:absolute max-sm:bottom-4 max-sm:left-4 max-sm:right-4">
-						<input x-model="fidelity" type="range" min="0" max="60" value="0" class="range mt-12 range-md" step="10" />
+					<section class="
+						w-full mt-14
+						max-sm:mt-0 max-sm:w-auto max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:p-4 max-sm:z-20 max-sm:bg-gray-100 max-sm:shadow-sm max-sm:border-t-[1px] max-sm:border-gray-300
+					">
+						<input x-model="fidelity" type="range" min="0" max="60" value="0" class="range range-md" step="10" />
 						<div class="w-full flex justify-between text-xs px-2">
 							<span>|</span>
 							<span>|</span>
@@ -278,16 +281,19 @@ export const prerender = true;
 							<span>|</span>
 							<span>|</span>
 						</div>
-						<div class="w-full flex justify-between text-xs mt-1 font-mono">
-							<span>Sun</span>
-							<span>Mon</span>
-							<span>Tue</span>
-							<span>Wed</span>
-							<span>Thu</span>
-							<span>Fri</span>
-							<span>Sat</span>
+						<div 
+							class="w-[calc(100%+16px)] ms-[-8px] flex justify-between text-xs mt-1 font-mono"
+							x-data="{ dayOfWeek: new Date().getDay() }"
+						>
+							<span class="p-1 px-2 rounded-md" x-on:click="fidelity = 10 * 0" x-bind:class="{ 'bg-gray-300': dayOfWeek === 0 || dayOfWeek === 7 }">Sun</span>
+							<span class="p-1 px-2 rounded-md" x-on:click="fidelity = 10 * 1" x-bind:class="{ 'bg-gray-300': dayOfWeek === 1 }">Mon</span>
+							<span class="p-1 px-2 rounded-md" x-on:click="fidelity = 10 * 2" x-bind:class="{ 'bg-gray-300': dayOfWeek === 2 }">Tue</span>
+							<span class="p-1 px-2 rounded-md" x-on:click="fidelity = 10 * 3" x-bind:class="{ 'bg-gray-300': dayOfWeek === 3 }">Wed</span>
+							<span class="p-1 px-2 rounded-md" x-on:click="fidelity = 10 * 4" x-bind:class="{ 'bg-gray-300': dayOfWeek === 4 }">Thu</span>
+							<span class="p-1 px-2 rounded-md" x-on:click="fidelity = 10 * 5" x-bind:class="{ 'bg-gray-300': dayOfWeek === 5 }">Fri</span>
+							<span class="p-1 px-2 rounded-md" x-on:click="fidelity = 10 * 6" x-bind:class="{ 'bg-gray-300': dayOfWeek === 6 }">Sat</span>
 						</div>	
-					</div>		  
+					</section>		  
 				</section>
 
 				<!-- Notification Alert -->
@@ -319,7 +325,7 @@ export const prerender = true;
 				></iframe> -->
 
 				<!-- Subscribe -->
-				<div class="relative w-full" x-ref="subscribeSection" x-cloak x-show="showSubscribeSection">
+				<div class="relative w-full max-sm:mx-[-24px] max-sm:w-screen" x-ref="subscribeSection" x-cloak x-show="showSubscribeSection">
 					<iframe 
 						src="https://embeds.beehiiv.com/c8ce3263-a472-44d8-a911-db5da1e572e2" 
 						data-test-id="beehiiv-embed" 
