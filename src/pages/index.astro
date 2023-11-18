@@ -4,20 +4,51 @@ import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import logoImgUrl from '../../public/logo.png';
 import { SCRIPTURE_TEXT , SCRIPTURE_REF } from '../utils/constants';
+import NativeFeelingDrawer from '../components/react/NativeFeelingDrawer';
+import { getVerse, type Verse } from '../api/bible'
+import { books, type bibleVersion } from '../api/bible/static/books';
 
-const scriptureText = SCRIPTURE_TEXT;
-const scriptureRef = SCRIPTURE_REF;
+const translation: bibleVersion = 'NIV'
+const chapterName =  books.Matthew.name;
+const bookId = books[chapterName].bookid;
+const chapter = 4;
+const verseNum = 4;
+
+const verseRef = `${chapterName} ${chapter}:${verseNum} ${translation}`
+
+let verse = {} as Verse
+try {
+	verse = await getVerse({
+		translation: translation,
+		bookId: bookId,
+		chapter,
+		verse: verseNum
+	});
+} catch (error) {
+	// User backup verse, instead
+	console.log(error)
+}
+
+const scriptureText = verse?.text || SCRIPTURE_TEXT;
+const scriptureRef = verseRef || SCRIPTURE_REF;
+
+// const getTranslations = await getBibleVersesFromMultipleTranslations({
+//     bookId: 43,
+//     chapterId: 1,
+//     verses: [3, 4, 5],
+//     translations: ['NIV', 'ESV', 'NLT']
+// })
 
 export const prerender = true;
 ---
 
 <Layout title="Malachi Daily: Memorize Bible Verses & Learn Their Context">
-	<div x-data="malachi">
+	<div vaul-drawer-wrapper="">
 		<main class="w-screen h-full min-h-[calc(100vh-40px)] px-6 flex justify-center bg-gray-100">
 			<div class="max-w-[600px] w-full flex flex-col py-12 max-sm:py-6 gap-12 max-sm:gap-6">
 				<!-- LOGO -->
 				<div class="w-full flex flex-col gap-2 items-start justify-start">
-					<div class="w-full flex gap-2 items-center">
+					<div class="w-full flex gap-2 justify-between">
 						<div class="flex gap-2 items-center justify-start">
 							<Image
 								src={logoImgUrl}
@@ -26,19 +57,53 @@ export const prerender = true;
 							/>
 							<h2 class="max-sm:text-xl text-3xl text-gray-800 font-bold whitespace-nowrap">Malachi Daily</h2>
 						</div>
-						<!-- Ask For Notification Permissions Button -->
-						<svg 
-							x-on:click="handleAskForNotificationPermissions" 
-							x-data="{ showAnimation: true }"
-							x-init="setTimeout(() => showAnimation = false, 2500)"
-							x-transition
-							x-cloak
-							x-bind:class="{ 'animate-bounce': showAnimation && !isSubscribedToNotifications }"
-							role="button" 
-							class="text-gray-600 flex-shrink-0" 
-							width="24" height="24" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-							<path fill="currentColor" d="M225.29 165.93C216.61 151 212 129.57 212 104a84 84 0 0 0-168 0c0 25.58-4.59 47-13.27 61.93a20.08 20.08 0 0 0-.07 20.07A19.77 19.77 0 0 0 48 196h36.18a44 44 0 0 0 87.64 0H208a19.77 19.77 0 0 0 17.31-10a20.08 20.08 0 0 0-.02-20.07ZM128 212a20 20 0 0 1-19.6-16h39.2a20 20 0 0 1-19.6 16Zm-73.34-40C63.51 154 68 131.14 68 104a60 60 0 0 1 120 0c0 27.13 4.48 50 13.33 68Z"/>
-						</svg>
+						<!-- Settings and Notifications -->
+						<div class="flex gap-4 items-center">
+							<svg 
+								x-on:click="handleAskForNotificationPermissions" 
+								x-data="{ showAnimation: true }"
+								x-init="setTimeout(() => showAnimation = false, 2500)"
+								x-transition
+								x-cloak
+								x-bind:class="{ 'animate-bounce': showAnimation && !isSubscribedToNotifications }"
+								role="button" 
+								class="text-gray-600 flex-shrink-0" 
+								width="24" height="24" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+								<path fill="currentColor" d="M225.29 165.93C216.61 151 212 129.57 212 104a84 84 0 0 0-168 0c0 25.58-4.59 47-13.27 61.93a20.08 20.08 0 0 0-.07 20.07A19.77 19.77 0 0 0 48 196h36.18a44 44 0 0 0 87.64 0H208a19.77 19.77 0 0 0 17.31-10a20.08 20.08 0 0 0-.02-20.07ZM128 212a20 20 0 0 1-19.6-16h39.2a20 20 0 0 1-19.6 16Zm-73.34-40C63.51 154 68 131.14 68 104a60 60 0 0 1 120 0c0 27.13 4.48 50 13.33 68Z"/>
+							</svg>
+							<NativeFeelingDrawer client:load>
+								<div class="flex flex-col gap-2">
+									<div class="form-control w-fit">
+										<label class="label cursor-pointer flex gap-2 items-center" for="show-first-letter">
+											<input 
+												x-model="showFirstLetter" 
+												type="checkbox" 
+												checked="checked" 
+												class="checkbox" 
+												name="show-first-letter" 
+												id="show-first-letter"
+												x-on:click="localStorage.setItem('showFirstLetter', JSON.stringify($el.checked));"
+											/>
+											<span class="label-text">Show the first letter in each hidden word</span> 
+										</label>
+									</div>	
+									<div class="form-control w-fit">
+										<label class="label cursor-pointer flex gap-2 items-center" for=checkbox-randomize-hidden-words">
+											<input 
+												x-model="shouldRandomizeOrderOfHiddenWords" 
+												type="checkbox" 
+												checked="checked" 
+												class="checkbox" 
+												name="checkbox-randomize-hidden-words"
+												id="checkbox-randomize-hidden-words"
+												x-on:click="localStorage.setItem('shouldRandomizeOrderOfHiddenWords', JSON.stringify($el.checked));"
+											/>
+											<span class="label-text">Randomize the order of hidden words</span> 
+										</label>
+									</div>		
+								</div>
+							</NativeFeelingDrawer>
+						</div>
 					</div>
 					<p class="text-gray-500 text-center max-sm:hidden">Scripture memorization, together. New verse every week.</p>
 				</div>
@@ -220,23 +285,7 @@ export const prerender = true;
 						<span>Thu</span>
 						<span>Fri</span>
 						<span>Sat</span>
-					</div>
-
-					<!-- Toggle Show First Letter -->
-					<div class="form-control w-fit mt-6">
-						<label class="label cursor-pointer flex gap-2 items-center" for="show-first-letter">
-							<input 
-								x-model="showFirstLetter" 
-								type="checkbox" 
-								checked="checked" 
-								class="checkbox" 
-								name="show-first-letter" 
-								id="show-first-letter"
-								x-on:click="localStorage.setItem('showFirstLetter', JSON.stringify($el.checked));"
-							/>
-							<span class="label-text">Show the first letter in each hidden word</span> 
-						</label>
-					</div>				  
+					</div>			  
 				</section>
 
 				<!-- Notification Alert -->
@@ -287,7 +336,7 @@ export const prerender = true;
 			</div>
 		</main>
 
-		<footer class="w-full flex justify-center gap-4 flex-wrap py-2 text-gray-400">
+		<footer class="w-full flex justify-center gap-6 flex-wrap py-2 text-gray-300 bg-gray-700">
 			<a 
 				class="link whitespace-nowrap"
 				x-data={`{
@@ -359,6 +408,15 @@ export const prerender = true;
 			}
 		}
 
+		const getShouldRandomizeOrderOfHiddenWords = () => {
+			const shouldRandomizeOrderOfHiddenWords = localStorage.getItem('shouldRandomizeOrderOfHiddenWords');
+			if (shouldRandomizeOrderOfHiddenWords === null) {
+				return true;
+			} else {
+				return JSON.parse(shouldRandomizeOrderOfHiddenWords);
+			}
+		}
+
 		const isUserAgentOniOS = (): boolean => {
 			const iOS = window.navigator.userAgent.toLowerCase().match(/(iphone|ipad|ipod)/);
 			console.log(iOS)
@@ -379,6 +437,9 @@ export const prerender = true;
 
 			return iOSVersionNumber
 		}
+
+		// Add this to the body tag
+		document.body.setAttribute('x-data', 'malachi');
 
 		document.addEventListener('alpine:init', () => {
 			const Alpine = window['Alpine'] || {}
@@ -440,7 +501,7 @@ export const prerender = true;
 				},
 				fidelity: 0,
 				showFirstLetter: getShowFirstLetter(),
-				hideWordsUpFrontVersusDispersed: true,
+				shouldRandomizeOrderOfHiddenWords: getShouldRandomizeOrderOfHiddenWords(),
 				showSubscribeSection: getShowSubscribeSection(),
 				handleHideSubscribeSection() {
 					const subscribeSection = this.$refs.subscribeSection;
@@ -567,17 +628,18 @@ export const prerender = true;
 
 							const indicesToReplace: number[] = []
 
-							if (this.hideWordsUpFrontVersusDispersed) {
-								for (let i = 0; i < words.length; i += 1) {
-									if (i < numOfWordsToReplace) {
-										indicesToReplace.push(i);
-									}
-								}
-							} else {
+							if (this.shouldRandomizeOrderOfHiddenWords) {
 								// This function evenly disperses the hidden words
 								for (let i = 0; i < words.length; i += 1) {
 									const index: number = Math.floor(i * words.length / numOfWordsToReplace);
 									indicesToReplace.push(index);
+								}
+							} else {
+								// Otherwise, hide the words from start to finish
+								for (let i = 0; i < words.length; i += 1) {
+									if (i < numOfWordsToReplace) {
+										indicesToReplace.push(i);
+									}
 								}
 							}
 
