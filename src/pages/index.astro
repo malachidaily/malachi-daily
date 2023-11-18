@@ -359,7 +359,7 @@ export const prerender = true;
 		const getShowFirstLetter = () => {
 			const showFirstLetter = localStorage.getItem('showFirstLetter');
 			if (showFirstLetter === null) {
-				return true;
+				return false;
 			} else {
 				return JSON.parse(showFirstLetter);
 			}
@@ -388,7 +388,7 @@ export const prerender = true;
 		const getShouldRandomizeOrderOfHiddenWords = () => {
 			const shouldRandomizeOrderOfHiddenWords = localStorage.getItem('shouldRandomizeOrderOfHiddenWords');
 			if (shouldRandomizeOrderOfHiddenWords === null) {
-				return true;
+				return false;
 			} else {
 				return JSON.parse(shouldRandomizeOrderOfHiddenWords);
 			}
