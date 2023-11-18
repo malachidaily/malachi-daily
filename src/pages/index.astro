@@ -44,7 +44,7 @@ export const prerender = true;
 
 <Layout title="Malachi Daily: Memorize Bible Verses & Learn Their Context">
 	<div vaul-drawer-wrapper="">
-		<main class="w-screen h-full min-h-[calc(100vh-40px)] px-6 flex justify-center bg-gray-100">
+		<main class="w-screen h-[100svh] h-full min-h-screen px-6 flex justify-center bg-gray-100">
 			<div class="max-w-[600px] w-full flex flex-col py-12 max-sm:py-6 gap-12 max-sm:gap-6">
 				<!-- LOGO -->
 				<div class="w-full flex flex-col gap-2 items-start justify-start">
@@ -267,25 +267,27 @@ export const prerender = true;
 					</div>
 
 					<!-- Scrubbing Input -->
-					<input x-model="fidelity" type="range" min="0" max="60" value="0" class="range mt-12 range-md" step="10" />
-					<div class="w-full flex justify-between text-xs px-2">
-						<span>|</span>
-						<span>|</span>
-						<span>|</span>
-						<span>|</span>
-						<span>|</span>
-						<span>|</span>
-						<span>|</span>
-					</div>
-					<div class="w-full flex justify-between text-xs mt-1 font-mono">
-						<span>Sun</span>
-						<span>Mon</span>
-						<span>Tue</span>
-						<span>Wed</span>
-						<span>Thu</span>
-						<span>Fri</span>
-						<span>Sat</span>
-					</div>			  
+					<div class="w-full max-sm:w-auto max-sm:absolute max-sm:bottom-4 max-sm:left-4 max-sm:right-4">
+						<input x-model="fidelity" type="range" min="0" max="60" value="0" class="range mt-12 range-md" step="10" />
+						<div class="w-full flex justify-between text-xs px-2">
+							<span>|</span>
+							<span>|</span>
+							<span>|</span>
+							<span>|</span>
+							<span>|</span>
+							<span>|</span>
+							<span>|</span>
+						</div>
+						<div class="w-full flex justify-between text-xs mt-1 font-mono">
+							<span>Sun</span>
+							<span>Mon</span>
+							<span>Tue</span>
+							<span>Wed</span>
+							<span>Thu</span>
+							<span>Fri</span>
+							<span>Sat</span>
+						</div>	
+					</div>		  
 				</section>
 
 				<!-- Notification Alert -->
@@ -335,37 +337,6 @@ export const prerender = true;
 				</div>
 			</div>
 		</main>
-
-		<footer class="w-full flex justify-center gap-6 flex-wrap py-2 text-gray-300 bg-gray-700">
-			<a 
-				class="link whitespace-nowrap"
-				x-data={`{
-					createEmailLink() {
-						// Set up the email link for getting help
-						const helpEmailLink = new URL('mailto:cameronandrewpak+malachidaily@gmail.com');
-						helpEmailLink.searchParams.set('cc', 'hello@malachidaily.com');
-						helpEmailLink.searchParams.set('subject', encodeURIComponent('Malachi Daily Help Request'));
-						let emailBody = '';
-						emailBody += 'I want help with the following:\\n\\n';
-						emailBody += '{Write about what you need help with here}\\n\\n';
-						emailBody += '—Below is some necessary data to help debug any issues:—'
-						emailBody += '\\n• Scripture Ref: ' + scriptureRef;
-						emailBody += '\\n• Scripture: ' + scriptureTextOriginal;
-						emailBody += '\\n• User Agent: ' + window.navigator.userAgent;
-						helpEmailLink.searchParams.set('body', encodeURIComponent(emailBody));
-						return decodeURIComponent(helpEmailLink.href)
-					},
-					emailLink: ''
-				}`}
-				x-init="emailLink = createEmailLink()"
-				x-bind:href="emailLink"
-				target="_blank"
-			>
-				Need help?
-			</a>
-			<a class="link whitespace-nowrap" href="mailto:hello@malachidaily.com" target="_blank">Contact Us</a>
-			<a class="link whitespace-nowrap" href="https://malachidaily.com" target="_blank">Visit Main Website</a>
-		</footer>
 	</div>
 	
 	<script>
