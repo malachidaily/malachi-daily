@@ -9,7 +9,7 @@ async function fetchAndCache(url: string, options?: RequestInit): Promise<Verse>
         console.log('loaded from cache', cachedResponse)
         return cachedResponse;
     } else {
-        const response = await fetch(url);
+        const response = await fetch(url, options);
         const data = await response.json()
         cache[url] = data
         return data;

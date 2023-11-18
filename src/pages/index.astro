@@ -8,7 +8,7 @@ import NativeFeelingDrawer from '../components/react/NativeFeelingDrawer';
 import { getVerse, type Verse } from '../api/bible'
 import { books, type bibleVersion } from '../api/bible/static/books';
 
-const translation: bibleVersion = 'NIV'
+const translation: bibleVersion = 'ESV'
 const chapterName =  books.Matthew.name;
 const bookId = books[chapterName].bookid;
 const chapter = 4;
@@ -574,7 +574,7 @@ export const prerender = true;
 						const wordToBeReplaced = word.match(/([A-Za-z]+)/ig)?.[0] || ''						
 						
 						let underscores = "_".repeat(wordToBeReplaced.length)
-						if (showFirstCharacter) {
+						if (showFirstCharacter && word.length > 1) {
 							underscores = "_".repeat(wordToBeReplaced.length - 1) 
 						} else if (wordToBeReplaced.length === 1) {
 							underscores = "_"
