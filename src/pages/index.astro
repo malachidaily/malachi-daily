@@ -139,7 +139,8 @@ export const prerender = true;
 				<div x-show="showDebug" x-transition x-cloak>
 					<pre
 						x-text="JSON.stringify($data, null, 2)"
-						class="whitespace-wrap text-gray-500 text-start break-all"
+						class="whitespace-pre text-gray-500 text-start break-all"
+						style="text-wrap: pretty"
 					></pre>
 				</div>
 
@@ -344,7 +345,7 @@ export const prerender = true;
 	
 	<script>
 		import { type Alpine as AlpineType } from 'alpinejs'
-		import { requestNotificationPermission } from '../messaging_init_in_sw.js'
+		import { requestNotificationPermission, messaging, getUserFirebaseNotificationToken } from '../messaging_init_in_sw.js'
 
 		declare global {
 			var Alpine: AlpineType
@@ -425,6 +426,15 @@ export const prerender = true;
 		document.addEventListener('alpine:init', () => {
 			const Alpine = window['Alpine'] || {}
 			Alpine.data('malachi', () => ({
+				init() {
+					messaging.onMessage((payload) => {
+						console.log('message received',payload)
+						// Update the UI to include the received message.
+						this.notificationInfo = payload?.notification?.body || '';
+					});
+
+					getUserFirebaseNotificationToken().then(token => this.firebaseCMToken = token)
+				},
 				showDebug: (() => {
 					// Get url param debug = true
 					const url = new URL(window.location.href);
