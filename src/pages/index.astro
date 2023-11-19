@@ -152,7 +152,7 @@ export const prerender = true;
 					class="rounded-md text-start max-sm:mx-[-24px]"
 				>
 					<div 
-						class="bg-white p-6 flex justify-center items-center rounded-xl shadow-xl max-sm:shadow-sm max-sm:rounded-3xl transition-[height] duration-300" 
+						class="bg-white p-6 pb-8 flex justify-center items-center rounded-xl shadow-xl max-sm:shadow-sm max-sm:rounded-3xl transition-[height] duration-300" 
 						x-ref="scriptureCard"
 						x-init={`
 							// https://alpinejs.dev/directives/init#next-tick
@@ -266,8 +266,8 @@ export const prerender = true;
 
 					<!-- Scrubbing Input -->
 					<section class="
-						w-full mt-14
-						max-sm:mt-0 max-sm:w-auto max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:p-4 max-sm:z-20 max-sm:bg-gray-100 max-sm:shadow-sm max-sm:border-t-[1px] max-sm:border-gray-300
+						w-full mt-12
+						max-sm:mx-6 max-sm:w-auto max-sm:mt-8
 					">
 						<input x-model="fidelity" type="range" min="0" max="60" value="0" class="range range-md" step="10" />
 						<div class="w-full flex justify-between text-xs px-2">
