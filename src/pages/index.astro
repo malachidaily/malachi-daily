@@ -6,7 +6,7 @@ import logoImgUrl from '../../public/logo.png';
 import { SCRIPTURE_TEXT , SCRIPTURE_REF } from '../utils/constants';
 import NativeFeelingDrawer from '../components/react/NativeFeelingDrawer';
 import { type BibleVersesFromMultipleTranslations, getBibleVersesFromMultipleTranslations } from '../api/bible'
-import { books, type bibleVersion, selectedBibleVersions, bibleVersionReadable } from '../api/bible/static/books';
+import { books, type bibleVersion, selectedBibleVersions, bibleVersionData } from '../api/bible/static/books';
 
 const translation: bibleVersion = 'ESV'
 const chapterName =  books.Matthew.name;
@@ -39,10 +39,11 @@ export const prerender = true;
 	<div  
 		x-init={`
 			versesObj = ${JSON.stringify(verses)}
+			bibleVersionData = ${JSON.stringify(bibleVersionData)}
 		`.trim()}
 		vaul-drawer-wrapper=""
 	>	
-		<main class="w-screen h-full min-h-screen px-6 flex justify-center bg-gray-100 pb-24">
+		<main class="w-screen h-full min-h-screen px-6 flex justify-center bg-gray-100">
 			<div class="max-w-[600px] w-full flex flex-col py-12 max-sm:py-6 gap-12 max-sm:gap-6">
 				<!-- LOGO -->
 				<div class="w-full flex flex-col gap-2 items-start justify-start">
@@ -82,7 +83,7 @@ export const prerender = true;
 											x-on:change="localStorage.setItem('bibleVersionPreference', JSON.stringify($el.value));"
 										>
 										  	{selectedBibleVersions.map((bibleVersion) => (
-												<option value={bibleVersion} x-bind:selected={`'${bibleVersion}' === bibleVersionPreference`}>{bibleVersionReadable[bibleVersion] || bibleVersion}</option>
+												<option value={bibleVersion} x-bind:selected={`'${bibleVersion}' === bibleVersionPreference`}>{bibleVersionData?.[bibleVersion]?.readableName || bibleVersion}</option>
 											))}
 										</select>
 									</div>
@@ -175,7 +176,6 @@ export const prerender = true;
 							})
 						`.trim()}
 						x-data={`{ 
-							isFullscreen: false,
 							timeItTakesToReadVerse: 5000,
 							toggleAllowDocumentScroll() {
 								document.body.classList.toggle('overflow-hidden');
@@ -224,9 +224,20 @@ export const prerender = true;
 					>
 						<div class="max-w-[calc(600px-24px*2)] w-full flex flex-col gap-4">
 							<div class="w-full flex justify-between gap-6 flex-grow-1">
-								<h1 x-text="scriptureRef + ' ' + bibleVersionPreference" class="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700">
-									{scriptureRef}
-								</h1>
+								<div class="flex gap-2 items-center">
+									<h1 x-text="scriptureRef + ' ' + bibleVersionPreference" class="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700">
+										{scriptureRef}
+									</h1>
+									<div
+										class="tooltip tooltip-bottom" 
+										x-show="Boolean(bibleVersionData && bibleVersionPreference)" 
+										x-bind:data-tip="bibleVersionData?.[bibleVersionPreference]?.attribution"
+									>
+										<svg width="16" height="16" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+											<path fill="currentColor" d="M108 84a16 16 0 1 1 16 16a16 16 0 0 1-16-16Zm128 44A108 108 0 1 1 128 20a108.12 108.12 0 0 1 108 108Zm-24 0a84 84 0 1 0-84 84a84.09 84.09 0 0 0 84-84Zm-72 36.68V132a20 20 0 0 0-20-20a12 12 0 0 0-4 23.32V168a20 20 0 0 0 20 20a12 12 0 0 0 4-23.32Z"/>
+										</svg>
+									</div>
+								</div>
 
 								<!-- Scripture Action Buttons -->
 								<div class="text-gray-500 flex gap-3 items-center">
@@ -291,7 +302,7 @@ export const prerender = true;
 							<span class="p-1 px-2 rounded-md" x-on:click="fidelity = 10 * 5" x-bind:class="{ 'bg-gray-300': dayOfWeek === 5 }">Fri</span>
 							<span class="p-1 px-2 rounded-md" x-on:click="fidelity = 10 * 6" x-bind:class="{ 'bg-gray-300': dayOfWeek === 6 }">Sat</span>
 						</div>	
-					</section>		  
+					</section>	
 				</section>
 
 				<!-- Notification Alert -->
@@ -309,18 +320,6 @@ export const prerender = true;
 					</svg>
 					<span x-text="notificationInfo"></span>
 				</div>
-
-				<!-- Listen to this as a song -->
-				<!-- <iframe 
-					style="border-radius:12px" 
-					src="https://open.spotify.com/embed/track/133ihRulr32OF5ydWZP61g?utm_source=generator&theme=0" 
-					width="100%" 
-					height="152" 
-					frameborder="0" 
-					allowfullscreen="" 
-					allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-					loading="lazy"
-				></iframe> -->
 
 				<!-- Subscribe -->
 				<div class="relative w-full max-sm:mx-[-24px] max-sm:w-screen" x-ref="subscribeSection" x-cloak x-show="showSubscribeSection">
@@ -448,6 +447,7 @@ export const prerender = true;
 					}
 					return false
 				})(),
+				bibleVersionData: undefined,
 				bibleVersionPreference: getUserBibleVersionPreference(),
 				versesObj: undefined,
 				notificationAlert: '',
@@ -498,6 +498,7 @@ export const prerender = true;
 				get isSubscribedToNotifications() {
 					return Boolean(('Notification' in window && Notification?.permission === 'granted') || false)
 				},
+				isFullscreen: false,
 				async handleAskForNotificationPermissions() {
 					if (this.isSubscribedToNotifications) {
 						this.notificationInfo = "Notifications will appear a few times a week";

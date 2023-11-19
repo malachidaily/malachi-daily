@@ -2,12 +2,27 @@
 
 export const selectedBibleVersions: readonly string[] = ["NIV", "ESV", "NLT", "KJV", "MSG"] as const
 export type bibleVersion = typeof selectedBibleVersions[number]
-export const bibleVersionReadable: { [key in bibleVersion]: string } = {
-    "NIV": "NIV - New International Version",
-    "ESV": "ESV - English Standard Version",
-    "NLT": "NLT - New Living Translation",
-    "KJV": "KJV - King James Version",
-    "MSG": "MSG - The Message"
+export const bibleVersionData: { [key in bibleVersion]: { readableName: string, attribution: string } } = {
+    "NIV": {
+        readableName: "NIV - New International Version",
+        attribution: "Scriptures taken from the Holy Bible, New International Version®, NIV®. Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.™ Used by permission of Zondervan. All rights reserved worldwide. www.zondervan.com The “NIV” and “New International Version” are trademarks registered in the United States Patent and Trademark Office by Biblica, Inc.™"
+    },
+    "ESV": {
+        readableName: "ESV - English Standard Version",
+        attribution: "Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved."
+    },
+    "NLT": {
+        readableName: "NLT - New Living Translation",
+        attribution: "Scripture quotations are taken from the Holy Bible, New Living Translation, copyright ©1996, 2004, 2015 by Tyndale House Foundation. Used by permission of Tyndale House Publishers, Carol Stream, Illinois 60188. All rights reserved."
+    },
+    "KJV": {
+        readableName: "KJV - King James Version",
+        attribution: "Rights in the Authorized (King James) Version in the United Kingdom are vested in the Crown. Published by permission of the Crown’s patentee, Cambridge University Press."
+    },
+    "MSG": {
+        readableName: "MSG - The Message",
+        attribution: "All Scripture quotations are taken from The Message, copyright © 1993, 2002, 2018 by Eugene H. Peterson. Used by permission of NavPress. . All rights reserved. Represented by Tyndale House Publishers."
+    }
 } 
 
 type BookName = "Genesis" | "Exodus" | "Leviticus" | "Numbers" | "Deuteronomy" | "Joshua" | "Judges" | "Ruth" | "1 Samuel" | "2 Samuel" | "1 Kings" | "2 Kings" | "1 Chronicles" | "2 Chronicles" | "Ezra" | "Nehemiah" | "Esther" | "Job" | "Psalms" | "Proverbs" | "Ecclesiastes" | "Song of Solomon" | "Isaiah" | "Jeremiah" | "Lamentations" | "Ezekiel" | "Daniel" | "Hosea" | "Joel" | "Amos" | "Obadiah" | "Jonah" | "Micah" | "Nahum" | "Habakkuk" | "Zephaniah" | "Haggai" | "Zechariah" | "Malachi" | "Matthew" | "Mark" | "Luke" | "John" | "Acts" | "Romans" | "1 Corinthians" | "2 Corinthians" | "Galatians" | "Ephesians" | "Philippians" | "Colossians" | "1 Thessalonians" | "2 Thessalonians" | "1 Timothy" | "2 Timothy" | "Titus" | "Philemon" | "Hebrews" | "James" | "1 Peter" | "2 Peter" | "1 John" | "2 John" | "3 John" | "Jude" | "Revelation" | "Psalm"
