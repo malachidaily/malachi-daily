@@ -73,6 +73,18 @@ export const prerender = true;
 							</svg>
 							<NativeFeelingDrawer client:load>
 								<div class="flex flex-col gap-2">
+									<div class="form-control w-full max-w-xs mb-2">
+										<label class="label">
+										  <span class="label-text">Select your preferred Bible translation</span>
+										</label>
+										<select class="select select-bordered">
+										  <option selected>NIV - New International Version</option>
+										  <option>ESV - English Standard Version</option>
+										  <option>MSG - The Message</option>
+										  <option>KJV - King James Version</option>
+										  <option>NLT - New Living Translation</option>
+										</select>
+									</div>
 									<div class="form-control w-fit">
 										<label class="label cursor-pointer flex gap-2 items-center" for="show-first-letter">
 											<input 
@@ -114,7 +126,7 @@ export const prerender = true;
 											/>
 											<span class="label-text">Use a more decorative font (serif)</span> 
 										</label>
-									</div>		
+									</div>											  
 								</div>
 							</NativeFeelingDrawer>
 						</div>
