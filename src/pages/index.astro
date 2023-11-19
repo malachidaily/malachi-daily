@@ -1,20 +1,28 @@
 ---
-import { Image } from 'astro:assets';
+import { Image } from "astro:assets";
 
-import Layout from '../layouts/Layout.astro';
-import logoImgUrl from '../../public/logo.png';
-import { SCRIPTURE_TEXT , SCRIPTURE_REF } from '../utils/constants';
-import NativeFeelingDrawer from '../components/react/NativeFeelingDrawer';
-import { type BibleVersesFromMultipleTranslations, getBibleVersesFromMultipleTranslations } from '../api/bible'
-import { books, type bibleVersion, selectedBibleVersions, bibleVersionData } from '../api/bible/static/books';
+import Layout from "../layouts/Layout.astro";
+import logoImgUrl from "../../public/logo.png";
+import { SCRIPTURE_TEXT, SCRIPTURE_REF } from "../utils/constants";
+import NativeFeelingDrawer from "../components/react/NativeFeelingDrawer";
+import {
+	type BibleVersesFromMultipleTranslations,
+	getBibleVersesFromMultipleTranslations,
+} from "../api/bible";
+import {
+	books,
+	type bibleVersion,
+	selectedBibleVersions,
+	bibleVersionData,
+} from "../api/bible/static/books";
 
-const translation: bibleVersion = 'ESV'
-const chapterName =  books.Matthew.name;
+const translation: bibleVersion = "ESV";
+const chapterName = books.Matthew.name;
 const bookId = books[chapterName].bookid;
 const chapter = 4;
 const verseNum = 4;
 
-const verseRef = `${chapterName} ${chapter}:${verseNum}`
+const verseRef = `${chapterName} ${chapter}:${verseNum}`;
 
 let verses: BibleVersesFromMultipleTranslations = {};
 try {
@@ -22,11 +30,11 @@ try {
 		bookId: bookId,
 		chapter,
 		verses: [verseNum],
-		translations: selectedBibleVersions
-	})
+		translations: selectedBibleVersions,
+	});
 } catch (error) {
 	// User backup verse, instead
-	console.log(error)
+	console.log(error);
 }
 
 const scriptureText = verses[translation] || SCRIPTURE_TEXT;
@@ -36,125 +44,178 @@ export const prerender = true;
 ---
 
 <Layout title="Malachi Daily: Memorize Bible Verses & Learn Their Context">
-	<div  
+	<div
 		x-init={`
 			versesObj = ${JSON.stringify(verses)}
 			bibleVersionData = ${JSON.stringify(bibleVersionData)}
 		`.trim()}
 		vaul-drawer-wrapper=""
-	>	
-		<main class="w-screen h-full min-h-screen px-6 flex justify-center bg-gray-100">
-			<div class="max-w-[600px] w-full flex flex-col py-12 max-sm:py-6 gap-12 max-sm:gap-6">
+	>
+		<main
+			class="w-screen h-full min-h-screen px-6 flex justify-center bg-gray-100"
+		>
+			<div
+				class="max-w-[600px] w-full flex flex-col py-12 max-sm:py-6 gap-12 max-sm:gap-6"
+			>
 				<!-- LOGO -->
-				<div class="w-full flex flex-col gap-2 items-start justify-start">
+				<div
+					class="w-full flex flex-col gap-2 items-start justify-start"
+				>
 					<div class="w-full flex gap-2 justify-between">
 						<div class="flex gap-2 items-center justify-start">
 							<Image
 								src={logoImgUrl}
-								alt="Malachi Daily Logo | shows hands praying" 
+								alt="Malachi Daily Logo | shows hands praying"
 								class={`aspect-[${logoImgUrl.height}/${logoImgUrl.width}] h-[32px] w-fit`}
 							/>
-							<h2 class="max-sm:text-xl text-3xl text-gray-800 font-bold whitespace-nowrap">Malachi Daily</h2>
+							<h2
+								class="max-sm:text-xl text-3xl text-gray-800 font-bold whitespace-nowrap"
+							>
+								Malachi Daily
+							</h2>
 						</div>
 						<!-- Settings and Notifications -->
 						<div class="flex gap-4 items-center">
-							<svg 
-								x-on:click="handleAskForNotificationPermissions" 
+							<svg
+								x-on:click="handleAskForNotificationPermissions"
 								x-data="{ showAnimation: true }"
 								x-init="setTimeout(() => showAnimation = false, 2500)"
 								x-transition
 								x-cloak
 								x-bind:class="{ 'animate-bounce': showAnimation && !isSubscribedToNotifications }"
-								role="button" 
-								class="text-gray-600 flex-shrink-0" 
-								width="24" height="24" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"
+								role="button"
+								class="text-gray-600 flex-shrink-0"
+								width="24"
+								height="24"
+								viewBox="0 0 256 256"
+								xmlns="http://www.w3.org/2000/svg"
 							>
-								<path fill="currentColor" d="M225.29 165.93C216.61 151 212 129.57 212 104a84 84 0 0 0-168 0c0 25.58-4.59 47-13.27 61.93a20.08 20.08 0 0 0-.07 20.07A19.77 19.77 0 0 0 48 196h36.18a44 44 0 0 0 87.64 0H208a19.77 19.77 0 0 0 17.31-10a20.08 20.08 0 0 0-.02-20.07ZM128 212a20 20 0 0 1-19.6-16h39.2a20 20 0 0 1-19.6 16Zm-73.34-40C63.51 154 68 131.14 68 104a60 60 0 0 1 120 0c0 27.13 4.48 50 13.33 68Z"/>
+								<path
+									fill="currentColor"
+									d="M225.29 165.93C216.61 151 212 129.57 212 104a84 84 0 0 0-168 0c0 25.58-4.59 47-13.27 61.93a20.08 20.08 0 0 0-.07 20.07A19.77 19.77 0 0 0 48 196h36.18a44 44 0 0 0 87.64 0H208a19.77 19.77 0 0 0 17.31-10a20.08 20.08 0 0 0-.02-20.07ZM128 212a20 20 0 0 1-19.6-16h39.2a20 20 0 0 1-19.6 16Zm-73.34-40C63.51 154 68 131.14 68 104a60 60 0 0 1 120 0c0 27.13 4.48 50 13.33 68Z"
+								></path>
 							</svg>
 							<NativeFeelingDrawer client:load>
 								<div class="flex flex-col gap-2">
-									<div class="form-control w-full max-w-xs mb-2">
+									<div
+										class="form-control w-full max-w-xs mb-2"
+									>
 										<label class="label">
-										  <span class="label-text">Select your preferred Bible translation</span>
+											<span class="label-text"
+												>Select your preferred Bible
+												translation</span
+											>
 										</label>
-										<select 
+										<select
 											class="select select-bordered"
 											x-model="bibleVersionPreference"
 											x-on:change="localStorage.setItem('bibleVersionPreference', JSON.stringify($el.value));"
 										>
-										  	{selectedBibleVersions.map((bibleVersion) => (
-												<option value={bibleVersion} x-bind:selected={`'${bibleVersion}' === bibleVersionPreference`}>{bibleVersionData?.[bibleVersion]?.readableName || bibleVersion}</option>
-											))}
+											{
+												selectedBibleVersions.map(
+													(bibleVersion) => (
+														<option
+															value={bibleVersion}
+															x-bind:selected={`'${bibleVersion}' === bibleVersionPreference`}
+														>
+															{bibleVersionData?.[
+																bibleVersion
+															]?.readableName ||
+																bibleVersion}
+														</option>
+													),
+												)
+											}
 										</select>
 									</div>
 									<div class="form-control w-fit">
-										<label class="label cursor-pointer flex gap-2 items-center" for="show-first-letter">
-											<input 
-												x-model="showFirstLetter" 
-												type="checkbox" 
-												checked="checked" 
-												class="checkbox" 
-												name="show-first-letter" 
+										<label
+											class="label cursor-pointer flex gap-2 items-center"
+											for="show-first-letter"
+										>
+											<input
+												x-model="showFirstLetter"
+												type="checkbox"
+												checked="checked"
+												class="checkbox"
+												name="show-first-letter"
 												id="show-first-letter"
 												x-on:click="localStorage.setItem('showFirstLetter', JSON.stringify($el.checked));"
 											/>
-											<span class="label-text">Show the first letter in each hidden word</span> 
+											<span class="label-text"
+												>Show the first letter in each
+												hidden word</span
+											>
 										</label>
-									</div>	
+									</div>
 									<div class="form-control w-fit">
-										<label class="label cursor-pointer flex gap-2 items-center" for="checkbox-randomize-hidden-words">
-											<input 
-												x-model="shouldRandomizeOrderOfHiddenWords" 
-												type="checkbox" 
-												checked="checked" 
-												class="checkbox" 
+										<label
+											class="label cursor-pointer flex gap-2 items-center"
+											for="checkbox-randomize-hidden-words"
+										>
+											<input
+												x-model="shouldRandomizeOrderOfHiddenWords"
+												type="checkbox"
+												checked="checked"
+												class="checkbox"
 												name="checkbox-randomize-hidden-words"
 												id="checkbox-randomize-hidden-words"
 												x-on:click="localStorage.setItem('shouldRandomizeOrderOfHiddenWords', JSON.stringify($el.checked));"
 											/>
-											<span class="label-text">Randomize the order of hidden words</span> 
+											<span class="label-text"
+												>Randomize the order of hidden
+												words</span
+											>
 										</label>
-									</div>	
+									</div>
 									<div class="form-control w-fit">
-										<label class="label cursor-pointer flex gap-2 items-center" for="checkbox-show-serif-font">
-											<input 
-												x-model="showSerifFont" 
-												type="checkbox" 
-												checked="checked" 
-												class="checkbox" 
+										<label
+											class="label cursor-pointer flex gap-2 items-center"
+											for="checkbox-show-serif-font"
+										>
+											<input
+												x-model="showSerifFont"
+												type="checkbox"
+												checked="checked"
+												class="checkbox"
 												name="checkbox-show-serif-font"
 												id="checkbox-show-serif-font"
 												x-on:click="localStorage.setItem('showSerifFont', JSON.stringify($el.checked));"
 											/>
-											<span class="label-text">Use a more decorative font (serif)</span> 
+											<span class="label-text"
+												>Use a more decorative font
+												(serif)</span
+											>
 										</label>
-									</div>											  
+									</div>
 								</div>
 							</NativeFeelingDrawer>
 						</div>
 					</div>
-					<p class="text-gray-500 text-center max-sm:hidden">Scripture memorization, together. New verse every week.</p>
+					<p class="text-gray-500 text-center max-sm:hidden">
+						Scripture memorization, together. New verse every week.
+					</p>
 				</div>
 
 				<div x-show="showDebug" x-transition x-cloak>
 					<pre
 						x-text="JSON.stringify($data, null, 2)"
 						class="whitespace-pre text-gray-500 text-start break-all"
-						style="text-wrap: pretty"
-					></pre>
+						style="text-wrap: pretty">
+					</pre>
 				</div>
 
 				<!-- SCRIPTURE TO MEMORIZE -->
 				<section
-					id="scripture" 
+					id="scripture"
 					x-init={`
 						scriptureRef = '${scriptureRef}';
 						fidelity = fidelityOfTheDay;
 					`}
 					class="rounded-md text-start max-sm:mx-[-24px]"
 				>
-					<div 
-						class="bg-white p-6 pb-8 flex justify-center items-center rounded-xl shadow-xl max-sm:shadow-sm max-sm:rounded-3xl transition-[height] duration-300" 
+					<div
+						class="bg-white p-6 pb-8 flex justify-center items-center rounded-xl shadow-xl max-sm:shadow-sm max-sm:rounded-3xl transition-[height] duration-300"
 						x-ref="scriptureCard"
 						x-init={`
 							// https://alpinejs.dev/directives/init#next-tick
@@ -223,41 +284,92 @@ export const prerender = true;
 						}`}
 						x-bind:class="{ 'absolute top-0 left-0 bottom-0 right-0 z-30': isFullscreen }"
 					>
-						<div class="max-w-[calc(600px-24px*2)] w-full flex flex-col gap-4">
-							<div class="w-full flex justify-between gap-6 flex-grow-1">
+						<div
+							class="max-w-[calc(600px-24px*2)] w-full flex flex-col gap-4"
+						>
+							<div
+								class="w-full flex justify-between gap-6 flex-grow-1"
+							>
 								<div class="flex gap-2 items-center">
-									<h1 x-text="scriptureRef + ' ' + bibleVersionPreference" class="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700">
+									<h1
+										x-text="scriptureRef + ' ' + bibleVersionPreference"
+										class="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700"
+									>
 										{scriptureRef}
 									</h1>
 									<div
-										class="tooltip tooltip-bottom" 
-										x-show="Boolean(bibleVersionData && bibleVersionPreference)" 
+										class="tooltip tooltip-bottom"
+										x-show="Boolean(bibleVersionData && bibleVersionPreference)"
 										x-bind:data-tip="bibleVersionData?.[bibleVersionPreference]?.attribution"
 									>
-										<svg width="16" height="16" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-											<path fill="currentColor" d="M108 84a16 16 0 1 1 16 16a16 16 0 0 1-16-16Zm128 44A108 108 0 1 1 128 20a108.12 108.12 0 0 1 108 108Zm-24 0a84 84 0 1 0-84 84a84.09 84.09 0 0 0 84-84Zm-72 36.68V132a20 20 0 0 0-20-20a12 12 0 0 0-4 23.32V168a20 20 0 0 0 20 20a12 12 0 0 0 4-23.32Z"/>
+										<svg
+											width="16"
+											height="16"
+											viewBox="0 0 256 256"
+											xmlns="http://www.w3.org/2000/svg"
+										>
+											<path
+												fill="currentColor"
+												d="M108 84a16 16 0 1 1 16 16a16 16 0 0 1-16-16Zm128 44A108 108 0 1 1 128 20a108.12 108.12 0 0 1 108 108Zm-24 0a84 84 0 1 0-84 84a84.09 84.09 0 0 0 84-84Zm-72 36.68V132a20 20 0 0 0-20-20a12 12 0 0 0-4 23.32V168a20 20 0 0 0 20 20a12 12 0 0 0 4-23.32Z"
+											></path>
 										</svg>
 									</div>
 								</div>
 
 								<!-- Scripture Action Buttons -->
-								<div class="text-gray-500 flex gap-3 items-center">
+								<div
+									class="text-gray-500 flex gap-3 items-center"
+								>
 									<!-- Show Fullscreen Button -->
-									<svg role="button" x-show="!isFullscreen" x-on:click="handleShowFullscreen" class="cursor-pointer"  width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+									<svg
+										role="button"
+										x-show="!isFullscreen"
+										x-on:click="handleShowFullscreen"
+										class="cursor-pointer"
+										width="24"
+										height="24"
+										viewBox="0 0 24 24"
+										xmlns="http://www.w3.org/2000/svg"
+									>
 										<g fill="none" fill-rule="evenodd">
-											<path d="M24 0v24H0V0h24ZM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018Zm.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022Zm-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01l-.184-.092Z"/>
-											<path fill="currentColor" d="M18.5 5.5H16a1.5 1.5 0 0 1 0-3h3A2.5 2.5 0 0 1 21.5 5v3a1.5 1.5 0 0 1-3 0V5.5ZM8 5.5H5.5V8a1.5 1.5 0 1 1-3 0V5A2.5 2.5 0 0 1 5 2.5h3a1.5 1.5 0 1 1 0 3Zm0 13H5.5V16a1.5 1.5 0 0 0-3 0v3A2.5 2.5 0 0 0 5 21.5h3a1.5 1.5 0 0 0 0-3Zm8 0h2.5V16a1.5 1.5 0 0 1 3 0v3a2.5 2.5 0 0 1-2.5 2.5h-3a1.5 1.5 0 0 1 0-3Z"/>
+											<path
+												d="M24 0v24H0V0h24ZM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018Zm.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022Zm-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01l-.184-.092Z"
+											></path>
+											<path
+												fill="currentColor"
+												d="M18.5 5.5H16a1.5 1.5 0 0 1 0-3h3A2.5 2.5 0 0 1 21.5 5v3a1.5 1.5 0 0 1-3 0V5.5ZM8 5.5H5.5V8a1.5 1.5 0 1 1-3 0V5A2.5 2.5 0 0 1 5 2.5h3a1.5 1.5 0 1 1 0 3Zm0 13H5.5V16a1.5 1.5 0 0 0-3 0v3A2.5 2.5 0 0 0 5 21.5h3a1.5 1.5 0 0 0 0-3Zm8 0h2.5V16a1.5 1.5 0 0 1 3 0v3a2.5 2.5 0 0 1-2.5 2.5h-3a1.5 1.5 0 0 1 0-3Z"
+											></path>
 										</g>
 									</svg>
 									<!-- Hide Fullscreen Button -->
-									<svg role="button" x-cloak x-show="isFullscreen" x-on:click="handleHideFullscreen" class="cursor-pointer" width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-										<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m7 7l10 10M7 17L17 7"/>
+									<svg
+										role="button"
+										x-cloak
+										x-show="isFullscreen"
+										x-on:click="handleHideFullscreen"
+										class="cursor-pointer"
+										width="28"
+										height="28"
+										viewBox="0 0 24 24"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											fill="none"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2.5"
+											d="m7 7l10 10M7 17L17 7"></path>
 									</svg>
 								</div>
 							</div>
 
 							<!-- Scripture Verses -->
-							<div x-ref="scriptureText" class="relative transition font-scripture" x-bind:class="{ 'font-scripture-serif': showSerifFont }">
+							<div
+								x-ref="scriptureText"
+								class="relative transition font-scripture"
+								x-bind:class="{ 'font-scripture-serif': showSerifFont }"
+							>
 								<h2
 									x-init={`
 										setTimeout(() => {
@@ -267,7 +379,7 @@ export const prerender = true;
 									x-transition
 									x-show="scriptureText"
 									id="verse-current"
-									x-html="scriptureText" 
+									x-html="scriptureText"
 									class="opacity-0 transition duration-1000 font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 leading-tight"
 								>
 									{scriptureText}
@@ -277,11 +389,19 @@ export const prerender = true;
 					</div>
 
 					<!-- Scrubbing Input -->
-					<section class="
-						w-full mt-12
-						max-sm:mx-6 max-sm:w-auto max-sm:mt-8
-					">
-						<input x-model="fidelity" type="range" min="0" max="60" value="0" class="range range-md" step="10" />
+					<section
+						class="w-full mt-12
+						max-sm:mx-6 max-sm:w-auto max-sm:mt-8"
+					>
+						<input
+							x-model="fidelity"
+							type="range"
+							min="0"
+							max="60"
+							value="0"
+							class="range range-md"
+							step="10"
+						/>
 						<div class="w-full flex justify-between text-xs px-2">
 							<span>|</span>
 							<span>|</span>
@@ -291,175 +411,283 @@ export const prerender = true;
 							<span>|</span>
 							<span>|</span>
 						</div>
-						<div 
+						<div
 							class="w-[calc(100%+16px)] ms-[-8px] flex justify-between text-xs mt-1 font-mono"
 							x-data="{ dayOfWeek: new Date().getDay() }"
 						>
-							<span class="p-1 px-2 rounded-md" x-on:click="fidelity = 10 * 0" x-bind:class="{ 'bg-gray-300': dayOfWeek === 0 || dayOfWeek === 7 }">Sun</span>
-							<span class="p-1 px-2 rounded-md" x-on:click="fidelity = 10 * 1" x-bind:class="{ 'bg-gray-300': dayOfWeek === 1 }">Mon</span>
-							<span class="p-1 px-2 rounded-md" x-on:click="fidelity = 10 * 2" x-bind:class="{ 'bg-gray-300': dayOfWeek === 2 }">Tue</span>
-							<span class="p-1 px-2 rounded-md" x-on:click="fidelity = 10 * 3" x-bind:class="{ 'bg-gray-300': dayOfWeek === 3 }">Wed</span>
-							<span class="p-1 px-2 rounded-md" x-on:click="fidelity = 10 * 4" x-bind:class="{ 'bg-gray-300': dayOfWeek === 4 }">Thu</span>
-							<span class="p-1 px-2 rounded-md" x-on:click="fidelity = 10 * 5" x-bind:class="{ 'bg-gray-300': dayOfWeek === 5 }">Fri</span>
-							<span class="p-1 px-2 rounded-md" x-on:click="fidelity = 10 * 6" x-bind:class="{ 'bg-gray-300': dayOfWeek === 6 }">Sat</span>
-						</div>	
-					</section>	
+							<span
+								class="p-1 px-2 rounded-md"
+								x-on:click="fidelity = 10 * 0"
+								x-bind:class="{ 'bg-gray-300': dayOfWeek === 0 || dayOfWeek === 7 }"
+								>Sun</span
+							>
+							<span
+								class="p-1 px-2 rounded-md"
+								x-on:click="fidelity = 10 * 1"
+								x-bind:class="{ 'bg-gray-300': dayOfWeek === 1 }"
+								>Mon</span
+							>
+							<span
+								class="p-1 px-2 rounded-md"
+								x-on:click="fidelity = 10 * 2"
+								x-bind:class="{ 'bg-gray-300': dayOfWeek === 2 }"
+								>Tue</span
+							>
+							<span
+								class="p-1 px-2 rounded-md"
+								x-on:click="fidelity = 10 * 3"
+								x-bind:class="{ 'bg-gray-300': dayOfWeek === 3 }"
+								>Wed</span
+							>
+							<span
+								class="p-1 px-2 rounded-md"
+								x-on:click="fidelity = 10 * 4"
+								x-bind:class="{ 'bg-gray-300': dayOfWeek === 4 }"
+								>Thu</span
+							>
+							<span
+								class="p-1 px-2 rounded-md"
+								x-on:click="fidelity = 10 * 5"
+								x-bind:class="{ 'bg-gray-300': dayOfWeek === 5 }"
+								>Fri</span
+							>
+							<span
+								class="p-1 px-2 rounded-md"
+								x-on:click="fidelity = 10 * 6"
+								x-bind:class="{ 'bg-gray-300': dayOfWeek === 6 }"
+								>Sat</span
+							>
+						</div>
+					</section>
 				</section>
 
 				<!-- Notification Alert -->
-				<div x-on:click="notificationAlert = ''" x-cloak x-transition x-show="notificationAlert" class="alert alert-warning flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]">
-					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+				<div
+					x-on:click="notificationAlert = ''"
+					x-cloak
+					x-transition
+					x-show="notificationAlert"
+					class="alert alert-warning flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						class="stroke-current shrink-0 w-6 h-6"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+						></path>
 					</svg>
 					<span x-text="notificationAlert"></span>
 				</div>
 
 				<!-- Notification Info -->
-				<div x-on:click="notificationInfo = ''" x-cloak x-transition x-show="notificationInfo" class="alert alert-info bg-white border-white flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]">
-					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+				<div
+					x-on:click="notificationInfo = ''"
+					x-cloak
+					x-transition
+					x-show="notificationInfo"
+					class="alert alert-info bg-white border-white flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						class="stroke-current shrink-0 w-6 h-6"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+						></path>
 					</svg>
 					<span x-text="notificationInfo"></span>
 				</div>
 
 				<!-- Subscribe -->
-				<div class="relative w-full max-sm:mx-[-24px] max-sm:w-screen" x-ref="subscribeSection" x-cloak x-show="showSubscribeSection">
-					<iframe 
-						src="https://embeds.beehiiv.com/c8ce3263-a472-44d8-a911-db5da1e572e2" 
-						data-test-id="beehiiv-embed" 
-						class="w-full rounded-xl"
-						height="320" 
-						frameborder="0" 
-						scrolling="no" 
-						style="margin: 0; background-color: transparent;"
+				<div
+					class="relative w-full max-sm:mx-[-24px] max-sm:w-screen rounded-xl bg-gray-200"
+					x-ref="subscribeSection"
+					x-cloak
+					x-show="showSubscribeSection"
+				>
+					<iframe
+						src="https://embeds.beehiiv.com/2f6c51bb-5e19-4053-95f7-d0f01ecd6546"
+						data-test-id="beehiiv-embed"
+						class="opacity-0 duration-200 transition-opacity w-full rounded-xl bg-gray-200 skeleton"
+						height="320"
+						frameborder="0"
+						scrolling="no"
+						style="margin: 0;"
 						loading="lazy"
+						x-bind:onload="setTimeout(() => { $el.classList.remove('opacity-0') }, 1000)"
 					></iframe>
 					<!-- Stop Showing Subscribe -->
-					<svg role="button" x-on:click="handleHideSubscribeSection" class="cursor-pointer top-6 right-6 absolute" width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-						<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m7 7l10 10M7 17L17 7"/>
+					<svg
+						role="button"
+						x-on:click="handleHideSubscribeSection"
+						class="cursor-pointer text-white top-6 right-6 absolute"
+						width="28"
+						height="28"
+						viewBox="0 0 24 24"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path
+							fill="none"
+							stroke="currentColor"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2.5"
+							d="m7 7l10 10M7 17L17 7"></path>
 					</svg>
 				</div>
 			</div>
 		</main>
 	</div>
-	
+
 	<script>
-		import { type Alpine as AlpineType } from 'alpinejs'
-		import { requestNotificationPermission, messaging, getUserFirebaseNotificationToken } from '../messaging_init_in_sw.js'
+		import { type Alpine as AlpineType } from "alpinejs";
+		import {
+			requestNotificationPermission,
+			messaging,
+			getUserFirebaseNotificationToken,
+		} from "../messaging_init_in_sw.js";
 
 		declare global {
-			var Alpine: AlpineType
+			var Alpine: AlpineType;
 		}
 
 		// create a function that gets "showFirstLetter" from localStorage
 		// if it doesn't exist, set it to true
 		const getShowFirstLetter = () => {
-			const showFirstLetter = localStorage.getItem('showFirstLetter');
+			const showFirstLetter = localStorage.getItem("showFirstLetter");
 			if (showFirstLetter === null) {
 				return false;
 			} else {
 				return JSON.parse(showFirstLetter);
 			}
-		}
+		};
 
 		// create a function that gets "showSerifFont" from localStorage
 		// if it doesn't exist, set it to false
 		const getShowSerifFont = () => {
-			const showSerifFont = localStorage.getItem('showSerifFont');
+			const showSerifFont = localStorage.getItem("showSerifFont");
 			if (showSerifFont === null) {
 				return false;
 			} else {
 				return JSON.parse(showSerifFont);
 			}
-		}
+		};
 
 		const getShowSubscribeSection = () => {
-			const showSubscribeSection = localStorage.getItem('showSubscribeSection');
+			const showSubscribeSection = localStorage.getItem(
+				"showSubscribeSection",
+			);
 			if (showSubscribeSection === null) {
 				return true;
 			} else {
 				return JSON.parse(showSubscribeSection);
 			}
-		}
+		};
 
 		const getShouldRandomizeOrderOfHiddenWords = () => {
-			const shouldRandomizeOrderOfHiddenWords = localStorage.getItem('shouldRandomizeOrderOfHiddenWords');
+			const shouldRandomizeOrderOfHiddenWords = localStorage.getItem(
+				"shouldRandomizeOrderOfHiddenWords",
+			);
 			if (shouldRandomizeOrderOfHiddenWords === null) {
 				return false;
 			} else {
 				return JSON.parse(shouldRandomizeOrderOfHiddenWords);
 			}
-		}
+		};
 
 		const getUserBibleVersionPreference = () => {
-			const bibleVersionPreference = localStorage.getItem('bibleVersionPreference');
+			const bibleVersionPreference = localStorage.getItem(
+				"bibleVersionPreference",
+			);
 			if (bibleVersionPreference === null) {
-				return 'NIV';
+				return "NIV";
 			} else {
 				return JSON.parse(bibleVersionPreference);
 			}
-		}
+		};
 
 		const isUserAgentOniOS = (): boolean => {
-			const iOS = window.navigator.userAgent.toLowerCase().match(/(iphone|ipad|ipod)/);
+			const iOS = window.navigator.userAgent
+				.toLowerCase()
+				.match(/(iphone|ipad|ipod)/);
 			// return boolean
-			return iOS ? true : false
-		}
+			return iOS ? true : false;
+		};
 
 		const getiOSVersion = () => {
 			let iOSVersionNumber: number = 0;
-			const iOS = window.navigator.userAgent.toLowerCase().match(/(iphone|ipad|ipod)/);
-			const iOSVersionMatch = /CPU iPhone OS (\d+_\d+)/.exec(window.navigator.userAgent);
-			iOSVersionNumber = parseFloat(iOSVersionMatch?.[1]?.replace('_', '.') || '0.0');
-			
+			const iOS = window.navigator.userAgent
+				.toLowerCase()
+				.match(/(iphone|ipad|ipod)/);
+			const iOSVersionMatch = /CPU iPhone OS (\d+_\d+)/.exec(
+				window.navigator.userAgent,
+			);
+			iOSVersionNumber = parseFloat(
+				iOSVersionMatch?.[1]?.replace("_", ".") || "0.0",
+			);
+
 			if (!iOS) {
 				// iOS is not detected. Must be using something else.
-				return iOSVersionNumber
+				return iOSVersionNumber;
 			}
 
-			return iOSVersionNumber
-		}
+			return iOSVersionNumber;
+		};
 
 		// Add this to the body tag
-		document.body.setAttribute('x-data', 'malachi');
+		document.body.setAttribute("x-data", "malachi");
 
-		document.addEventListener('alpine:init', () => {
-			const Alpine = window['Alpine'] || {}
-			Alpine.data('malachi', () => ({
+		document.addEventListener("alpine:init", () => {
+			const Alpine = window["Alpine"] || {};
+			Alpine.data("malachi", () => ({
 				init() {
 					messaging.onMessage((payload) => {
-						console.log('message received',payload)
+						console.log("message received", payload);
 						// Update the UI to include the received message.
-						this.notificationInfo = payload?.notification?.body || '';
+						this.notificationInfo =
+							payload?.notification?.body || "";
 					});
 
-					getUserFirebaseNotificationToken().then(token => this.firebaseCMToken = token)
+					getUserFirebaseNotificationToken().then(
+						(token) => (this.firebaseCMToken = token),
+					);
 				},
 				showDebug: (() => {
 					// Get url param debug = true
 					const url = new URL(window.location.href);
-					const urlParams = url.searchParams
-					const debug = urlParams.get('debug');
-					if (debug === 'true') {
-						return true
+					const urlParams = url.searchParams;
+					const debug = urlParams.get("debug");
+					if (debug === "true") {
+						return true;
 					}
-					return false
+					return false;
 				})(),
 				bibleVersionData: undefined,
 				bibleVersionPreference: getUserBibleVersionPreference(),
 				versesObj: undefined,
-				notificationAlert: '',
-				notificationInfo: '',
+				notificationAlert: "",
+				notificationInfo: "",
 				get scriptureTextOriginal() {
-					return this.versesObj?.[this.bibleVersionPreference] || ''
+					return this.versesObj?.[this.bibleVersionPreference] || "";
 				},
-				scriptureRef: '',
+				scriptureRef: "",
 				showSerifFont: getShowSerifFont(),
 				iOSVersion: getiOSVersion(),
 				get isEligibleForNotificationPermission() {
 					const IOS_VERSION_WITH_NOTIFICATIONS = 16.4;
 					const iOSVersion = getiOSVersion();
-					
+
 					if (!iOSVersion) {
 						return true;
 					}
@@ -481,95 +709,125 @@ export const prerender = true;
 					} else {
 						dayOfWeekAsNumber = dayOfWeek;
 					}
-					return dayOfWeekAsNumber * 10;	
+					return dayOfWeekAsNumber * 10;
 				},
 				fidelity: 0,
 				showFirstLetter: getShowFirstLetter(),
-				shouldRandomizeOrderOfHiddenWords: getShouldRandomizeOrderOfHiddenWords(),
+				shouldRandomizeOrderOfHiddenWords:
+					getShouldRandomizeOrderOfHiddenWords(),
 				showSubscribeSection: getShowSubscribeSection(),
 				handleHideSubscribeSection() {
 					const subscribeSection = this.$refs.subscribeSection;
-					subscribeSection.style.display = 'none';
-					localStorage.setItem('showSubscribeSection', 'false');
+					subscribeSection.style.display = "none";
+					localStorage.setItem("showSubscribeSection", "false");
 				},
-				firebaseCMToken: '',
+				firebaseCMToken: "",
 				get isSubscribedToNotifications() {
-					return Boolean(('Notification' in window && Notification?.permission === 'granted') || false)
+					return Boolean(
+						("Notification" in window &&
+							Notification?.permission === "granted") ||
+							false,
+					);
 				},
 				isFullscreen: false,
 				async handleAskForNotificationPermissions() {
 					if (this.isSubscribedToNotifications) {
-						this.notificationInfo = "Notifications will appear a few times a week";
+						this.notificationInfo =
+							"Notifications will appear a few times a week";
 
-						if (!('Notification' in window)) {
+						if (!("Notification" in window)) {
 							return;
 						}
 
 						// Instead, show a test notification from the web push api
-						const notification = new Notification('This is a Test Notification', {
-							body: `
+						const notification = new Notification(
+							"This is a Test Notification",
+							{
+								body: `
 								${this.scriptureWithUnderscores}
 								— ${this.scriptureRef}
 							`.trim(),
-							icon: '/logo.png',
-						});
+								icon: "/logo.png",
+							},
+						);
 
 						return;
 					}
 
 					if (this.isEligibleForNotificationPermission) {
 						// Check if the browser supports notifications
-						if (!('Notification' in window)) {
-							this.notificationInfo = "Install this web app to allow notifications. Tap share and click 'Add to Home Screen'";
+						if (!("Notification" in window)) {
+							this.notificationInfo =
+								"Install this web app to allow notifications. Tap share and click 'Add to Home Screen'";
 							return;
 						}
 
 						// Check if notification permissions have already been granted
-						if (Notification.permission === 'granted') {
+						if (Notification.permission === "granted") {
 							return;
 						}
 
 						// Request notification permissions
 						try {
-							const currentToken = await requestNotificationPermission();
-							this.firebaseCMToken = currentToken
-							this.notificationInfo = "Notification permissions granted."
+							const currentToken =
+								await requestNotificationPermission();
+							this.firebaseCMToken = currentToken;
+							this.notificationInfo =
+								"Notification permissions granted.";
 						} catch (error: Error | any) {
-							if (error?.message.includes("Can't find variable: Notification")) {
-								const isUserOniOS = isUserAgentOniOS()
+							if (
+								error?.message.includes(
+									"Can't find variable: Notification",
+								)
+							) {
+								const isUserOniOS = isUserAgentOniOS();
 								if (isUserOniOS) {
-									this.notificationInfo = "Install this web app to allow notifications. Tap share and click 'Add to Home Screen'"
+									this.notificationInfo =
+										"Install this web app to allow notifications. Tap share and click 'Add to Home Screen'";
 								} else {
-									this.notificationInfo = "Notifications are not supported on this device."
+									this.notificationInfo =
+										"Notifications are not supported on this device.";
 								}
 							} else {
 								if (isUserAgentOniOS()) {
-									this.notificationInfo = "Please update to the latest iOS version to get notifications."
-								}  else {
-									this.notificationAlert = error?.message || 'An error occurred. Please close the app and try again.' 
+									this.notificationInfo =
+										"Please update to the latest iOS version to get notifications.";
+								} else {
+									this.notificationAlert =
+										error?.message ||
+										"An error occurred. Please close the app and try again.";
 								}
 							}
 						}
 					}
 				},
 				get scriptureWithUnderscores() {
-					return document.getElementById('verse-current')?.innerText || ''
+					return (
+						document.getElementById("verse-current")?.innerText ||
+						""
+					);
 				},
 				get scriptureText() {
 					// Replace some words from the original with underscores for each character
 					// but do so where we replace more and more words as fidelity grows
 					// when fideltiy is at 0, we just return the original
 					// when fidelity is at 60, we return every word with underscores for each character
-					const words = this.scriptureTextOriginal.split(' ');
+					const words = this.scriptureTextOriginal.split(" ");
 
-					function convertWordToUnderscores(word: string, showFirstCharacter: boolean = false): string {
-						const wordToBeReplaced = word.match(/([A-Za-z]+)/ig)?.[0] || ''						
-						
-						let underscores = "_".repeat(wordToBeReplaced.length)
+					function convertWordToUnderscores(
+						word: string,
+						showFirstCharacter: boolean = false,
+					): string {
+						const wordToBeReplaced =
+							word.match(/([A-Za-z]+)/gi)?.[0] || "";
+
+						let underscores = "_".repeat(wordToBeReplaced.length);
 						if (showFirstCharacter && word.length > 1) {
-							underscores = "_".repeat(wordToBeReplaced.length - 1) 
+							underscores = "_".repeat(
+								wordToBeReplaced.length - 1,
+							);
 						} else if (wordToBeReplaced.length === 1) {
-							underscores = "_"
+							underscores = "_";
 						}
 
 						const makeUnderscoresVisible = () => {
@@ -583,18 +841,30 @@ export const prerender = true;
 									}"
 									class="opacity-40 animate-pulse text-blue-700"
 									x-on:mouseover="
-										$el.innerText = '${showFirstCharacter ? wordToBeReplaced.slice(1) : wordToBeReplaced}'
+										$el.innerText = '${
+											showFirstCharacter
+												? wordToBeReplaced.slice(1)
+												: wordToBeReplaced
+										}'
 										$el.classList.add('opacity-80')
 									"
 									x-on:mouseleave="resetText()"
 									x-on:click.outside="resetText()"
 								>${underscores}</span>
-							`.trim()
-						}
+							`.trim();
+						};
 
-						const bookendsOfTheWord = word.replace(wordToBeReplaced, '{INSERT_UNDERSCORES}')
-						const firstCharacter = showFirstCharacter ? (wordToBeReplaced[0] || '') : ''
-						const replacedWord = bookendsOfTheWord.replace('{INSERT_UNDERSCORES}', firstCharacter + makeUnderscoresVisible())
+						const bookendsOfTheWord = word.replace(
+							wordToBeReplaced,
+							"{INSERT_UNDERSCORES}",
+						);
+						const firstCharacter = showFirstCharacter
+							? wordToBeReplaced[0] || ""
+							: "";
+						const replacedWord = bookendsOfTheWord.replace(
+							"{INSERT_UNDERSCORES}",
+							firstCharacter + makeUnderscoresVisible(),
+						);
 
 						return `
 							<span class="text-[inherit] cursor-default align-bottom inline-block whitespace-nowrap rounded-md focus:outline-2 focus:outline-blue-400">
@@ -605,25 +875,36 @@ export const prerender = true;
 
 					return words
 						.map((word: string, index: number) => {
-							const fidelityAsNumber: number = Number(this.fidelity);
-							
+							const fidelityAsNumber: number = Number(
+								this.fidelity,
+							);
+
 							if (fidelityAsNumber === 0) {
-								return word
+								return word;
 							}
 
 							if (fidelityAsNumber === 60) {
-								return convertWordToUnderscores(word, this.showFirstLetter)
+								return convertWordToUnderscores(
+									word,
+									this.showFirstLetter,
+								);
 							}
 
-							const percentOfWordsHidden: number = fidelityAsNumber / 60;
-							const numOfWordsToReplace: number = Math.round(percentOfWordsHidden * words.length)
+							const percentOfWordsHidden: number =
+								fidelityAsNumber / 60;
+							const numOfWordsToReplace: number = Math.round(
+								percentOfWordsHidden * words.length,
+							);
 
-							const indicesToReplace: number[] = []
+							const indicesToReplace: number[] = [];
 
 							if (this.shouldRandomizeOrderOfHiddenWords) {
 								// This function evenly disperses the hidden words
 								for (let i = 0; i < words.length; i += 1) {
-									const index: number = Math.floor(i * words.length / numOfWordsToReplace);
+									const index: number = Math.floor(
+										(i * words.length) /
+											numOfWordsToReplace,
+									);
 									indicesToReplace.push(index);
 								}
 							} else {
@@ -635,16 +916,18 @@ export const prerender = true;
 								}
 							}
 
-
 							if (indicesToReplace.includes(index)) {
-								return convertWordToUnderscores(word, this.showFirstLetter)
+								return convertWordToUnderscores(
+									word,
+									this.showFirstLetter,
+								);
 							}
 
 							return word;
 						})
-						.join(' ');
+						.join(" ");
 				},
-			}))
-		})
+			}));
+		});
 	</script>
 </Layout>
