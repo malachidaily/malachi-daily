@@ -429,14 +429,14 @@ export const prerender = true;
 			const Alpine = window['Alpine'] || {}
 			Alpine.data('malachi', () => ({
 				init() {
-					// Handle incoming messages. Called when:
-					// - a message is received while the app has focus
-					// - the user clicks on an app notification created by a service worker
-					//   `messaging.onBackgroundMessage` handler.
-					onMessage(messaging, (payload) => {
-						// Update the UI to include the received message.
-						this.notificationInfo = payload?.data?.message || '';
-					});
+					// // Handle incoming messages. Called when:
+					// // - a message is received while the app has focus
+					// // - the user clicks on an app notification created by a service worker
+					// //   `messaging.onBackgroundMessage` handler.
+					// onMessage(messaging, (payload) => {
+					// 	// Update the UI to include the received message.
+					// 	this.notificationInfo = payload?.data?.message || '';
+					// });
 				},
 				showDebug: (() => {
 					// Get url param debug = true
@@ -500,6 +500,12 @@ export const prerender = true;
 				},
 				async handleAskForNotificationPermissions() {
 					if (this.isSubscribedToNotifications) {
+						this.notificationInfo = "Notifications will appear a few times a week";
+						
+						if (!('Notification' in window)) {
+							return;
+						}
+
 						// Instead, show a test notification from the web push api
 						const notification = new Notification('This is a Test Notification', {
 							body: `
@@ -508,6 +514,7 @@ export const prerender = true;
 							`.trim(),
 							icon: '/logo.png',
 						});
+
 						return;
 					}
 
