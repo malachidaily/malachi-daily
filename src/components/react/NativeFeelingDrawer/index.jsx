@@ -23,8 +23,8 @@ function NativeFeelingDrawer({ children }) {
                   Settings
                 </Drawer.Title>
                 {children}
-                <ul class="w-full flex justify-center gap-6 flex-wrap text-gray-500 p-4 bg-gray-100 rounded-lg">
-                <li class="leading-3">
+                <ul className="w-full flex justify-center gap-6 flex-wrap text-gray-500 p-4 bg-gray-100 rounded-lg">
+                <li className="leading-3">
 									<a 
 										x-data={`{
 											createEmailLink() {
@@ -47,16 +47,16 @@ function NativeFeelingDrawer({ children }) {
 										x-init="emailLink = createEmailLink()"
 										x-bind:href="emailLink"
 										target="_blank"
-                    class="link whitespace-nowrap text-xs"
+                    className="link whitespace-nowrap text-xs"
 									>
 										Need help?
 									</a>
                 </li>
-                <li class="leading-3">
-                  <a class="link whitespace-nowrap text-xs" href="mailto:hello@malachidaily.com" target="_blank">Contact Us</a>
+                <li className="leading-3">
+                  <a className="link whitespace-nowrap text-xs" href="mailto:hello@malachidaily.com" target="_blank">Contact Us</a>
                 </li>
-                <li class="leading-3">
-                  <a class="link whitespace-nowrap text-xs" href="https://malachidaily.com" target="_blank">Visit Main Website</a>
+                <li className="leading-3">
+                  <a className="link whitespace-nowrap text-xs" href="https://malachidaily.com" target="_blank">Visit Main Website</a>
                 </li>
               </ul>
               </div>

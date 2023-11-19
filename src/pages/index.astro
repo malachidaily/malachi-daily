@@ -5,7 +5,7 @@ import Layout from '../layouts/Layout.astro';
 import logoImgUrl from '../../public/logo.png';
 import { SCRIPTURE_TEXT , SCRIPTURE_REF } from '../utils/constants';
 import NativeFeelingDrawer from '../components/react/NativeFeelingDrawer';
-import { getVerse, type Verse, getBibleVersesFromMultipleTranslations } from '../api/bible'
+import { type BibleVersesFromMultipleTranslations, getBibleVersesFromMultipleTranslations } from '../api/bible'
 import { books, type bibleVersion, selectedBibleVersions, bibleVersionReadable } from '../api/bible/static/books';
 
 const translation: bibleVersion = 'ESV'
@@ -14,37 +14,34 @@ const bookId = books[chapterName].bookid;
 const chapter = 4;
 const verseNum = 4;
 
-const verseRef = `${chapterName} ${chapter}:${verseNum} ${translation}`
+const verseRef = `${chapterName} ${chapter}:${verseNum}`
 
-let verse = {} as Verse
-let verses;
+let verses: BibleVersesFromMultipleTranslations = {};
 try {
-	verse = await getVerse({
-		translation: translation,
-		bookId: bookId,
-		chapter,
-		verse: verseNum
-	});
 	verses = await getBibleVersesFromMultipleTranslations({
 		bookId: bookId,
 		chapter,
 		verses: [verseNum],
 		translations: selectedBibleVersions
 	})
-	console.log('verses', verses)
 } catch (error) {
 	// User backup verse, instead
 	console.log(error)
 }
 
-const scriptureText = verse?.text || SCRIPTURE_TEXT;
+const scriptureText = verses[translation] || SCRIPTURE_TEXT;
 const scriptureRef = verseRef || SCRIPTURE_REF;
 
 export const prerender = true;
 ---
 
 <Layout title="Malachi Daily: Memorize Bible Verses & Learn Their Context">
-	<div vaul-drawer-wrapper="">
+	<div  
+		x-init={`
+			versesObj = ${JSON.stringify(verses)}
+		`.trim()}
+		vaul-drawer-wrapper=""
+	>	
 		<main class="w-screen h-full min-h-screen px-6 flex justify-center bg-gray-100 pb-24">
 			<div class="max-w-[600px] w-full flex flex-col py-12 max-sm:py-6 gap-12 max-sm:gap-6">
 				<!-- LOGO -->
@@ -78,8 +75,14 @@ export const prerender = true;
 										<label class="label">
 										  <span class="label-text">Select your preferred Bible translation</span>
 										</label>
-										<select class="select select-bordered">
-										  {selectedBibleVersions.map((bibleVersion) => <option>{bibleVersionReadable[bibleVersion] || bibleVersion}</option>)}
+										<select 
+											class="select select-bordered"
+											x-model="bibleVersionPreference"
+											x-on:change="localStorage.setItem('bibleVersionPreference', JSON.stringify($el.value));"
+										>
+										  	{selectedBibleVersions.map((bibleVersion) => (
+												<option value={bibleVersion} x-bind:selected={`'${bibleVersion}' === bibleVersionPreference`}>{bibleVersionReadable[bibleVersion] || bibleVersion}</option>
+											))}
 										</select>
 									</div>
 									<div class="form-control w-fit">
@@ -132,40 +135,16 @@ export const prerender = true;
 				</div>
 
 				<div x-show="showDebug" x-transition x-cloak>
-					<!-- FIREBASE CLOUD MESSAGING TOKEN -->
-					<p 
-						x-transition
-						x-cloak
-						x-show="firebaseCMToken"
-						x-text="firebaseCMToken"
+					<pre
+						x-text="JSON.stringify($data, null, 2)"
 						class="whitespace-wrap text-gray-500 text-start break-all"
-					></p>
-
-					<!-- IOS VERSION -->
-					<p 
-						x-transition
-						x-cloak
-						x-show="iOSVersion"
-						x-text="iOSVersion"
-						class="whitespace-wrap text-gray-500 text-start break-all"
-					></p>
-
-					<p 
-						x-data="{ userAgent: '' }" 
-						x-init="userAgent = window.navigator.userAgent" 
-						x-text="userAgent" 
-						x-cloak 
-						x-show="userAgent"
-						x-transition
-					>
-					</p>
+					></pre>
 				</div>
 
 				<!-- SCRIPTURE TO MEMORIZE -->
 				<section
 					id="scripture" 
 					x-init={`
-						scriptureTextOriginal = '${scriptureText}';
 						scriptureRef = '${scriptureRef}';
 						fidelity = fidelityOfTheDay;
 					`}
@@ -244,7 +223,7 @@ export const prerender = true;
 					>
 						<div class="max-w-[calc(600px-24px*2)] w-full flex flex-col gap-4">
 							<div class="w-full flex justify-between gap-6 flex-grow-1">
-								<h1 x-text="scriptureRef" class="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700">
+								<h1 x-text="scriptureRef + ' ' + bibleVersionPreference" class="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700">
 									{scriptureRef}
 								</h1>
 
@@ -412,6 +391,15 @@ export const prerender = true;
 			}
 		}
 
+		const getUserBibleVersionPreference = () => {
+			const bibleVersionPreference = localStorage.getItem('bibleVersionPreference');
+			if (bibleVersionPreference === null) {
+				return 'NIV';
+			} else {
+				return JSON.parse(bibleVersionPreference);
+			}
+		}
+
 		const isUserAgentOniOS = (): boolean => {
 			const iOS = window.navigator.userAgent.toLowerCase().match(/(iphone|ipad|ipod)/);
 			console.log(iOS)
@@ -459,9 +447,13 @@ export const prerender = true;
 					}
 					return false
 				})(),
+				bibleVersionPreference: getUserBibleVersionPreference(),
+				versesObj: undefined,
 				notificationAlert: '',
 				notificationInfo: '',
-				scriptureTextOriginal: '',
+				get scriptureTextOriginal() {
+					return this.versesObj?.[this.bibleVersionPreference] || ''
+				},
 				scriptureRef: '',
 				showSerifFont: getShowSerifFont(),
 				iOSVersion: getiOSVersion(),

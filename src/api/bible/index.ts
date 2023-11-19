@@ -4,16 +4,16 @@ import { type bibleVersion, selectedBibleVersions } from './static/books';
 const bibleApiOrigin = 'https://bolls.life'
 const cache: { [key: string]: Verse } = {}
 
-async function fetchAndCache(url: string, options?: RequestInit): Promise<any> {
-    const cachedResponse = cache[url]
+async function fetchAndCache(url: string, cacheKey: string, options?: RequestInit): Promise<any> {
+    const cachedResponse = cache[cacheKey]
 
     if (cachedResponse) {
-        console.log('loaded from cache', cachedResponse)
+        console.log('loaded from cache with key', cacheKey, cachedResponse)
         return cachedResponse;
     } else {
         const response = await fetch(url, options);
         const data = await response.json()
-        cache[url] = data
+        cache[cacheKey] = data
         return data;
     }
 }
@@ -69,27 +69,35 @@ function transformBibleVersesFromMultipleTranslations(data: Array<Array<Verse>>)
     return returnObj
 }
 
+export type BibleVersesFromMultipleTranslations = {
+    [key: bibleVersion]: string
+}
+
 export async function getBibleVersesFromMultipleTranslations({
     bookId,
     chapter,
     verses,
     translations
-} : GetVerses) {
-    const data = await fetchAndCache(`${bibleApiOrigin}/get-paralel-verses/`, {
-        method: "POST",
-        cache: 'default',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        referrerPolicy: "no-referrer",
-        body: JSON.stringify({
-            translations: JSON.stringify(translations || selectedBibleVersions),
-            verses: JSON.stringify(verses),
-            book: bookId,
-            chapter
-        }),
-    })
+} : GetVerses): Promise<BibleVersesFromMultipleTranslations> {
+    const data = await fetchAndCache(
+        `${bibleApiOrigin}/get-paralel-verses/`, 
+        `get-paralel-verses-${bookId}-${chapter}-${verses.join('-')}`,
+        {
+            method: "POST",
+            cache: 'default',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify({
+                translations: JSON.stringify(translations || selectedBibleVersions),
+                verses: JSON.stringify(verses),
+                book: bookId,
+                chapter
+            }),
+        }
+    )
 
     // Transform verse to readable data
     const returnObj = transformBibleVersesFromMultipleTranslations(data)
@@ -104,7 +112,10 @@ export async function getVerse({
     chapter,
     verse
 } : GetVerse): Promise<Verse> {
-    const data = await fetchAndCache(`${bibleApiOrigin}/get-verse/${translation}/${bookId}/${chapter}/${verse}/`)
+    const data = await fetchAndCache(
+        `${bibleApiOrigin}/get-verse/${translation}/${bookId}/${chapter}/${verse}/`,
+        `get-verse-${translation}-${bookId}-${chapter}-${verse}`
+    )
 
     // Remove the title from the scripture.
     // (Usually this happens for the first verse in teh chapter)
