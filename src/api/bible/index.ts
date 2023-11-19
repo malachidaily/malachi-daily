@@ -1,9 +1,11 @@
 // Documentation can be found at https://bolls.life/api/
+import { type bibleVersion, selectedBibleVersions } from './static/books';
+
 const bibleApiOrigin = 'https://bolls.life'
 const cache: { [key: string]: Verse } = {}
 
-async function fetchAndCache(url: string, options?: RequestInit): Promise<Verse> {
-    const cachedResponse: Verse = cache[url]
+async function fetchAndCache(url: string, options?: RequestInit): Promise<any> {
+    const cachedResponse = cache[url]
 
     if (cachedResponse) {
         console.log('loaded from cache', cachedResponse)
@@ -20,7 +22,7 @@ type GetVerses = {
     bookId: number;
     chapter: number;
     verses: number[];
-    translations?: string[];
+    translations?: readonly string[];
 }
 
 export type Verse = {
@@ -32,33 +34,67 @@ export type Verse = {
 }
 
 type GetVerse = {
-    translation: 'NIV' | 'ESV' | 'NLT';
+    translation: bibleVersion;
     bookId: number;
     chapter: number;
     verse: number;
+}
+
+function transformBibleVersesFromMultipleTranslations(data: Array<Array<Verse>>) {
+    const returnObj = {} as { [key: bibleVersion]: string }
+    for (let versionIndex = 0; versionIndex < data.length; versionIndex += 1) {
+        // Collect each verse near its translation (which is the key of the object)
+        const currentVersion = selectedBibleVersions[versionIndex];
+
+        // This is a list of verses with the same translation
+        for (let verseIndex = 0; verseIndex < data[versionIndex].length ; verseIndex += 1) {
+            const hasMultipleVerses = Boolean(verseIndex > 0)
+            
+            let verseText = data[versionIndex][verseIndex].text
+            if (verseText.includes('<br/>')) {
+                // Remove br and everything before
+                verseText = verseText.split('<br/>')[1]
+            }
+
+            // Remove anything that looks like HTML syntax in string
+            verseText = verseText.replace(/(<([^>]+)>)/ig, ' ')
+
+            if (hasMultipleVerses) {
+                returnObj[currentVersion] += verseText;
+            } else {
+                returnObj[currentVersion] = verseText;
+            }
+        }
+    }
+    return returnObj
 }
 
 export async function getBibleVersesFromMultipleTranslations({
     bookId,
     chapter,
     verses,
-    translations = ['NIV', 'ESV', 'NLT', 'MSG', 'KJV']
+    translations
 } : GetVerses) {
     const data = await fetchAndCache(`${bibleApiOrigin}/get-paralel-verses/`, {
         method: "POST",
         cache: 'default',
         headers: {
-            "Content-Type": "application/json"
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
         },
+        referrerPolicy: "no-referrer",
         body: JSON.stringify({
-            translations,
-            verses,
+            translations: JSON.stringify(translations || selectedBibleVersions),
+            verses: JSON.stringify(verses),
             book: bookId,
             chapter
         }),
     })
 
-    return data
+    // Transform verse to readable data
+    const returnObj = transformBibleVersesFromMultipleTranslations(data)
+
+    return returnObj
 }
 
 // Get the verse using this API https://bolls.life/get-text/<slug:translation>/<int:book>/<int:chapter>/<int:verse>/

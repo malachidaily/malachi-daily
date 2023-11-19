@@ -5,8 +5,8 @@ import Layout from '../layouts/Layout.astro';
 import logoImgUrl from '../../public/logo.png';
 import { SCRIPTURE_TEXT , SCRIPTURE_REF } from '../utils/constants';
 import NativeFeelingDrawer from '../components/react/NativeFeelingDrawer';
-import { getVerse, type Verse } from '../api/bible'
-import { books, type bibleVersion } from '../api/bible/static/books';
+import { getVerse, type Verse, getBibleVersesFromMultipleTranslations } from '../api/bible'
+import { books, type bibleVersion, selectedBibleVersions, bibleVersionReadable } from '../api/bible/static/books';
 
 const translation: bibleVersion = 'ESV'
 const chapterName =  books.Matthew.name;
@@ -17,6 +17,7 @@ const verseNum = 4;
 const verseRef = `${chapterName} ${chapter}:${verseNum} ${translation}`
 
 let verse = {} as Verse
+let verses;
 try {
 	verse = await getVerse({
 		translation: translation,
@@ -24,6 +25,13 @@ try {
 		chapter,
 		verse: verseNum
 	});
+	verses = await getBibleVersesFromMultipleTranslations({
+		bookId: bookId,
+		chapter,
+		verses: [verseNum],
+		translations: selectedBibleVersions
+	})
+	console.log('verses', verses)
 } catch (error) {
 	// User backup verse, instead
 	console.log(error)
@@ -31,13 +39,6 @@ try {
 
 const scriptureText = verse?.text || SCRIPTURE_TEXT;
 const scriptureRef = verseRef || SCRIPTURE_REF;
-
-// const getTranslations = await getBibleVersesFromMultipleTranslations({
-//     bookId: 43,
-//     chapterId: 1,
-//     verses: [3, 4, 5],
-//     translations: ['NIV', 'ESV', 'NLT']
-// })
 
 export const prerender = true;
 ---
@@ -78,11 +79,7 @@ export const prerender = true;
 										  <span class="label-text">Select your preferred Bible translation</span>
 										</label>
 										<select class="select select-bordered">
-										  <option selected>NIV - New International Version</option>
-										  <option>ESV - English Standard Version</option>
-										  <option>MSG - The Message</option>
-										  <option>KJV - King James Version</option>
-										  <option>NLT - New Living Translation</option>
+										  {selectedBibleVersions.map((bibleVersion) => <option>{bibleVersionReadable[bibleVersion] || bibleVersion}</option>)}
 										</select>
 									</div>
 									<div class="form-control w-fit">
