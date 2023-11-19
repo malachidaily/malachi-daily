@@ -344,8 +344,7 @@ export const prerender = true;
 	
 	<script>
 		import { type Alpine as AlpineType } from 'alpinejs'
-		import { onMessage } from "firebase/messaging";
-		import { requestNotificationPermission, messaging } from '../messaging_init_in_sw.js'
+		import { requestNotificationPermission } from '../messaging_init_in_sw.js'
 
 		declare global {
 			var Alpine: AlpineType
@@ -402,7 +401,6 @@ export const prerender = true;
 
 		const isUserAgentOniOS = (): boolean => {
 			const iOS = window.navigator.userAgent.toLowerCase().match(/(iphone|ipad|ipod)/);
-			console.log(iOS)
 			// return boolean
 			return iOS ? true : false
 		}
@@ -427,16 +425,6 @@ export const prerender = true;
 		document.addEventListener('alpine:init', () => {
 			const Alpine = window['Alpine'] || {}
 			Alpine.data('malachi', () => ({
-				init() {
-					// // Handle incoming messages. Called when:
-					// // - a message is received while the app has focus
-					// // - the user clicks on an app notification created by a service worker
-					// //   `messaging.onBackgroundMessage` handler.
-					// onMessage(messaging, (payload) => {
-					// 	// Update the UI to include the received message.
-					// 	this.notificationInfo = payload?.data?.message || '';
-					// });
-				},
 				showDebug: (() => {
 					// Get url param debug = true
 					const url = new URL(window.location.href);
