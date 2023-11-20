@@ -9,7 +9,18 @@ import partytown from "@astrojs/partytown";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [tailwind(), alpinejs(), sitemap(), react(), partytown()],
+  integrations: [
+    tailwind(), 
+    alpinejs(), 
+    sitemap(), 
+    react(), 
+    partytown({
+      // https://docs.astro.build/en/guides/integrations-guide/partytown/#configforward
+      config: {
+        forward: ['dataLayer.push'],
+      },
+    })
+  ],
   output: 'server',
   adapter: netlify()
 });
