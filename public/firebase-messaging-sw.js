@@ -15,8 +15,9 @@ firebase.initializeApp(firebaseConfig);
 
 const isSupported = firebase.messaging.isSupported();
 if (isSupported) {
-    const messaging = firebase.messaging();
-    messaging.onBackgroundMessage(({ notification: { title, body, image } }) => {
-        self.registration.showNotification(title, { body, icon: image || '/logo.png' });
-    });
+    firebase.messaging();
+    // We shouldn't need this. It should work automatically. This is just if I want to mutate something.
+    // messaging.onBackgroundMessage(({ notification: { title, body, image } }) => {
+    //     self.registration.showNotification(title, { body, icon: image || '/logo.png' });
+    // });
 }
