@@ -14,9 +14,19 @@ firebase.initializeApp(firebaseConfig);
 export const messaging = firebase.messaging();
 
 export async function getUserFirebaseNotificationToken() {
-    const currentToken = await messaging.getToken({
-        vapidKey: "BCWhyz_ReqLr3lA_dUjrtyHAEJ-LnNPoI-zOdutLHnKnpb9LYVbbox13YlovUIadeyMfq7RWE3fUz0sVfEGokqA",
-    });
+    const isSubscribedToNotifications = Boolean(
+        ("Notification" in window &&
+            Notification?.permission === "granted") ||
+            false,
+    );
+    let currentToken = '';
+
+    if (isSubscribedToNotifications) {
+        currentToken = await messaging.getToken({
+            vapidKey: "BCWhyz_ReqLr3lA_dUjrtyHAEJ-LnNPoI-zOdutLHnKnpb9LYVbbox13YlovUIadeyMfq7RWE3fUz0sVfEGokqA",
+        });
+    }
+    
     return currentToken
 }
 
