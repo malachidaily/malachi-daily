@@ -77,11 +77,40 @@ export const prerender = true;
 						</div>
 						<!-- Settings and Notifications -->
 						<div class="flex gap-4 items-center">
+							<!-- Share Icon -->
+							<svg 
+								aria-title="Share Malachi Daily"
+								role="button"
+								class="text-gray-600 flex-shrink-0"
+								width="24" 
+								height="24" 
+								viewBox="0 0 24 24" 
+								xmlns="http://www.w3.org/2000/svg"
+								x-on:click={`
+									const title = document.title;
+									const url = document.querySelector('link[rel=canonical]') ? document.querySelector('link[rel=canonical]').href : document.location.href;
+									
+									if (navigator?.share) {
+										navigator.share({
+											title,
+											url
+										})
+									} else {
+										// Copy the url to the clipboard
+										navigator.clipboard.writeText(url);
+										notificationInfo = 'URL copied to clipboard';
+									};
+								`.trim()}
+							>
+								<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v8.5M15 7l-3-3l-3 3m-4 5v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/>
+							</svg>
+							<!-- Notifications Icon -->
 							<svg
 								x-on:click="handleAskForNotificationPermissions"
 								x-data="{ showAnimation: true }"
 								x-init="setTimeout(() => showAnimation = false, 2500)"
 								x-transition
+								x-show="!isSubscribedToNotifications"
 								x-cloak
 								x-bind:class="{ 'animate-bounce': showAnimation && !isSubscribedToNotifications }"
 								role="button"
