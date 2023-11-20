@@ -615,10 +615,12 @@ export const prerender = true;
 	</div>
 
 	<!-- Install App Section -->
-	<section 
+	<section
+		x-init="setTimeout(() => { $el.classList.remove('opacity-0') }, 3000)"
 		x-cloak
 		x-show="!isPWAInstalled && Boolean(userAppInstallEvent)"
-		class="alert bg-white border-white flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]"
+		x-ref="installAppSection"
+		class="opacity-0 transition-opacity sm:hidden alert bg-white border-white flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]"
 	>
 		<div class="flex gap-4 items-center">
 			<Image
@@ -626,12 +628,18 @@ export const prerender = true;
 				alt="Malachi Daily Logo | shows hands praying"
 				class={`aspect-[${logoImgUrl.height}/${logoImgUrl.width}] h-[32px] w-fit`}
 			/>
-			<div>
+			<div class="h-full flex flex-col justify-start text-start">
 				<p class="font-bold">Malachi Daily</p>
 				<p class="text-gray-600 text-xs">One simple daily notification that helps you memorize Scripture in community</p>
 			</div>
 		</div>
-		<div class="flex flex-grow-1 justify-end">
+		<div class="flex w-full gap-3 justify-end">
+			<button 
+				class="btn btn-shost rounded-full btn-sm whitespace-nowrap" 
+				x-on:click="$refs.installAppSection.remove();"
+			>
+				Dismiss
+			</button>
 			<button 
 				class="btn btn-neutral rounded-full btn-sm whitespace-nowrap" 
 				x-on:click={`
