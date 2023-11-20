@@ -23,6 +23,9 @@ const bookId = books[chapterName].bookid;
 const chapter = 4;
 const verseNum = 4;
 
+// Anytime there's a new passage for Malachi Daily, this will increment by one.
+const passageNum = 13;
+
 const verseRef = `${chapterName} ${chapter}:${verseNum}`;
 
 let verses: BibleVersesFromMultipleTranslations = {};
@@ -228,30 +231,13 @@ export const prerender = true;
 					</div>
 					<div class="flex gap-2 items-center">
 						<p class="text-gray-500 text-center max-sm:hidden">
-							Scripture memorization, together. New verse every
-							week.
+							Scripture memorization, together. New verse every two
+							weeks
 						</p>
 						<div
 							class="badge bg-gray-200 py-3"
-							x-data={`{
-								get weekNumber() {
-									const date = new Date();
-
-									// Get the first day of the year
-									const startDate = new Date(date.getFullYear(), 0, 1);
-
-									// Calculate the difference in days between the current date and the first day of the year
-									const days = Math.floor((date.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-
-									// Calculate the week number (assuming the first week starts on Sunday)
-									const weekNumber = Math.ceil((days + startDate.getDay() + 1) / 7);
-
-									return weekNumber;
-								},
-							}`}
-							x-text="`Week ${weekNumber}`"
 						>
-							Week --
+							Passage {passageNum}
 						</div>
 					</div>
 				</div>
