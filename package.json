@@ -13,6 +13,7 @@
     "@astrojs/alpinejs": "^0.3.1",
     "@astrojs/check": "^0.3.1",
     "@astrojs/netlify": "^3.0.4",
+    "@astrojs/partytown": "^2.0.2",
     "@astrojs/react": "^3.0.5",
     "@astrojs/sitemap": "^3.0.3",
     "@astrojs/tailwind": "^5.0.2",

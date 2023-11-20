@@ -3,12 +3,13 @@ import tailwind from "@astrojs/tailwind";
 import alpinejs from "@astrojs/alpinejs";
 import sitemap from "@astrojs/sitemap";
 import netlify from "@astrojs/netlify/functions";
-
 import react from "@astrojs/react";
+
+import partytown from "@astrojs/partytown";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [tailwind(), alpinejs(), sitemap(), react()],
+  integrations: [tailwind(), alpinejs(), sitemap(), react(), partytown()],
   output: 'server',
   adapter: netlify()
 });
