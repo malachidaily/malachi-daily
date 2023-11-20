@@ -23,42 +23,6 @@ function NativeFeelingDrawer({ children }) {
                   Settings
                 </Drawer.Title>
                 {children}
-                <ul className="w-full flex justify-center gap-6 flex-wrap text-gray-500 p-4 bg-gray-100 rounded-lg">
-                <li className="leading-3">
-									<a 
-										x-data={`{
-											createEmailLink() {
-												// Set up the email link for getting help
-												const helpEmailLink = new URL('mailto:cameronandrewpak+malachidaily@gmail.com');
-												helpEmailLink.searchParams.set('cc', 'hello@malachidaily.com');
-												helpEmailLink.searchParams.set('subject', encodeURIComponent('Malachi Daily Help Request'));
-												let emailBody = '';
-												emailBody += 'I want help with the following:\\n\\n';
-												emailBody += '{Write about what you need help with here}\\n\\n';
-												emailBody += '—Below is some necessary data to help debug any issues:—'
-												emailBody += '\\n• Scripture Ref: ' + scriptureRef;
-												emailBody += '\\n• Scripture: ' + scriptureTextOriginal;
-												emailBody += '\\n• User Agent: ' + window.navigator.userAgent;
-												helpEmailLink.searchParams.set('body', encodeURIComponent(emailBody));
-												return decodeURIComponent(helpEmailLink.href)
-											},
-											emailLink: ''
-										}`}
-										x-init="emailLink = createEmailLink()"
-										x-bind:href="emailLink"
-										target="_blank"
-                    className="link whitespace-nowrap text-xs"
-									>
-										Need help?
-									</a>
-                </li>
-                <li className="leading-3">
-                  <a className="link whitespace-nowrap text-xs" href="mailto:hello@malachidaily.com" target="_blank">Contact Us</a>
-                </li>
-                <li className="leading-3">
-                  <a className="link whitespace-nowrap text-xs" href="https://malachidaily.com" target="_blank">Visit Main Website</a>
-                </li>
-              </ul>
               </div>
             </div>
           </Drawer.Content>

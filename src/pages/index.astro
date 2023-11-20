@@ -5,6 +5,7 @@ import Layout from "../layouts/Layout.astro";
 import logoImgUrl from "../../public/logo.png";
 import { SCRIPTURE_TEXT, SCRIPTURE_REF } from "../utils/constants";
 import NativeFeelingDrawer from "../components/react/NativeFeelingDrawer";
+import SectionLinks from '../components/astro/SectionLinks/index.astro';
 import {
 	type BibleVersesFromMultipleTranslations,
 	getBibleVersesFromMultipleTranslations,
@@ -189,6 +190,7 @@ export const prerender = true;
 										</label>
 									</div>
 								</div>
+								<SectionLinks />
 							</NativeFeelingDrawer>
 						</div>
 					</div>
@@ -290,7 +292,7 @@ export const prerender = true;
 							<div
 								class="w-full flex justify-between gap-6 flex-grow-1"
 							>
-								<div class="flex gap-2 items-center">
+								<div class="flex items-center">
 									<h1
 										x-text="scriptureRef + ' ' + bibleVersionPreference"
 										class="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700"
@@ -298,7 +300,7 @@ export const prerender = true;
 										{scriptureRef}
 									</h1>
 									<div
-										class="tooltip tooltip-bottom"
+										class="ml-1 tooltip tooltip-bottom h-[24px] w-[24px] flex items-center justify-center text-purple-700"
 										x-show="Boolean(bibleVersionData && bibleVersionPreference)"
 										x-bind:data-tip="bibleVersionData?.[bibleVersionPreference]?.attribution"
 									>
@@ -546,6 +548,11 @@ export const prerender = true;
 							d="m7 7l10 10M7 17L17 7"></path>
 					</svg>
 				</div>
+
+				<!-- Footer -->
+				<footer>
+					<SectionLinks />
+				</footer>
 			</div>
 		</main>
 	</div>
