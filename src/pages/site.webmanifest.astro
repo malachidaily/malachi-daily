@@ -1,5 +1,6 @@
 ---
 const includesDebugMode = Astro.url.searchParams.get('debug');
+const originUrl = Astro.url.origin;
 const webmanifest = {
     "name": "Malachi Daily | Simple Scripture Memorization, Together",
     "short_name": "Malachi Daily",
@@ -19,7 +20,7 @@ const webmanifest = {
     "background_color": "#1f2937",
     "display": "standalone",
     "gcm_sender_id": "44879717629",
-    "start_url": includesDebugMode ? 'https://app.malachidaily.com/?debug=true' : 'https://app.malachidaily.com/',
+    "start_url": includesDebugMode ? originUrl + '?debug=true' : originUrl,
     "dir": "ltr",
     "lang": "en",
     "orientation": "portrait-primary",
