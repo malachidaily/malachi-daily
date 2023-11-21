@@ -10,9 +10,14 @@ const firebaseConfig = {
     appId: "1:44879717629:web:c06413d20d281de6c24a94",
     measurementId: "G-S0N4P2MHKX"
 };
+
 firebase.initializeApp(firebaseConfig);
 
 const isSupported = firebase.messaging.isSupported();
 if (isSupported) {
-    const messaging = firebase.messaging();
+    firebase.messaging();
+    // We shouldn't need this. It should work automatically. This is just if I want to mutate something.
+    // messaging.onBackgroundMessage(({ notification: { title, body, image } }) => {
+    //     self.registration.showNotification(title, { body, icon: image || '/logo.png' });
+    // });
 }
