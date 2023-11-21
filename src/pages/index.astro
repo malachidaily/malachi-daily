@@ -17,6 +17,8 @@ import {
 	bibleVersionData,
 } from "../api/bible/static/books";
 
+const isDebugModeEnabled = Astro.url.searchParams.get('debug') === 'true';
+
 const translation: bibleVersion = "ESV";
 const chapterName = books.Matthew.name;
 const bookId = books[chapterName].bookid;
@@ -81,9 +83,9 @@ export const prerender = true;
 								class={`aspect-[${logoImgUrl.height}/${logoImgUrl.width}] h-[32px] w-fit`}
 							/>
 							<h2
-								class="max-sm:text-xl text-3xl text-gray-800 font-bold whitespace-nowrap"
+								class="max-sm:text-xl text-3xl text-gray-800 font-bold line-clamp-2 text-ellipsis overflow-hidden"
 							>
-								Malachi Daily
+								Malachi Daily {isDebugModeEnabled ? '(Debug)' : ''}
 							</h2>
 						</div>
 						<!-- Settings and Notifications -->
@@ -506,12 +508,11 @@ export const prerender = true;
 					</section>
 				</section>
 
-				<!-- Debug Information -->
-				<div x-show="showDebug" x-transition x-cloak>
+				<div class="p-6 rounded-xl bg-gray-200 w-full" x-show="showDebug" x-transition x-cloak>
 					<pre
 						x-text="JSON.stringify($data, null, 2)"
-						class="whitespace-pre text-gray-500 text-start break-all"
-						style="text-wrap: pretty">
+						class="whitespace-pre text-gray-500 text-start break-all overflow-x-scroll"
+					>
 					</pre>
 				</div>
 
