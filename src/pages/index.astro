@@ -261,6 +261,12 @@ export const prerender = true;
 											>
 										</label>
 									</div>
+									<div class="form-control w-fit mt-2">
+										<button 
+											class="btn-sm btn btn-outline border-gray-200 rounded-full normal-case"
+											x-on:click="if (window.confirm('Reload the app?')) { location.reload() }"
+										>Reload App</button>
+									</div>
 								</div>
 							</NativeFeelingDrawer>
 						</div>
