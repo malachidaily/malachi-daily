@@ -764,6 +764,7 @@ export const prerender = true;
 			Alpine.data("malachi", () => ({
 				isPWAInstalled: window.matchMedia("(display-mode: standalone)")
 					.matches,
+				openCount: 0,
 				init() {
 					// Set the native operating system badge.
 					const setAppBadgeNative = (value: number) => {
@@ -811,6 +812,17 @@ export const prerender = true;
 					);
 
 					removeAlpineAttributes();
+
+					// After the page has been in focus a few times, 
+					// then I want to refresh the page to help make
+					// sure the user has the most up-to-date code.
+					window.addEventListener("focus", () => {
+						this.openCount += 1;
+
+						if (this.openCount >= 2) {
+							window.location.reload();
+						}
+					});
 				},
 				showDebug: (() => {
 					// Get url param debug = true
