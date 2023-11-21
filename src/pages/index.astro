@@ -369,12 +369,15 @@ export const prerender = true;
 								class="w-full flex justify-between gap-6 flex-grow-1"
 							>
 								<div class="flex items-center">
-									<h1
-										x-text="scriptureRef + ' ' + bibleVersionPreference"
-										class="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700"
-									>
-										{scriptureRef}
-									</h1>
+									<div class="flex gap-2 items-baseline bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700">
+										<h1
+											x-text="scriptureRef"
+											class="text-xl font-medium"
+										>
+											{scriptureRef}
+										</h1>
+										<span class="text-xl font-medium cursor-pointer" x-on:click="$refs.settingsDrawerBtn.click();" x-text="bibleVersionPreference"></span>
+									</div>
 									<div
 										class="ml-1 tooltip tooltip-bottom h-[24px] w-[24px] flex items-center justify-center text-purple-700"
 										x-show="Boolean(bibleVersionData && bibleVersionPreference)"
