@@ -722,8 +722,7 @@ export const prerender = true;
 					messaging.onMessage((payload) => {
 						console.log("message received", payload);
 						// Update the UI to include the received message.
-						this.notificationInfo =
-							payload?.notification?.body || "";
+						this.notificationInfo = `${payload?.notification?.title}: ${payload?.notification?.body}` || "";
 					});
 
 					getUserFirebaseNotificationToken().then(
