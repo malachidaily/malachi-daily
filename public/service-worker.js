@@ -14,7 +14,7 @@
 // Names of the two caches used in this version of the service worker.
 // Change to v2, etc. when you update any of the local resources, which will
 // in turn trigger the install event again.
-const PRECACHE = 'precache-v2.5';
+const PRECACHE = 'precache-v2.6';
 const RUNTIME = 'runtime';
 
 // A list of local resources we always want to be cached.
@@ -100,6 +100,7 @@ const showLocalNotification = (title, body, swRegistration) => {
 
 // https://totheroot.io/article/native-apps-are-dead-web-push-on-i-os-with-next-js
 self.addEventListener('push', async (event) => {
+  console.log('service worker received information', event)
   if (event.data) {
     const eventData = await event.data.json()
     showLocalNotification(eventData.title, eventData.body, self.registration)
