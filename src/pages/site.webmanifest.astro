@@ -1,4 +1,6 @@
-{
+---
+const includesDebugMode = Astro.url.searchParams.get('debug');
+const webmanifest = {
     "name": "Malachi Daily | Simple Scripture Memorization, Together",
     "short_name": "Malachi Daily",
     "icons": [
@@ -17,7 +19,7 @@
     "background_color": "#1f2937",
     "display": "standalone",
     "gcm_sender_id": "44879717629",
-    "start_url": "https://app.malachidaily.com",
+    "start_url": includesDebugMode ? 'https://app.malachidaily.com/?debug=true' : 'https://app.malachidaily.com/',
     "dir": "ltr",
     "lang": "en",
     "orientation": "portrait-primary",
@@ -27,4 +29,14 @@
     ],
     "id": "app-malachi-daily",
     "description": "The daily notification with an eternal purpose. Join thousands of Jesus followers memorizing Scripture together. Learn one Bible verse and its context per week."
-  }
+}
+return new Response(
+    JSON.stringify(webmanifest), 
+    {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }
+);
+---
