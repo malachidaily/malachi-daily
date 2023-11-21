@@ -608,6 +608,7 @@ export const prerender = true;
 			messaging,
 			getUserFirebaseNotificationToken,
 		} from "../messaging_init_in_sw.js";
+		import { registerServiceWorkers, unregisterServiceWorkers } from "../utils";
 
 		declare global {
 			var Alpine: AlpineType;
@@ -813,6 +814,9 @@ export const prerender = true;
 								"Install this web app to allow notifications. Tap share and click 'Add to Home Screen'";
 							return;
 						}
+
+						await unregisterServiceWorkers()
+						await registerServiceWorkers()
 
 						// Check if notification permissions have already been granted
 						if (Notification.permission === "granted") {
