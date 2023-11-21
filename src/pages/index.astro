@@ -764,7 +764,6 @@ export const prerender = true;
 			Alpine.data("malachi", () => ({
 				isPWAInstalled: window.matchMedia("(display-mode: standalone)")
 					.matches,
-				openCount: 0,
 				init() {
 					// Set the native operating system badge.
 					const setAppBadgeNative = (value: number) => {
