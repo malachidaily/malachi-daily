@@ -813,13 +813,27 @@ export const prerender = true;
 
 					removeAlpineAttributes();
 
-					// After the page has been in focus a few times, 
-					// then I want to refresh the page to help make
-					// sure the user has the most up-to-date code.
+					// This runs when the user opens the app/page.
 					window.addEventListener("focus", () => {
-						this.openCount += 1;
+						let lastRefresh = localStorage.getItem("lastRefresh");
+						
+						if (!lastRefresh) {
+							const lastRefresh = JSON.stringify(Date.now());
+							localStorage.setItem(
+								"lastRefresh",
+								lastRefresh,
+							);
+							return;
+						}
 
-						if (this.openCount >= 2) {
+						const isLastRefreshFromToday = lastRefresh
+							? new Date(Number(lastRefresh)).toDateString() ===
+								new Date().toDateString()
+							: false;
+						const isLastRefreshAnHourOrMoreAgo = Boolean(lastRefresh && (Date.now() - Number(lastRefresh)) > 3600000)
+
+						if (!isLastRefreshFromToday || isLastRefreshAnHourOrMoreAgo) {
+							localStorage.removeItem('lastRefresh');
 							window.location.reload();
 						}
 					});
