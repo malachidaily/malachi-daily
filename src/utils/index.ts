@@ -79,11 +79,13 @@ export async function saveSubscription(subscription: PushSubscription) {
 // all service workers in our app. This helps when you are changing the code of the 
 // service worker later on. Normally you have to manually unregister the service worker 
 // by using the developer tools of your webbrowser, but we will do it programmatically:
+// https://totheroot.io/article/native-apps-are-dead-web-push-on-i-os-with-next-js
 export const unregisterServiceWorkers = async () => {
     const registrations = await navigator.serviceWorker.getRegistrations()
     await Promise.all(registrations.map((r) => r.unregister()))
 }
 
+// https://totheroot.io/article/native-apps-are-dead-web-push-on-i-os-with-next-js
 export const registerServiceWorkers = async () => {
     return Promise.all([
         navigator.serviceWorker.register('/service.js'),
