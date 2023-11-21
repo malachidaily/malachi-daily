@@ -83,7 +83,16 @@ export const prerender = true;
 					class="w-full flex flex-col gap-2 items-start justify-start"
 				>
 					<div class="w-full flex gap-2 justify-between">
-						<div class="flex gap-2 items-center justify-start">
+						<div 
+							x-data={`{ clickCount: 0}`}
+							x-on:click={`
+								clickCount += 1;
+								if (clickCount >= 10) {
+									showDebug = true;
+								}
+							`.trim()}
+							class="flex gap-2 items-center justify-start"
+						>
 							<Image
 								src={logoImgUrl}
 								alt="Malachi Daily Logo | shows hands praying"
@@ -91,10 +100,9 @@ export const prerender = true;
 							/>
 							<h2
 								class="max-sm:text-xl text-3xl text-gray-800 font-bold line-clamp-2 text-ellipsis overflow-hidden"
+								x-text="showDebug ? 'Malachi Daily (Debug)' : 'Malachi Daily'"
 							>
-								Malachi Daily {
-									isDebugModeEnabled ? "(Debug)" : ""
-								}
+								Malachi Daily
 							</h2>
 						</div>
 						<!-- Settings and Notifications -->
