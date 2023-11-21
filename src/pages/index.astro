@@ -62,11 +62,11 @@ export const prerender = true;
 		>
 			<div class="p-6 rounded-xl bg-gray-200 max-w-[600px] w-full" x-show="showDebug" x-transition x-cloak>
 				<p class="text-gray-500">Your Firebase Cloud Messaging Token:</p>
-				<pre
-					x-text="$data.firebaseCMToken"
-					class="select-all whitespace-pre text-gray-800 font-medium text-start break-all"
-					style="text-wrap: pretty">
-				</pre>
+				<p
+					x-text="$data.firebaseCMToken || 'No token available. Try requesting notification acccess.'"
+					class="select-all font-mono  text-gray-800 font-medium text-start break-all"
+				>
+				</p>
 			</div>
 			<div
 				class="max-w-[600px] w-full flex flex-col py-12 max-sm:py-6 gap-12 max-sm:gap-6"
@@ -511,7 +511,7 @@ export const prerender = true;
 				<div class="p-6 rounded-xl bg-gray-200 w-full" x-show="showDebug" x-transition x-cloak>
 					<pre
 						x-text="JSON.stringify($data, null, 2)"
-						class="whitespace-pre text-gray-500 text-start break-all overflow-x-scroll"
+						class="font-mono whitespace-pre text-gray-500 text-start break-all overflow-x-scroll"
 					>
 					</pre>
 				</div>

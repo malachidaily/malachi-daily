@@ -39,10 +39,12 @@ getUserFirebaseNotificationToken()
  */
 export async function requestNotificationPermission() {
     let currentToken = '';
+
     const permission = await Notification.requestPermission()
     if (permission === 'granted') {
+        currentToken = await getUserFirebaseNotificationToken();
         // User can receive messages
-        console.log('Notification permissions granted!')
+        console.log('Notification permissions granted!');
     } else if (permission === 'denied') {
         // Permission has been denied
         console.log('Notification permission has been denied.');
