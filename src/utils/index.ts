@@ -4,47 +4,52 @@
  * @return {void} This function does not return anything.
  */
 export function removeAlpineAttributes(): void {
-    const xDataElements = document.querySelectorAll('[x-data]');
+    const xDataElements = document.querySelectorAll('[x-data][x-clear]');
     xDataElements.forEach((el) => {
         el.removeAttribute('x-data');
     });
 
-    const xShowElements = document.querySelectorAll('[x-show]');
+    const xInitElements = document.querySelectorAll('[x-init][x-clear]');
+    xInitElements.forEach((el) => {
+        el.removeAttribute('x-init');
+    });
+
+    const xShowElements = document.querySelectorAll('[x-show][x-clear]');
     xShowElements.forEach((el) => {
         el.removeAttribute('x-show');
     });
 
-    const xRefsElements = document.querySelectorAll('[x-ref]');
+    const xRefsElements = document.querySelectorAll('[x-ref][x-clear]');
     xRefsElements.forEach((el) => {
         el.removeAttribute('x-ref');
     });
 
-    const xBindElements = document.querySelectorAll('[x-bind]');
+    const xBindElements = document.querySelectorAll('[x-bind][x-clear]');
     xBindElements.forEach((el) => {
         el.removeAttribute('x-bind');
     });
 
-    const xTextElements = document.querySelectorAll('[x-text]');
+    const xTextElements = document.querySelectorAll('[x-text][x-clear]');
     xTextElements.forEach((el) => {
         el.removeAttribute('x-text');
     });
 
-    const xHtmlElements = document.querySelectorAll('[x-html]');
+    const xHtmlElements = document.querySelectorAll('[x-html][x-clear]');
     xHtmlElements.forEach((el) => {
         el.removeAttribute('x-html');
     });
 
-    const xModelElements = document.querySelectorAll('[x-model]');
+    const xModelElements = document.querySelectorAll('[x-model][x-clear]');
     xModelElements.forEach((el) => {
         el.removeAttribute('x-model');
     });
 
-    const xOnElements = document.querySelectorAll('[x-on]');
+    const xOnElements = document.querySelectorAll('[x-on][x-clear]');
     xOnElements.forEach((el) => {
-        el.removeAttribute('x-on');
+        el.removeAttribute('x-on:click');
     });
 
-    const xCloakElements = document.querySelectorAll('[x-cloak]');
+    const xCloakElements = document.querySelectorAll('[x-cloak][x-clear]');
     xCloakElements.forEach((el) => {
         el.removeAttribute('x-cloak');
     });

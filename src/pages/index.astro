@@ -55,6 +55,7 @@ export const prerender = true;
 			versesObj = ${JSON.stringify(verses)}
 			bibleVersionData = ${JSON.stringify(bibleVersionData)}
 		`.trim()}
+		x-clear
 		vaul-drawer-wrapper=""
 	>
 		<main
@@ -91,6 +92,7 @@ export const prerender = true;
 									showDebug = true;
 								}
 							`.trim()}
+							x-clear
 							class="flex gap-2 items-center justify-start"
 						>
 							<Image
@@ -286,6 +288,7 @@ export const prerender = true;
 					<div
 						class="bg-white p-6 pb-8 flex justify-center items-center rounded-xl shadow-xl max-sm:shadow-sm max-sm:rounded-3xl transition-[height] duration-300"
 						x-ref="scriptureCard"
+						x-clear
 						x-init={`
 							// https://alpinejs.dev/directives/init#next-tick
 							$nextTick(() => {
@@ -652,6 +655,7 @@ export const prerender = true;
 			messaging,
 			getUserFirebaseNotificationToken,
 		} from "../messaging_init_in_sw.js";
+		import { removeAlpineAttributes } from '../utils'
 
 		declare global {
 			var Alpine: AlpineType;
@@ -812,6 +816,8 @@ export const prerender = true;
 					getUserFirebaseNotificationToken().then(
 						(token) => (this.firebaseCMToken = token),
 					);
+
+					removeAlpineAttributes();
 				},
 				showDebug: (() => {
 					// Get url param debug = true
