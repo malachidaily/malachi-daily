@@ -761,12 +761,13 @@ export const prerender = true;
 				init() {
 					// Set the native operating system badge.
 					const setAppBadgeNative = (value: number) => {
-						if (supportsAppBadge) {
+						const supportsAppBadge = "setAppBadge" in navigator;
+						if (supportsAppBadge && matchMedia("(display-mode: standalone)")
+										.matches) {
 							navigator.setAppBadge(value);
 						}
 					};
 
-					const supportsAppBadge = "setAppBadge" in navigator;
 					messaging.onMessage((payload) => {
 						console.log("message received", payload);
 						// Update the UI to include the received message.
@@ -785,24 +786,10 @@ export const prerender = true;
 								},
 							);
 
-							if (supportsAppBadge) {
-								navigator.setAppBadge(1);
-
-								// If the app is installed and the Badging API is supported,
-								// set the badge on the native operating system. Else, fall
-								// back to the favicon.
-								if (
-									matchMedia("(display-mode: standalone)")
-										.matches &&
-									supportsAppBadge
-								) {
-									setAppBadgeNative(1);
-								}
-							}
+							setAppBadgeNative(1);
 
 							notification.onclick = () => {
 								window.focus();
-								setAppBadgeNative(0);
 								notification.close();
 							};
 						}

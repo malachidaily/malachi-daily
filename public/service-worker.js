@@ -98,11 +98,21 @@ const showLocalNotification = (title, body, swRegistration) => {
   })
 }
 
+// Set the native operating system badge.
+const setAppBadgeNative = (value) => {
+  const supportsAppBadge = "setAppBadge" in navigator;
+  if (supportsAppBadge && matchMedia("(display-mode: standalone)")
+          .matches) {
+    navigator.setAppBadge(value);
+  }
+};
+
 // https://totheroot.io/article/native-apps-are-dead-web-push-on-i-os-with-next-js
 self.addEventListener('push', async (event) => {
   console.log('service worker received information', event)
   if (event.data) {
     const eventData = await event.data.json()
     showLocalNotification(eventData.title, eventData.body, self.registration)
+    setAppBadgeNative(1);
   }
 })
