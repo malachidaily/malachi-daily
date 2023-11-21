@@ -89,3 +89,18 @@ self.addEventListener('fetch', event => {
     );
   }
 });
+
+// https://totheroot.io/article/native-apps-are-dead-web-push-on-i-os-with-next-js
+self.addEventListener('push', async (event) => {
+  if (event.data) {
+    const eventData = await event.data.json()
+    showLocalNotification(eventData.title, eventData.body, self.registration)
+  }
+})
+
+const showLocalNotification = (title, body, swRegistration) => {
+  swRegistration.showNotification(title, {
+    body,
+    icon: '/apple-touch-icon.png',
+  })
+}
