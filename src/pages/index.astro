@@ -17,7 +17,7 @@ import {
 	bibleVersionData,
 } from "../api/bible/static/books";
 
-const isDebugModeEnabled = Astro.url.searchParams.get('debug') === 'true';
+const isDebugModeEnabled = Astro.url.searchParams.get("debug") === "true";
 
 const translation: bibleVersion = "ESV";
 const chapterName = books.Matthew.name;
@@ -60,11 +60,18 @@ export const prerender = true;
 		<main
 			class="w-screen h-auto min-h-[calc(100vh-52px)] px-6 flex flex-col items-center bg-gray-100"
 		>
-			<div class="p-6 rounded-xl bg-gray-200 max-w-[600px] w-full" x-show="showDebug" x-transition x-cloak>
-				<p class="text-gray-500">Your Firebase Cloud Messaging Token:</p>
+			<div
+				class="p-6 rounded-xl bg-gray-200 max-w-[600px] w-full"
+				x-show="showDebug"
+				x-transition
+				x-cloak
+			>
+				<p class="text-gray-500">
+					Your Firebase Cloud Messaging Token:
+				</p>
 				<p
 					x-text="$data.firebaseCMToken || 'No token available. Try requesting notification acccess.'"
-					class="select-all font-mono  text-gray-800 font-medium text-start break-all"
+					class="select-all font-mono text-gray-800 font-medium text-start break-all"
 				>
 				</p>
 			</div>
@@ -85,18 +92,20 @@ export const prerender = true;
 							<h2
 								class="max-sm:text-xl text-3xl text-gray-800 font-bold line-clamp-2 text-ellipsis overflow-hidden"
 							>
-								Malachi Daily {isDebugModeEnabled ? '(Debug)' : ''}
+								Malachi Daily {
+									isDebugModeEnabled ? "(Debug)" : ""
+								}
 							</h2>
 						</div>
 						<!-- Settings and Notifications -->
 						<div class="flex gap-4 items-center">
 							<!-- Share Icon -->
 							<button title="Share Malachi Daily">
-								<svg 
+								<svg
 									class="text-gray-600 flex-shrink-0"
-									width="24" 
-									height="24" 
-									viewBox="0 0 24 24" 
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
 									xmlns="http://www.w3.org/2000/svg"
 									x-on:click={`
 										const title = document.title;
@@ -114,14 +123,21 @@ export const prerender = true;
 										};
 									`.trim()}
 								>
-									<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v8.5M15 7l-3-3l-3 3m-4 5v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/>
+									<path
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 5v8.5M15 7l-3-3l-3 3m-4 5v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"
+									></path>
 								</svg>
 							</button>
 							<!-- Notifications Icon -->
-							<button 
+							<button
 								x-show="!isSubscribedToNotifications"
-								x-cloak 
-								title="Subscribe to Notifications" 
+								x-cloak
+								title="Subscribe to Notifications"
 							>
 								<svg
 									x-on:click="handleAskForNotificationPermissions"
@@ -241,12 +257,10 @@ export const prerender = true;
 					</div>
 					<div class="flex gap-2 items-center">
 						<p class="text-gray-500 text-center max-sm:hidden">
-							Scripture memorization, together. New verse every two
-							weeks
+							Scripture memorization, together. New verse every
+							two weeks
 						</p>
-						<div
-							class="badge bg-gray-200 py-3"
-						>
+						<div class="badge bg-gray-200 py-3">
 							Passage {passageNum}
 						</div>
 					</div>
@@ -368,7 +382,11 @@ export const prerender = true;
 									class="text-gray-500 flex gap-3 items-center"
 								>
 									<!-- Show Fullscreen Button -->
-									<button x-show="!isFullscreen" title="Open fullscreen verse view" x-transition>
+									<button
+										x-show="!isFullscreen"
+										title="Open fullscreen verse view"
+										x-transition
+									>
 										<svg
 											x-on:click="handleShowFullscreen"
 											class="cursor-pointer"
@@ -389,8 +407,13 @@ export const prerender = true;
 										</svg>
 									</button>
 									<!-- Hide Fullscreen Button -->
-									<button x-show="isFullscreen" title="Dismiss fullscreen verse view"  x-cloak x-transition>
-										<svg											
+									<button
+										x-show="isFullscreen"
+										title="Dismiss fullscreen verse view"
+										x-cloak
+										x-transition
+									>
+										<svg
 											x-on:click="handleHideFullscreen"
 											class="cursor-pointer"
 											width="28"
@@ -508,11 +531,15 @@ export const prerender = true;
 					</section>
 				</section>
 
-				<div class="p-6 rounded-xl bg-gray-200 w-full" x-show="showDebug" x-transition x-cloak>
+				<div
+					class="p-6 rounded-xl bg-gray-200 w-full"
+					x-show="showDebug"
+					x-transition
+					x-cloak
+				>
 					<pre
 						x-text="JSON.stringify($data, null, 2)"
-						class="font-mono whitespace-pre text-gray-500 text-start break-all overflow-x-scroll"
-					>
+						class="font-mono whitespace-pre text-gray-500 text-start break-all overflow-x-scroll">
 					</pre>
 				</div>
 
@@ -609,7 +636,6 @@ export const prerender = true;
 			<SectionLinks />
 		</footer>
 	</div>
-	
 
 	<script>
 		import { type Alpine as AlpineType } from "alpinejs";
@@ -624,10 +650,10 @@ export const prerender = true;
 		}
 
 		console.log(
-			'🙏'.repeat(15) + 
-			'\n\nWelcome to the console! Jesus loves you.\n\n' +
-			'🙏'.repeat(15)
-		)
+			"🙏".repeat(15) +
+				"\n\nWelcome to the console! Jesus loves you.\n\n" +
+				"🙏".repeat(15),
+		);
 
 		// create a function that gets "showFirstLetter" from localStorage
 		// if it doesn't exist, set it to true
@@ -718,12 +744,61 @@ export const prerender = true;
 		document.addEventListener("alpine:init", () => {
 			const Alpine = window["Alpine"] || {};
 			Alpine.data("malachi", () => ({
-				isPWAInstalled: window.matchMedia('(display-mode: standalone)').matches,
+				isPWAInstalled: window.matchMedia("(display-mode: standalone)")
+					.matches,
 				init() {
+					// Set the native operating system badge.
+					const setAppBadgeNative = (value: number) => {
+						if (supportsAppBadge) {
+							navigator.setAppBadge(value);
+						}
+					};
+
+					const supportsAppBadge = "setAppBadge" in navigator;
 					messaging.onMessage((payload) => {
 						console.log("message received", payload);
 						// Update the UI to include the received message.
-						this.notificationInfo = `${payload?.notification?.title}: ${payload?.notification?.body}` || "";
+						this.notificationInfo =
+							`${payload?.notification?.title}: ${payload?.notification?.body}` ||
+							"";
+
+						// Send web push notification to the device
+						if (this.notificationInfo) {
+							// Show the notification
+							const notification = new Notification(
+								payload?.notification?.title,
+								{
+									body: payload?.notification?.body,
+									icon: "apple-touch-icon.png",
+								},
+							);
+
+							if (supportsAppBadge) {
+								navigator.setAppBadge(1);
+
+								// If the app is installed and the Badging API is supported,
+								// set the badge on the native operating system. Else, fall
+								// back to the favicon.
+								if (
+									matchMedia("(display-mode: standalone)")
+										.matches &&
+									supportsAppBadge
+								) {
+									setAppBadgeNative(1);
+								}
+							}
+
+							notification.onclick = () => {
+								window.focus();
+								setAppBadgeNative(0);
+								notification.close();
+							};
+						}
+					});
+
+					// add event listener for when window is focused
+					window.addEventListener("focus", () => {
+						setAppBadgeNative(0);
 					});
 
 					getUserFirebaseNotificationToken().then(
