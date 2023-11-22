@@ -836,8 +836,8 @@ export const prerender = true;
 			return iOSVersionNumber;
 		};
 
-		// Add this to the body tag
-		document.body.setAttribute("x-data", "malachi");
+		// Get the Alpine data connected to the DOM.
+		document.documentElement.setAttribute("x-data", "malachi");
 
 		document.addEventListener("alpine:init", () => {
 			const Alpine = window["Alpine"] || {};
@@ -883,19 +883,17 @@ export const prerender = true;
 						}
 					});
 
-					// add event listener for when window is focused
-					window.addEventListener("focus", () => {
-						setAppBadgeNative(0);
-					});
-
 					getUserFirebaseNotificationToken().then(
 						(token) => (this.firebaseCMToken = token),
 					);
 
 					removeAlpineAttributes();
 
+					// TODO - here I want to fade in the verse again every time.
 					// This runs when the user opens the app/page.
 					window.addEventListener("focus", () => {
+						setAppBadgeNative(0);
+
 						let lastRefresh = localStorage.getItem("lastRefresh");
 						
 						if (!lastRefresh) {
