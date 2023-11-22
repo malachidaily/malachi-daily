@@ -78,6 +78,10 @@ export const prerender = true;
 		.text-beautiful-gradient {
 			@apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 dark:from-blue-300 to-purple-700 dark:to-purple-400;
 		}
+
+		html.dark .range {
+			--range-shdw: 200 28% 17%;
+		}
 	</style>
 	<div
 		x-init={`
@@ -797,8 +801,6 @@ export const prerender = true;
 				isPWAInstalled: window.matchMedia("(display-mode: standalone)")
 					.matches,
 				init() {
-					this.notificationInfo = 'poopie butt hahaha'
-
 					// Set the native operating system badge.
 					const setAppBadgeNative = (value: number) => {
 						const supportsAppBadge = "setAppBadge" in navigator;
