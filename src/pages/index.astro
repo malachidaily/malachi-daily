@@ -733,6 +733,16 @@ export const prerender = true;
 			var Alpine: AlpineType;
 		}
 
+		async function enableNoSleepMode() {
+			try {
+				const wakeLock = await navigator.wakeLock.request("screen");
+			} catch {
+				// Do nothing...
+			}
+		}
+
+		enableNoSleepMode();
+
 		console.log(
 			"🙏".repeat(15) +
 				"\n\nWelcome to the console! Jesus loves you.\n\n" +
