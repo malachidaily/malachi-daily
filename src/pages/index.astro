@@ -797,7 +797,7 @@ export const prerender = true;
 				) {
 					return true;
 				}
-				
+
 				return false;
 			} else {
 				return JSON.parse(isDarkMode);
@@ -1107,7 +1107,7 @@ export const prerender = true;
 									class="opacity-40 animate-pulse text-blue-700 dark:text-gray-300"
 									x-on:mouseover="
 										$el.innerText = '${
-											showFirstCharacter
+											showFirstCharacter && wordToBeReplaced.length > 1
 												? wordToBeReplaced.slice(1)
 												: wordToBeReplaced
 										}'
@@ -1126,10 +1126,14 @@ export const prerender = true;
 						const firstCharacter = showFirstCharacter
 							? wordToBeReplaced[0] || ""
 							: "";
-						const replacedWord = bookendsOfTheWord.replace(
+						let replacedWord = bookendsOfTheWord.replace(
 							"{INSERT_UNDERSCORES}",
 							firstCharacter + makeUnderscoresVisible(),
 						);
+
+						if (wordToBeReplaced.length === 1) {
+							replacedWord = makeUnderscoresVisible();
+						}
 
 						return `
 							<span class="text-[inherit] cursor-default align-bottom inline-block whitespace-nowrap rounded-md focus:outline-2 focus:outline-blue-400">
