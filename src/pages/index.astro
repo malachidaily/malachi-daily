@@ -52,15 +52,15 @@ export const prerender = true;
 <Layout title="Malachi Daily: Memorize Bible Verses & Learn Their Context">
 	<style is:global>
 		.surface-primary {
-			@apply bg-white dark:bg-gray-800;
+			@apply bg-white dark:bg-gray-700;
 		}
 
 		.canvas-secondary {
-			@apply bg-gray-100 dark:bg-gray-900;
+			@apply bg-gray-100 dark:bg-gray-800;
 		}
 
 		.canvas-tertiary {
-			@apply bg-gray-200 dark:bg-gray-800;
+			@apply bg-gray-200 dark:bg-gray-700;
 		}
 
 		.text-muted {
@@ -75,12 +75,16 @@ export const prerender = true;
 			@apply border-gray-200 dark:border-gray-700;
 		}
 
-		.text-beautiful-gradient {
-			@apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 dark:from-blue-300 to-purple-700 dark:to-purple-400;
+		html:not(.dark) .text-beautiful-gradient {
+			@apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700;
+		}
+
+		html.dark .text-beautiful-gradient {
+			@apply text-gray-300;
 		}
 
 		html.dark .range {
-			--range-shdw: 200 28% 17%;
+			--range-shdw: 217 19% 27%;
 		}
 	</style>
 	<div
@@ -207,13 +211,13 @@ export const prerender = true;
 										class="form-control w-full max-w-xs mb-2"
 									>
 										<label class="label">
-											<span class="label-text"
+											<span class="label-text text-primary"
 												>Select your preferred Bible
 												translation</span
 											>
 										</label>
 										<select
-											class="select select-bordered"
+											class="select select-bordered dark:bg-gray-700 text-primary"
 											x-model="bibleVersionPreference"
 											x-on:change="localStorage.setItem('bibleVersionPreference', JSON.stringify($el.value));"
 										>
@@ -248,7 +252,7 @@ export const prerender = true;
 												id="show-first-letter"
 												x-on:click="localStorage.setItem('showFirstLetter', JSON.stringify($el.checked));"
 											/>
-											<span class="label-text"
+											<span class="label-text text-primary"
 												>Show the first letter in each
 												hidden word</span
 											>
@@ -268,7 +272,7 @@ export const prerender = true;
 												id="checkbox-randomize-hidden-words"
 												x-on:click="localStorage.setItem('shouldRandomizeOrderOfHiddenWords', JSON.stringify($el.checked));"
 											/>
-											<span class="label-text"
+											<span class="label-text text-primary"
 												>Randomize the order of hidden
 												words</span
 											>
@@ -288,7 +292,7 @@ export const prerender = true;
 												id="checkbox-show-serif-font"
 												x-on:click="localStorage.setItem('showSerifFont', JSON.stringify($el.checked));"
 											/>
-											<span class="label-text"
+											<span class="label-text text-primary"
 												>Use a more decorative font
 												(serif)</span
 											>
@@ -296,7 +300,7 @@ export const prerender = true;
 									</div>
 									<div class="form-control w-fit mt-2">
 										<button 
-											class="btn-sm btn btn-outline thin-line rounded-full normal-case"
+											class="btn-sm btn btn-outline text-primary thin-line rounded-full normal-case"
 											x-on:click="if (window.confirm('Reload the app?')) { location.reload() }"
 										>Reload App</button>
 									</div>
@@ -309,7 +313,7 @@ export const prerender = true;
 							Scripture memorization, together. New verse every
 							two weeks
 						</p>
-						<div class="badge canvas-tertiary text-muted py-3 dark:border-gray-700">
+						<div class="badge canvas-tertiary text-primary py-3 dark:border-gray-700">
 							Passage {passageNum}
 						</div>
 					</div>
@@ -412,7 +416,7 @@ export const prerender = true;
 										<span class="text-xl font-medium cursor-pointer" x-on:click="$refs.settingsDrawerBtn.click();" x-text="bibleVersionPreference"></span>
 									</div>
 									<div
-										class="ml-1 tooltip tooltip-bottom h-[24px] w-[24px] flex items-center justify-center text-purple-700 dark:text-purple-400"
+										class="ml-1 tooltip tooltip-bottom h-[24px] w-[24px] flex items-center justify-center text-purple-700 dark:text-gray-300"
 										x-show="Boolean(bibleVersionData && bibleVersionPreference)"
 										x-bind:data-tip="bibleVersionData?.[bibleVersionPreference]?.attribution"
 									>
@@ -1049,7 +1053,7 @@ export const prerender = true;
 											$el.classList.remove('opacity-80')
 										},
 									}"
-									class="opacity-40 animate-pulse text-blue-700 dark:text-blue-500"
+									class="opacity-40 animate-pulse text-blue-700 dark:text-gray-300"
 									x-on:mouseover="
 										$el.innerText = '${
 											showFirstCharacter
