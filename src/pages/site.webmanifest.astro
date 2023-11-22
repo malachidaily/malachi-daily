@@ -1,42 +1,46 @@
 ---
-const includesDebugMode = Astro.url.searchParams.get('debug');
+const includesDebugMode = Astro.url.searchParams.get("debug");
 const originUrl = Astro.url.origin;
 const webmanifest = {
-    "name": "Malachi Daily | Simple Scripture Memorization, Together",
-    "short_name": "Malachi Daily",
-    "icons": [
-      {
-        "src": "/android-chrome-192x192.png",
-        "sizes": "192x192",
-        "type": "image/png"
-      },
-      {
-        "src": "/android-chrome-512x512.png",
-        "sizes": "512x512",
-        "type": "image/png"
-      }
-    ],
-    "background_color": "#1f2937",
-    "display": "standalone",
-    "gcm_sender_id": "44879717629",
-    "start_url": includesDebugMode ? originUrl + '?debug=true' : originUrl,
-    "dir": "ltr",
-    "lang": "en",
-    "orientation": "portrait-primary",
-    "categories": [
-      "education",
-      "lifestyle"
-    ],
-    "id": "app-malachi-daily",
-    "description": "The daily notification with an eternal purpose. Join thousands of Jesus followers memorizing Scripture together. Learn one Bible verse and its context per week."
-}
-return new Response(
-    JSON.stringify(webmanifest), 
+  name: "Malachi Daily | Simple Scripture Memorization, Together",
+  short_name: "Malachi Daily",
+  icons: [
     {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }
-);
+      src: "/android-chrome-192x192.png",
+      sizes: "192x192",
+      type: "image/png",
+    },
+    {
+      src: "/android-chrome-512x512.png",
+      sizes: "512x512",
+      type: "image/png",
+    },
+  ],
+  // https://developer.mozilla.org/en-US/docs/Web/Manifest/shortcuts
+  shortcuts: [
+    {
+      name: "Open Malachi Daily",
+      url: "/",
+      description: "Let's memorize today's verse",
+    },
+  ],
+  background_color: "#1f2937",
+  display: "standalone",
+  gcm_sender_id: "44879717629",
+  start_url: includesDebugMode ? originUrl + "?debug=true" : originUrl,
+  dir: "ltr",
+  lang: "en",
+  orientation: "portrait-primary",
+  categories: ["education", "lifestyle"],
+  id: "app-malachi-daily",
+  description:
+    "The daily notification with an eternal purpose. Join thousands of Jesus followers memorizing Scripture together. Learn one Bible verse and its context per week.",
+};
+
+return new Response(JSON.stringify(webmanifest), {
+  status: 200,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 ---
