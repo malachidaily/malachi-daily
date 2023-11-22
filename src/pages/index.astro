@@ -50,6 +50,35 @@ export const prerender = true;
 ---
 
 <Layout title="Malachi Daily: Memorize Bible Verses & Learn Their Context">
+	<style is:global>
+		.surface-primary {
+			@apply bg-white dark:bg-gray-800;
+		}
+
+		.canvas-secondary {
+			@apply bg-gray-100 dark:bg-gray-900;
+		}
+
+		.canvas-tertiary {
+			@apply bg-gray-200 dark:bg-gray-800;
+		}
+
+		.text-muted {
+			@apply text-gray-500 dark:text-gray-400;
+		}
+
+		.text-primary {
+			@apply text-gray-800 dark:text-gray-100;
+		}
+
+		.thin-line {
+			@apply border-gray-200 dark:border-gray-700;
+		}
+
+		.text-beautiful-gradient {
+			@apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 dark:from-blue-300 to-purple-700 dark:to-purple-400;
+		}
+	</style>
 	<div
 		x-init={`
 			versesObj = ${JSON.stringify(verses)}
@@ -59,20 +88,20 @@ export const prerender = true;
 		vaul-drawer-wrapper=""
 	>
 		<main
-			class="w-screen h-auto min-h-[calc(100vh-52px)] px-6 flex flex-col items-center bg-gray-100"
+			class="w-screen h-auto min-h-[calc(100vh-52px)] px-6 flex flex-col items-center canvas-secondary"
 		>
 			<div
-				class="p-6 rounded-xl bg-gray-200 max-w-[600px] w-full"
+				class="p-6 rounded-xl canvas-tertiary max-w-[600px] w-full"
 				x-show="showDebug"
 				x-transition
 				x-cloak
 			>
-				<p class="text-gray-500">
+				<p class="text-muted">
 					Your Firebase Cloud Messaging Token:
 				</p>
 				<p
 					x-text="$data.firebaseCMToken || 'No token available. Try requesting notification acccess.'"
-					class="select-all font-mono text-gray-800 font-medium text-start break-all"
+					class="select-all font-mono text-primary font-medium text-start break-all"
 				>
 				</p>
 			</div>
@@ -101,7 +130,7 @@ export const prerender = true;
 								class={`aspect-[${logoImgUrl.height}/${logoImgUrl.width}] h-[32px] w-fit`}
 							/>
 							<h2
-								class="max-sm:text-xl text-3xl text-gray-800 font-bold line-clamp-2 text-ellipsis overflow-hidden"
+								class="max-sm:text-xl text-3xl text-primary font-bold line-clamp-2 text-ellipsis overflow-hidden"
 								x-text="showDebug ? 'Malachi Daily (Debug)' : 'Malachi Daily'"
 							>
 								Malachi Daily
@@ -112,7 +141,7 @@ export const prerender = true;
 							<!-- Share Icon -->
 							<button title="Share Malachi Daily">
 								<svg
-									class="text-gray-600 flex-shrink-0"
+									class="text-muted flex-shrink-0"
 									width="24"
 									height="24"
 									viewBox="0 0 24 24"
@@ -156,7 +185,7 @@ export const prerender = true;
 									x-transition
 									x-bind:class="{ 'animate-bounce': showAnimation && !isSubscribedToNotifications }"
 									role="button"
-									class="text-gray-600 flex-shrink-0"
+									class="text-muted flex-shrink-0"
 									width="24"
 									height="24"
 									viewBox="0 0 256 256"
@@ -263,7 +292,7 @@ export const prerender = true;
 									</div>
 									<div class="form-control w-fit mt-2">
 										<button 
-											class="btn-sm btn btn-outline border-gray-200 rounded-full normal-case"
+											class="btn-sm btn btn-outline thin-line rounded-full normal-case"
 											x-on:click="if (window.confirm('Reload the app?')) { location.reload() }"
 										>Reload App</button>
 									</div>
@@ -272,11 +301,11 @@ export const prerender = true;
 						</div>
 					</div>
 					<div class="flex gap-2 items-center">
-						<p class="text-gray-500 text-center max-sm:hidden">
+						<p class="text-muted text-center max-sm:hidden">
 							Scripture memorization, together. New verse every
 							two weeks
 						</p>
-						<div class="badge bg-gray-200 py-3">
+						<div class="badge canvas-tertiary text-muted py-3 dark:border-gray-700">
 							Passage {passageNum}
 						</div>
 					</div>
@@ -292,7 +321,7 @@ export const prerender = true;
 					class="rounded-md text-start max-sm:mx-[-24px]"
 				>
 					<div
-						class="bg-white p-6 pb-8 flex justify-center items-center rounded-xl shadow-xl max-sm:shadow-sm max-sm:rounded-3xl transition-[height] duration-300"
+						class="surface-primary p-6 pb-8 flex justify-center items-center rounded-xl shadow-xl max-sm:shadow-sm max-sm:rounded-3xl transition-[height] duration-300"
 						x-ref="scriptureCard"
 						x-clear
 						x-init={`
@@ -369,7 +398,7 @@ export const prerender = true;
 								class="w-full flex justify-between gap-6 flex-grow-1"
 							>
 								<div class="flex items-center">
-									<div class="flex gap-2 items-baseline bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-700">
+									<div class="flex gap-2 items-baseline text-beautiful-gradient">
 										<h1
 											x-text="scriptureRef"
 											class="text-xl font-medium"
@@ -379,7 +408,7 @@ export const prerender = true;
 										<span class="text-xl font-medium cursor-pointer" x-on:click="$refs.settingsDrawerBtn.click();" x-text="bibleVersionPreference"></span>
 									</div>
 									<div
-										class="ml-1 tooltip tooltip-bottom h-[24px] w-[24px] flex items-center justify-center text-purple-700"
+										class="ml-1 tooltip tooltip-bottom h-[24px] w-[24px] flex items-center justify-center text-purple-700 dark:text-purple-400"
 										x-show="Boolean(bibleVersionData && bibleVersionPreference)"
 										x-bind:data-tip="bibleVersionData?.[bibleVersionPreference]?.attribution"
 									>
@@ -399,7 +428,7 @@ export const prerender = true;
 
 								<!-- Scripture Action Buttons -->
 								<div
-									class="text-gray-500 flex gap-3 items-center"
+									class="text-muted flex gap-3 items-center"
 								>
 									<!-- Show Fullscreen Button -->
 									<button
@@ -469,7 +498,7 @@ export const prerender = true;
 									x-show="scriptureText"
 									id="verse-current"
 									x-html="scriptureText"
-									class="opacity-0 transition duration-1000 font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700 leading-tight"
+									class="opacity-0 transition duration-1000 font-bold text-beautiful-gradient leading-tight"
 								>
 									{scriptureText}
 								</h2>
@@ -492,7 +521,7 @@ export const prerender = true;
 							class="range range-md"
 							step="10"
 						/>
-						<div class="w-full flex justify-between text-xs px-2">
+						<div class="w-full flex justify-between text-xs px-2 text-muted">
 							<span>|</span>
 							<span>|</span>
 							<span>|</span>
@@ -502,49 +531,49 @@ export const prerender = true;
 							<span>|</span>
 						</div>
 						<div
-							class="w-[calc(100%+16px)] ms-[-8px] flex justify-between text-xs mt-1 font-mono"
+							class="w-[calc(100%+16px)] ms-[-8px] flex justify-between text-xs mt-1 font-mono text-muted"
 							x-data="{ dayOfWeek: new Date().getDay() }"
 						>
 							<span
 								class="cursor-pointer p-1 px-2 rounded-md"
 								x-on:click="fidelity = 10 * 0"
-								x-bind:class="{ 'bg-gray-200': dayOfWeek === 0 || dayOfWeek === 7 }"
+								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 0 || dayOfWeek === 7 }"
 								>Sun</span
 							>
 							<span
 								class="cursor-pointer p-1 px-2 rounded-md"
 								x-on:click="fidelity = 10 * 1"
-								x-bind:class="{ 'bg-gray-200': dayOfWeek === 1 }"
+								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 1 }"
 								>Mon</span
 							>
 							<span
 								class="cursor-pointer p-1 px-2 rounded-md"
 								x-on:click="fidelity = 10 * 2"
-								x-bind:class="{ 'bg-gray-200': dayOfWeek === 2 }"
+								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 2 }"
 								>Tue</span
 							>
 							<span
 								class="cursor-pointer p-1 px-2 rounded-md"
 								x-on:click="fidelity = 10 * 3"
-								x-bind:class="{ 'bg-gray-200': dayOfWeek === 3 }"
+								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 3 }"
 								>Wed</span
 							>
 							<span
 								class="cursor-pointer p-1 px-2 rounded-md"
 								x-on:click="fidelity = 10 * 4"
-								x-bind:class="{ 'bg-gray-200': dayOfWeek === 4 }"
+								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 4 }"
 								>Thu</span
 							>
 							<span
 								class="cursor-pointer p-1 px-2 rounded-md"
 								x-on:click="fidelity = 10 * 5"
-								x-bind:class="{ 'bg-gray-200': dayOfWeek === 5 }"
+								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 5 }"
 								>Fri</span
 							>
 							<span
 								class="cursor-pointer p-1 px-2 rounded-md"
 								x-on:click="fidelity = 10 * 6"
-								x-bind:class="{ 'bg-gray-200': dayOfWeek === 6 }"
+								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 6 }"
 								>Sat</span
 							>
 						</div>
@@ -552,14 +581,14 @@ export const prerender = true;
 				</section>
 
 				<div
-					class="p-6 rounded-xl bg-gray-200 w-full"
+					class="p-6 rounded-xl canvas-tertiary w-full"
 					x-show="showDebug"
 					x-transition
 					x-cloak
 				>
 					<pre
 						x-text="JSON.stringify($data, null, 2)"
-						class="font-mono whitespace-pre text-gray-500 text-start break-all overflow-x-scroll">
+						class="font-mono whitespace-pre text-muted text-start break-all overflow-x-scroll">
 					</pre>
 				</div>
 
@@ -569,7 +598,7 @@ export const prerender = true;
 					x-cloak
 					x-transition
 					x-show="notificationAlert"
-					class="alert alert-warning flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]"
+					class="text-primary alert alert-warning dark:bg-red-900 dark:border-red-900 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -593,7 +622,7 @@ export const prerender = true;
 					x-cloak
 					x-transition
 					x-show="notificationInfo"
-					class="alert alert-info bg-white border-white flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]"
+					class="text-primary alert alert-info surface-primary border-white dark:border-gray-600 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -613,7 +642,7 @@ export const prerender = true;
 
 				<!-- Subscribe -->
 				<div
-					class="relative w-full max-sm:mx-[-24px] max-sm:w-screen rounded-xl bg-gray-200"
+					class="relative w-full max-sm:mx-[-24px] max-sm:w-screen rounded-xl canvas-tertiary"
 					x-ref="subscribeSection"
 					x-cloak
 					x-show="showSubscribeSection"
@@ -621,7 +650,7 @@ export const prerender = true;
 					<iframe
 						src="https://embeds.beehiiv.com/2f6c51bb-5e19-4053-95f7-d0f01ecd6546"
 						data-test-id="beehiiv-embed"
-						class="opacity-0 duration-200 transition-opacity w-full rounded-xl bg-gray-200 skeleton"
+						class="opacity-0 duration-200 transition-opacity w-full rounded-xl canvas-tertiary skeleton"
 						height="320"
 						title="Subscribe to the Malachi Daily email newsletter"
 						frameborder="0"
@@ -652,7 +681,7 @@ export const prerender = true;
 			</div>
 		</main>
 		<!-- Footer -->
-		<footer class="w-full bg-gray-100">
+		<footer class="w-full canvas-secondary">
 			<SectionLinks />
 		</footer>
 	</div>
@@ -768,6 +797,8 @@ export const prerender = true;
 				isPWAInstalled: window.matchMedia("(display-mode: standalone)")
 					.matches,
 				init() {
+					this.notificationInfo = 'poopie butt hahaha'
+
 					// Set the native operating system badge.
 					const setAppBadgeNative = (value: number) => {
 						const supportsAppBadge = "setAppBadge" in navigator;
@@ -1016,7 +1047,7 @@ export const prerender = true;
 											$el.classList.remove('opacity-80')
 										},
 									}"
-									class="opacity-40 animate-pulse text-blue-700"
+									class="opacity-40 animate-pulse text-blue-700 dark:text-blue-500"
 									x-on:mouseover="
 										$el.innerText = '${
 											showFirstCharacter
