@@ -515,21 +515,24 @@ export const prerender = true;
 
 							<!-- Scripture Verses -->
 							<div
-								x-ref="scriptureText"
 								class="relative transition font-scripture"
 								x-bind:class="{ 'font-scripture-serif': showSerifFont }"
 							>
 								<h2
-									x-init={`
-										setTimeout(() => {
-											$el.classList.remove('opacity-0')
-										}, 150)
-									`.trim()}
-									x-transition
-									x-show="scriptureText"
+									x-on:visibilitychange.document=`
+										if (document.visibilityState === 'hidden') {
+											$el.classList.remove('transition-opacity', 'duration-1000');
+											$el.classList.add('opacity-0');
+										} else {
+											$el.classList.add('transition-opacity', 'duration-1000');
+											setTimeout(() => $el.classList.remove('opacity-0'), 1000);
+										}
+									`
+									x-ref="scriptureTextEl"
+									x-init="$el.classList.remove('opacity-0')"
 									id="verse-current"
 									x-html="scriptureText"
-									class="opacity-0 transition duration-1000 font-bold text-beautiful-gradient leading-tight"
+									class="opacity-0 transition-opacity duration-1000 font-bold text-beautiful-gradient leading-tight"
 								>
 									{scriptureText}
 								</h2>
@@ -846,7 +849,7 @@ export const prerender = true;
 				isDarkMode: getIsDarkMode(),
 				isPWAInstalled: window.matchMedia("(display-mode: standalone)")
 					.matches,
-				init() {
+				init() {					
 					// Set the native operating system badge.
 					const setAppBadgeNative = (value: number) => {
 						const supportsAppBadge = "setAppBadge" in navigator;
