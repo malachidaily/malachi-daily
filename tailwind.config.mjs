@@ -10,4 +10,6 @@ export default {
 			"winter",
 		],
 	},
+	// https://tailwindcss.com/docs/dark-mode#toggling-dark-mode-manually
+	darkMode: 'class',
 }
