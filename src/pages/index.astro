@@ -245,6 +245,25 @@ export const prerender = true;
 									<div class="form-control w-fit">
 										<label
 											class="label cursor-pointer flex gap-2 items-center"
+										>
+											<input
+												x-model="isDarkMode"
+												type="checkbox"
+												checked="checked"
+												class="checkbox"
+												x-on:click=`
+													localStorage.setItem('isDarkMode', JSON.stringify($el.checked));
+													toggleDarkMode();
+												`
+											/>
+											<span class="label-text text-primary"
+												>Enable Dark Mode</span
+											>
+										</label>
+									</div>
+									<div class="form-control w-fit">
+										<label
+											class="label cursor-pointer flex gap-2 items-center"
 											for="show-first-letter"
 										>
 											<input
@@ -717,6 +736,10 @@ export const prerender = true;
 				"🙏".repeat(15),
 		);
 
+		function toggleDarkMode() {
+			document.documentElement.classList.toggle('dark');
+		}
+
 		// create a function that gets "showFirstLetter" from localStorage
 		// if it doesn't exist, set it to true
 		const getShowFirstLetter = () => {
@@ -760,6 +783,19 @@ export const prerender = true;
 				return JSON.parse(shouldRandomizeOrderOfHiddenWords);
 			}
 		};
+
+		const getIsDarkMode = () => {
+			const isDarkMode = localStorage.getItem("isDarkMode");
+			if (isDarkMode === null) {
+				return false;
+			} else {
+				return JSON.parse(isDarkMode);
+			}
+		}
+
+		if (getIsDarkMode()) {
+			toggleDarkMode();
+		}
 
 		const getUserBibleVersionPreference = () => {
 			const bibleVersionPreference = localStorage.getItem(
@@ -806,6 +842,8 @@ export const prerender = true;
 		document.addEventListener("alpine:init", () => {
 			const Alpine = window["Alpine"] || {};
 			Alpine.data("malachi", () => ({
+				toggleDarkMode: toggleDarkMode,
+				isDarkMode: getIsDarkMode(),
 				isPWAInstalled: window.matchMedia("(display-mode: standalone)")
 					.matches,
 				init() {
