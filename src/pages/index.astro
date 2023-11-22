@@ -790,6 +790,14 @@ export const prerender = true;
 		const getIsDarkMode = () => {
 			const isDarkMode = localStorage.getItem("isDarkMode");
 			if (isDarkMode === null) {
+				// Does user's media prefer dark mode?
+				if (
+					window.matchMedia &&
+					window.matchMedia("(prefers-color-scheme: dark)").matches
+				) {
+					return true;
+				}
+				
 				return false;
 			} else {
 				return JSON.parse(isDarkMode);
