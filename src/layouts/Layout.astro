@@ -10,7 +10,7 @@ interface Props {
 const isDebugModeEnabled = Astro.url.searchParams.get('debug');
 
 const canonicalUrl = 'https://app.malachidaily.com' + Astro.url.pathname;
-const urlForTwitterDomainMetaTag = Astro.url.origin.replace(Astro.url.protocol + '//', '');
+const urlForTwitterDomainMetaTag = 'app.malachidaily.com';
 
 const { 
 	title = 'Malachi Daily: Memorize Bible Verses & Learn Their Context', 
