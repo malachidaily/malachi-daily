@@ -9,7 +9,7 @@ interface Props {
 
 const isDebugModeEnabled = Astro.url.searchParams.get('debug');
 
-const canonicalUrl = Astro.url.origin + Astro.url.pathname;
+const canonicalUrl = 'https://app.malachidaily.com' + Astro.url.pathname;
 const urlForTwitterDomainMetaTag = Astro.url.origin.replace(Astro.url.protocol + '//', '');
 
 const { 
