@@ -2,37 +2,65 @@
 import "@fontsource/inconsolata/900.css"; // Specify weight
 
 interface Props {
-	title: string;
+	title?: string;
 	description?: string;
+	ogImageUrl?: string;
 }
 
 const isDebugModeEnabled = Astro.url.searchParams.get('debug');
 
-const { title, description = 'The daily notification with an eternal purpose. Join thousands of Jesus followers memorizing Scripture together. Learn one Bible verse and its context per week.' } = Astro.props;
+const canonicalUrl = Astro.url.origin + Astro.url.pathname;
+const urlForTwitterDomainMetaTag = Astro.url.origin.replace(Astro.url.protocol + '//', '');
+
+const { 
+	title = 'Malachi Daily: Memorize Bible Verses & Learn Their Context', 
+	description = 'The daily notification with an eternal purpose. Join thousands of Jesus followers memorizing Scripture together. Learn one Bible verse and its context per week.',
+	ogImageUrl = '/og-image.png',
+} = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en" class="bg-gray-800">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content={description} />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-		<!-- https://web.dev/learn/pwa/web-app-manifest -->
-		<meta name="theme-color" x-bind:content="isDarkMode ? '#1f2937' : '#f3f4f6'">
-		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
-		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-		<link rel="manifest" href={isDebugModeEnabled ? "/site.webmanifest?debug=true" : "/site.webmanifest"}>
 		<meta name="generator" content={Astro.generator} />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+		<link rel="canonical" href={canonicalUrl} />
+
 		<title>{title}</title>
-		<meta property="og:image" content="/og-image.png">
-		<link type="text/partytown" rel="preconnect" href="https://fonts.googleapis.com">
-		<link type="text/partytown" rel="preconnect" href="https://fonts.gstatic.com" crossorigin>	
-		<script
-			type="text/partytown"
-			src="https://www.googletagmanager.com/gtag/js?id=G-XN36VGGVNK"
-		></script>
+		
+		<!-- Facebook Meta Tags - generated via https://www.opengraph.xyz -->
+		<meta property="og:url" content={Astro.url.origin} />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={ogImageUrl} />
+	  
+		<!-- Twitter Meta Tags - generated via https://www.opengraph.xyz -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta property="twitter:domain" content={urlForTwitterDomainMetaTag} />
+		<meta property="twitter:url" content={Astro.url.origin} />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImageUrl} />
+	  
+		<!-- 
+			This is how I can easily change the header in the PWA on light and dark mode. 
+			https://web.dev/learn/pwa/web-app-manifest 
+		-->
+		<meta name="theme-color" x-bind:content="isDarkMode ? '#1f2937' : '#f3f4f6'" />
+		<link rel="manifest" href={isDebugModeEnabled ? "/site.webmanifest?debug=true" : "/site.webmanifest"} />
+
+		<!-- Favicon -->
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+		<!-- Google Scripts - Analytics & fonts -->
+		<link type="text/partytown" rel="preconnect" href="https://fonts.googleapis.com" />
+		<link type="text/partytown" rel="preconnect" href="https://fonts.gstatic.com" crossorigin />	
+		<script type="text/partytown" src="https://www.googletagmanager.com/gtag/js?id=G-XN36VGGVNK"></script>
 		<script type="text/partytown">
 			window.dataLayer = window.dataLayer || [];
 			function gtag() {
@@ -42,6 +70,17 @@ const { title, description = 'The daily notification with an eternal purpose. Jo
 			gtag("config", "G-XN36VGGVNK");
 		  </script>
 		<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+
+		<!-- Register the service worker up-front -->
+		<script>
+			if ('serviceWorker' in navigator) {
+				navigator
+					.serviceWorker
+					.register('/service-worker.js')
+			}
+		</script>
+
+		<!-- Styles -->
 		<style is:global>
 			.font-scripture {
 				font-family: "Inconsolata";
@@ -70,13 +109,6 @@ const { title, description = 'The daily notification with an eternal purpose. Jo
 				@apply max-sm:mt-0 max-sm:w-auto max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:p-4 max-sm:z-20 max-sm:bg-gray-100 max-sm:shadow-sm max-sm:border-t-[1px] max-sm:border-gray-300 max-sm:mx-0;
 			}
 		</style>
-		<script>
-			if ('serviceWorker' in navigator) {
-				navigator
-					.serviceWorker
-					.register('/service-worker.js')
-			}
-		</script>
 	</head>
 	<body>
 		<slot />
