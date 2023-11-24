@@ -39,20 +39,31 @@ const futureVersesFromApi = await getAllVerses({
 		groups: [],
 	}),
 	orderBy: "Start Date",
-	size: 3,
+	size: 2,
 });
 
-const firstFutureVerseFromApi = futureVersesFromApi.results[0];
-const firstVerseFromApi = nowAndPastVersesFromApi.results[0];
-let verseToUse = firstVerseFromApi;
+function getMostCurrentVerse() {
+	const firstVerseFromApi = nowAndPastVersesFromApi.results[0];
+	
+	const firstFutureVerseFromApi = futureVersesFromApi.results[0];
+	const secondFutureVerseFromApi = futureVersesFromApi.results?.[1] || null;
 
-const futureVerseStartTimeInMilliseconds = new Date(firstFutureVerseFromApi["Start Date"]).getTime() / 1000;
-const isFutureVerseActuallyNow = futureVerseStartTimeInMilliseconds >= Date.now();
+	const firstFutureVerseStartTime = new Date(firstFutureVerseFromApi["Start Date"]).getTime() / 1000;
+	const secondFutureVerseStartTime = secondFutureVerseFromApi ? new Date(secondFutureVerseFromApi["Start Date"]).getTime() / 1000 : null;
 
-// This could happen due to cacheing, because I have a 1 day cache on most API calls.
-if (isFutureVerseActuallyNow) {
-	verseToUse = firstFutureVerseFromApi;
+	let isFutureVerseActuallyNow = firstFutureVerseStartTime >= Date.now();
+
+	// This could happen due to cacheing, because I have a 1 day cache on most API calls.
+	if (isFutureVerseActuallyNow && (secondFutureVerseStartTime ? secondFutureVerseStartTime <= Date.now() : false)) {
+		return secondFutureVerseFromApi;
+	} else if (isFutureVerseActuallyNow) {
+		return firstFutureVerseFromApi;
+	} else {
+		return firstVerseFromApi;
+	}
 }
+
+const verseToUse = getMostCurrentVerse();
 
 const translation: bibleVersion = "ESV";
 const chapterName: BookName = verseToUse.Book.value || "Matthew";
