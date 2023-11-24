@@ -1,22 +1,8 @@
 // Documentation can be found at https://bolls.life/api/
 import { type bibleVersion, selectedBibleVersions } from './static/books';
+import { fetchAndCache } from '../index.ts';
 
 const bibleApiOrigin = 'https://bolls.life'
-const cache: { [key: string]: Verse } = {}
-
-async function fetchAndCache(url: string, cacheKey: string, options?: RequestInit): Promise<any> {
-    const cachedResponse = cache[cacheKey]
-
-    if (cachedResponse) {
-        console.log('loaded from cache with key', cacheKey, cachedResponse)
-        return cachedResponse;
-    } else {
-        const response = await fetch(url, options);
-        const data = await response.json()
-        cache[cacheKey] = data
-        return data;
-    }
-}
 
 type GetVerses = {
     bookId: number;
@@ -41,6 +27,10 @@ type GetVerse = {
 }
 
 function transformBibleVersesFromMultipleTranslations(data: Array<Array<Verse>>) {
+    if (!data || !data.length) {
+        throw new Error("Verse does not exist.")
+    }
+
     const returnObj = {} as { [key: bibleVersion]: string }
     for (let versionIndex = 0; versionIndex < data.length; versionIndex += 1) {
         // Collect each verse near its translation (which is the key of the object)
@@ -79,10 +69,10 @@ export async function getBibleVersesFromMultipleTranslations({
     verses,
     translations
 } : GetVerses): Promise<BibleVersesFromMultipleTranslations> {
-    const data = await fetchAndCache(
-        `${bibleApiOrigin}/get-paralel-verses/`, 
-        `get-paralel-verses-${bookId}-${chapter}-${verses.join('-')}`,
-        {
+    const data = await fetchAndCache({
+        url: `${bibleApiOrigin}/get-paralel-verses/`, 
+        cacheKey: `get-paralel-verses-${bookId}-${chapter}-${verses.join('-')}`,
+        options: {
             method: "POST",
             cache: 'default',
             headers: {
@@ -97,7 +87,11 @@ export async function getBibleVersesFromMultipleTranslations({
                 chapter
             }),
         }
-    )
+    })
+
+    if (!data || !data.length) {
+        throw new Error("Verse does not exist.")
+    }
 
     // Transform verse to readable data
     const returnObj = transformBibleVersesFromMultipleTranslations(data)
@@ -112,10 +106,10 @@ export async function getVerse({
     chapter,
     verse
 } : GetVerse): Promise<Verse> {
-    const data = await fetchAndCache(
-        `${bibleApiOrigin}/get-verse/${translation}/${bookId}/${chapter}/${verse}/`,
-        `get-verse-${translation}-${bookId}-${chapter}-${verse}`
-    )
+    const data = await fetchAndCache({
+        url: `${bibleApiOrigin}/get-verse/${translation}/${bookId}/${chapter}/${verse}/`,
+        cacheKey: `get-verse-${translation}-${bookId}-${chapter}-${verse}`
+    })
 
     // Remove the title from the scripture.
     // (Usually this happens for the first verse in teh chapter)

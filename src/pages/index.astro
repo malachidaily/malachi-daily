@@ -3,7 +3,7 @@ import { Image } from "astro:assets";
 
 import Layout from "../layouts/Layout.astro";
 import logoImgUrl from "../../public/logo.png";
-import { SCRIPTURE_TEXT, SCRIPTURE_REF } from "../utils/constants";
+import { backupVerse } from "../utils/constants";
 import NativeFeelingDrawer from "../components/react/NativeFeelingDrawer";
 import SectionLinks from "../components/astro/SectionLinks/index.astro";
 import {
@@ -12,41 +12,155 @@ import {
 } from "../api/bible";
 import {
 	books,
+	type BookName,
 	type bibleVersion,
 	selectedBibleVersions,
 	bibleVersionData,
 } from "../api/bible/static/books";
+import { getAllVerses } from "../api/verses";
 
-const isDebugModeEnabled = Astro.url.searchParams.get("debug") === "true";
+const urlSearchParams = Astro.url.searchParams;
+const searchParamBook = urlSearchParams.get("book");
+const searchParamChapter = urlSearchParams.get("chapter");
+const searchParamStartVerse = urlSearchParams.get("start-verse");
+const searchParamEndVerse = urlSearchParams.get("end-verse");
+let verseToUse;
+const getVerseFromUrlParams = Boolean(
+	searchParamBook && searchParamChapter && searchParamStartVerse,
+);
 
-const translation: bibleVersion = "ESV";
-const chapterName = books.Matthew.name;
+let errorText = "";
+let infoText = "";
+
+if (getVerseFromUrlParams) {
+	// Return the verse from the params...
+	verseToUse = {
+		Book: {
+			value: searchParamBook,
+		},
+		Chapter: searchParamChapter,
+		"Verse Number Start": searchParamStartVerse,
+		"Verse Number End": searchParamEndVerse,
+	};
+} else {
+	// Nope, let's get the verse from the API!
+	try {
+		// This will get the most recent verse from the API that's live.
+		const nowAndPastVersesFromApi = await getAllVerses({
+			filters: JSON.stringify({
+				filter_type: "AND",
+				filters: [
+					{ type: "boolean", field: "Past Start Date", value: "1" },
+				],
+				groups: [],
+			}),
+			// The minus up front tells the API to order by the descending order.
+			orderBy: "-Start Date",
+			size: 1,
+		});
+
+		// This will get and cache the latest verses fom the API.
+		const futureVersesFromApi = await getAllVerses({
+			filters: JSON.stringify({
+				filter_type: "AND",
+				filters: [
+					{ type: "boolean", field: "Past Start Date", value: "0" },
+				],
+				groups: [],
+			}),
+			orderBy: "Start Date",
+			size: 2,
+		});
+
+		function getMostCurrentVerse() {
+			const firstVerseFromApi = nowAndPastVersesFromApi.results[0];
+
+			const firstFutureVerseFromApi = futureVersesFromApi.results[0];
+			const secondFutureVerseFromApi =
+				futureVersesFromApi.results?.[1] || null;
+
+			const firstFutureVerseStartTime =
+				new Date(firstFutureVerseFromApi["Start Date"]).getTime() /
+				1000;
+			const secondFutureVerseStartTime = secondFutureVerseFromApi
+				? new Date(secondFutureVerseFromApi["Start Date"]).getTime() /
+				  1000
+				: null;
+
+			let isFutureVerseActuallyNow =
+				firstFutureVerseStartTime >= Date.now();
+
+			// This could happen due to cacheing, because I have a 1 day cache on most API calls.
+			if (
+				isFutureVerseActuallyNow &&
+				(secondFutureVerseStartTime
+					? secondFutureVerseStartTime <= Date.now()
+					: false)
+			) {
+				return secondFutureVerseFromApi;
+			} else if (isFutureVerseActuallyNow) {
+				return firstFutureVerseFromApi;
+			} else {
+				return firstVerseFromApi;
+			}
+		}
+
+		verseToUse = getMostCurrentVerse();
+	} catch (error) {
+		errorText =	'An error occured. Returning backup verse: Matthew 4:4';
+		verseToUse = backupVerse;
+	}
+}
+
+const translation: bibleVersion = "NLT";
+const chapterName: BookName = verseToUse.Book.value;
 const bookId = books[chapterName].bookid;
-const chapter = 4;
-const verseNum = 4;
+const chapter = Number(verseToUse.Chapter);
+const verseNum = Number(verseToUse["Verse Number Start"]);
+const verseNumEnd = Number(verseToUse["Verse Number End"]);
+
+// Allow user to get multiple verses at once
+const verseNums: number[] = [];
+verseNums.push(verseNum);
+if (verseNumEnd && verseNum < verseNumEnd) {
+	for (let i = verseNum + 1; i <= verseNumEnd; i++) {
+		verseNums.push(i);
+	}
+}
 
 // Anytime there's a new passage for Malachi Daily, this will increment by one.
-const passageNum = 13;
+const passageNum = verseToUse["Passage Number"] || "0";
 
-const verseRef = `${chapterName} ${chapter}:${verseNum}`;
+let verseRef = `${chapterName} ${chapter}:${verseNum}${
+	verseNumEnd ? `-${verseNumEnd}` : ""
+}`;
 
 let verses: BibleVersesFromMultipleTranslations = {};
+
+if (getVerseFromUrlParams) {
+	infoText = `Showing verse from URL Params: ${verseRef}`;
+}
 try {
 	verses = await getBibleVersesFromMultipleTranslations({
 		bookId: bookId,
 		chapter,
-		verses: [verseNum],
+		verses: verseNums,
 		translations: selectedBibleVersions,
 	});
 } catch (error) {
-	// User backup verse, instead
-	console.log(error);
+	// User backup verse, instead.
+	errorText = `${verseRef} cannot be found. Returning Matthew 4:4`;
+	verses = await getBibleVersesFromMultipleTranslations({
+		bookId: books["Matthew"].bookid,
+		chapter: 4,
+		verses: [4],
+		translations: selectedBibleVersions,
+	});
+	verseRef = "Matthew 4:4";
 }
 
-const scriptureText = verses[translation] || SCRIPTURE_TEXT;
-const scriptureRef = verseRef || SCRIPTURE_REF;
-
-export const prerender = true;
+const scriptureText = verses[translation];
+const scriptureRef = verseRef;
 ---
 
 <Layout title="Malachi Daily: Memorize Bible Verses & Learn Their Context">
@@ -93,8 +207,10 @@ export const prerender = true;
 	</style>
 	<div
 		x-init={`
-			versesObj = ${JSON.stringify(verses)}
-			bibleVersionData = ${JSON.stringify(bibleVersionData)}
+			versesObj = ${JSON.stringify(verses)};
+			bibleVersionData = ${JSON.stringify(bibleVersionData)};
+			notificationAlert = '${errorText}';
+			notificationInfo = '${infoText}';
 		`.trim()}
 		x-clear
 		vaul-drawer-wrapper=""
@@ -108,9 +224,7 @@ export const prerender = true;
 				x-transition
 				x-cloak
 			>
-				<p class="text-muted">
-					Your Firebase Cloud Messaging Token:
-				</p>
+				<p class="text-muted">Your Firebase Cloud Messaging Token:</p>
 				<p
 					x-text="$data.firebaseCMToken || 'No token available. Try requesting notification acccess.'"
 					class="select-all font-mono text-primary font-medium text-start break-all"
@@ -125,7 +239,7 @@ export const prerender = true;
 					class="w-full flex flex-col gap-2 items-start justify-start"
 				>
 					<div class="w-full flex gap-2 justify-between">
-						<div 
+						<div
 							x-data={`{ clickCount: 0}`}
 							x-on:click={`
 								clickCount += 1;
@@ -215,7 +329,8 @@ export const prerender = true;
 										class="form-control w-full max-w-xs mb-2"
 									>
 										<label class="label">
-											<span class="label-text text-primary"
+											<span
+												class="label-text text-primary"
 												>Select your preferred Bible
 												translation</span
 											>
@@ -256,7 +371,8 @@ export const prerender = true;
 													toggleDarkMode();
 												`
 											/>
-											<span class="label-text text-primary"
+											<span
+												class="label-text text-primary"
 												>Enable Dark Mode</span
 											>
 										</label>
@@ -275,7 +391,8 @@ export const prerender = true;
 												id="show-first-letter"
 												x-on:click="localStorage.setItem('showFirstLetter', JSON.stringify($el.checked));"
 											/>
-											<span class="label-text text-primary"
+											<span
+												class="label-text text-primary"
 												>Show the first letter in each
 												hidden word</span
 											>
@@ -295,7 +412,8 @@ export const prerender = true;
 												id="checkbox-randomize-hidden-words"
 												x-on:click="localStorage.setItem('shouldRandomizeOrderOfHiddenWords', JSON.stringify($el.checked));"
 											/>
-											<span class="label-text text-primary"
+											<span
+												class="label-text text-primary"
 												>Randomize the order of hidden
 												words</span
 											>
@@ -315,30 +433,37 @@ export const prerender = true;
 												id="checkbox-show-serif-font"
 												x-on:click="localStorage.setItem('showSerifFont', JSON.stringify($el.checked));"
 											/>
-											<span class="label-text text-primary"
+											<span
+												class="label-text text-primary"
 												>Use a more decorative font
 												(serif)</span
 											>
 										</label>
 									</div>
 									<div class="form-control w-fit mt-2">
-										<button 
+										<button
 											class="btn-sm btn btn-outline text-primary thin-line rounded-full normal-case"
 											x-on:click="if (window.confirm('Reload the app?')) { location.reload() }"
-										>Reload App</button>
+											>Reload App</button
+										>
 									</div>
 								</div>
 							</NativeFeelingDrawer>
 						</div>
 					</div>
-					<div class="flex gap-2 items-center">
-						<p class="text-muted text-center max-sm:hidden">
+					<div class="flex gap-2 items-center flex-wrap">
+						<p class="text-muted text-start max-sm:hidden">
 							Scripture memorization, together. New verse every
 							two weeks
 						</p>
-						<div class="badge canvas-tertiary text-primary py-3 dark:border-gray-700">
-							Passage {passageNum}
-						</div>
+						<button
+							x-data={`{ passageNum: ${passageNum}}`}
+							class="whitespace-nowrap badge canvas-tertiary text-primary py-3 dark:border-gray-700"
+							x-on:click="passageNum === 0 ? (window.location.href = '/') : null"
+							x-text="passageNum ? ('Passage ' + passageNum) : 'Go Back to Main Verse'"
+						>
+							Passage --
+						</button>
 					</div>
 				</div>
 
@@ -373,6 +498,13 @@ export const prerender = true;
 									localStorage.setItem('showSerifFont', showSerifFont);
 									getAndSetCardWidth($el);
 								})
+							})
+
+							// https://alpinejs.dev/magics/watch
+							$watch('bibleVersionPreference', (prevVal, newVal) => {
+								if (prevVal !== newVal) {
+									getAndSetCardWidth($el)
+								}
 							})
 						`.trim()}
 						x-data={`{ 
@@ -429,14 +561,20 @@ export const prerender = true;
 								class="w-full flex justify-between gap-6 flex-grow-1"
 							>
 								<div class="flex items-center">
-									<div class="flex gap-2 items-baseline text-beautiful-gradient">
+									<div
+										class="flex flex-wrap gap-2 items-baseline text-beautiful-gradient"
+									>
 										<h1
 											x-text="scriptureRef"
 											class="text-xl font-medium"
 										>
 											{scriptureRef}
 										</h1>
-										<span class="text-xl font-medium cursor-pointer" x-on:click="$refs.settingsDrawerBtn.click();" x-text="bibleVersionPreference"></span>
+										<span
+											class="text-xl font-medium cursor-pointer"
+											x-on:click="$refs.settingsDrawerBtn.click();"
+											x-text="bibleVersionPreference"
+										></span>
 									</div>
 									<div
 										class="ml-1 tooltip tooltip-bottom h-[24px] w-[24px] flex items-center justify-center text-purple-700 dark:text-gray-300"
@@ -458,9 +596,7 @@ export const prerender = true;
 								</div>
 
 								<!-- Scripture Action Buttons -->
-								<div
-									class="text-muted flex gap-3 items-center"
-								>
+								<div class="text-muted flex gap-3 items-center">
 									<!-- Show Fullscreen Button -->
 									<button
 										x-show="!isFullscreen"
@@ -555,7 +691,9 @@ export const prerender = true;
 							class="range range-md"
 							step="10"
 						/>
-						<div class="w-full flex justify-between text-xs px-2 text-muted">
+						<div
+							class="w-full flex justify-between text-xs px-2 text-muted"
+						>
 							<span>|</span>
 							<span>|</span>
 							<span>|</span>
@@ -632,7 +770,7 @@ export const prerender = true;
 					x-cloak
 					x-transition
 					x-show="notificationAlert"
-					class="text-primary alert alert-warning dark:bg-red-900 dark:border-red-900 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]"
+					class="text-primary alert alert-warning dark:bg-red-900 dark:border-red-900 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-sm:max-w-full"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -656,7 +794,7 @@ export const prerender = true;
 					x-cloak
 					x-transition
 					x-show="notificationInfo"
-					class="text-primary alert alert-info surface-primary border-white dark:border-gray-600 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]"
+					class="text-primary alert alert-info surface-primary border-white dark:border-gray-600 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-sm:max-w-full"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -727,7 +865,7 @@ export const prerender = true;
 			messaging,
 			getUserFirebaseNotificationToken,
 		} from "../messaging_init_on_client.js";
-		import { removeAlpineAttributes } from '../utils'
+		import { removeAlpineAttributes } from "../utils";
 
 		declare global {
 			var Alpine: AlpineType;
@@ -750,7 +888,7 @@ export const prerender = true;
 		);
 
 		function toggleDarkMode() {
-			document.documentElement.classList.toggle('dark');
+			document.documentElement.classList.toggle("dark");
 		}
 
 		// create a function that gets "showFirstLetter" from localStorage
@@ -812,7 +950,7 @@ export const prerender = true;
 			} else {
 				return JSON.parse(isDarkMode);
 			}
-		}
+		};
 
 		if (getIsDarkMode()) {
 			toggleDarkMode();
@@ -867,12 +1005,14 @@ export const prerender = true;
 				isDarkMode: getIsDarkMode(),
 				isPWAInstalled: window.matchMedia("(display-mode: standalone)")
 					.matches,
-				init() {					
+				init() {
 					// Set the native operating system badge.
 					const setAppBadgeNative = (value: number) => {
 						const supportsAppBadge = "setAppBadge" in navigator;
-						if (supportsAppBadge && matchMedia("(display-mode: standalone)")
-										.matches) {
+						if (
+							supportsAppBadge &&
+							matchMedia("(display-mode: standalone)").matches
+						) {
 							navigator.setAppBadge(value);
 						}
 					};
@@ -916,24 +1056,27 @@ export const prerender = true;
 						setAppBadgeNative(0);
 
 						let lastRefresh = localStorage.getItem("lastRefresh");
-						
+
 						if (!lastRefresh) {
 							const lastRefresh = JSON.stringify(Date.now());
-							localStorage.setItem(
-								"lastRefresh",
-								lastRefresh,
-							);
+							localStorage.setItem("lastRefresh", lastRefresh);
 							return;
 						}
 
 						const isLastRefreshFromToday = lastRefresh
 							? new Date(Number(lastRefresh)).toDateString() ===
-								new Date().toDateString()
+							  new Date().toDateString()
 							: false;
-						const isLastRefreshAnHourOrMoreAgo = Boolean(lastRefresh && (Date.now() - Number(lastRefresh)) > 3600000)
+						const isLastRefreshAnHourOrMoreAgo = Boolean(
+							lastRefresh &&
+								Date.now() - Number(lastRefresh) > 3600000,
+						);
 
-						if (!isLastRefreshFromToday || isLastRefreshAnHourOrMoreAgo) {
-							localStorage.removeItem('lastRefresh');
+						if (
+							!isLastRefreshFromToday ||
+							isLastRefreshAnHourOrMoreAgo
+						) {
+							localStorage.removeItem("lastRefresh");
 							window.location.reload();
 						}
 					});
@@ -1117,7 +1260,8 @@ export const prerender = true;
 									class="opacity-40 animate-pulse text-blue-700 dark:text-gray-300"
 									x-on:mouseover="
 										$el.innerText = '${
-											showFirstCharacter && wordToBeReplaced.length > 1
+											showFirstCharacter &&
+											wordToBeReplaced.length > 1
 												? wordToBeReplaced.slice(1)
 												: wordToBeReplaced
 										}'
