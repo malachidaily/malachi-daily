@@ -44,7 +44,7 @@ const futureVersesFromApi = await getAllVerses({
 
 function getMostCurrentVerse() {
 	const firstVerseFromApi = nowAndPastVersesFromApi.results[0];
-	
+
 	const firstFutureVerseFromApi = futureVersesFromApi.results[0];
 	const secondFutureVerseFromApi = futureVersesFromApi.results?.[1] || null;
 
@@ -74,9 +74,10 @@ const verseNum = Number(verseToUse["Verse Number Start"]) || 4;
 // Anytime there's a new passage for Malachi Daily, this will increment by one.
 const passageNum = Number(verseToUse["Passage Number"]) || 0;
 
-const verseRef = `${chapterName} ${chapter}:${verseNum}`;
+let verseRef = `${chapterName} ${chapter}:${verseNum}`;
 
 let verses: BibleVersesFromMultipleTranslations = {};
+let errorText = '';
 try {
 	verses = await getBibleVersesFromMultipleTranslations({
 		bookId: bookId,
@@ -85,8 +86,15 @@ try {
 		translations: selectedBibleVersions,
 	});
 } catch (error) {
-	// User backup verse, instead
-	console.log(error);
+	// User backup verse, instead.
+	errorText = `${verseRef} cannot be found. Returning Matthew 4:4`
+	verses = await getBibleVersesFromMultipleTranslations({
+		bookId: books["Matthew"].bookid,
+		chapter: 4,
+		verses: [4],
+		translations: selectedBibleVersions,
+	});
+	verseRef = "Matthew 4:4";
 }
 
 const scriptureText = verses[translation] || SCRIPTURE_TEXT;
@@ -137,8 +145,9 @@ const scriptureRef = verseRef || SCRIPTURE_REF;
 	</style>
 	<div
 		x-init={`
-			versesObj = ${JSON.stringify(verses)}
-			bibleVersionData = ${JSON.stringify(bibleVersionData)}
+			versesObj = ${JSON.stringify(verses)};
+			bibleVersionData = ${JSON.stringify(bibleVersionData)};
+			notificationAlert = '${errorText}';
 		`.trim()}
 		x-clear
 		vaul-drawer-wrapper=""
@@ -688,7 +697,7 @@ const scriptureRef = verseRef || SCRIPTURE_REF;
 					x-cloak
 					x-transition
 					x-show="notificationAlert"
-					class="text-primary alert alert-warning dark:bg-red-900 dark:border-red-900 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]"
+					class="text-primary alert alert-warning dark:bg-red-900 dark:border-red-900 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-sm:max-w-full"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -712,7 +721,7 @@ const scriptureRef = verseRef || SCRIPTURE_REF;
 					x-cloak
 					x-transition
 					x-show="notificationInfo"
-					class="text-primary alert alert-info surface-primary border-white dark:border-gray-600 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-w-[400px]"
+					class="text-primary alert alert-info surface-primary border-white dark:border-gray-600 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-sm:max-w-full"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -923,6 +932,7 @@ const scriptureRef = verseRef || SCRIPTURE_REF;
 				isDarkMode: getIsDarkMode(),
 				isPWAInstalled: window.matchMedia("(display-mode: standalone)")
 					.matches,
+				errorMessageFromServer: '',
 				init() {
 					// Set the native operating system badge.
 					const setAppBadgeNative = (value: number) => {

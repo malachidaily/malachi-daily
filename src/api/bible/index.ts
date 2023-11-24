@@ -27,6 +27,10 @@ type GetVerse = {
 }
 
 function transformBibleVersesFromMultipleTranslations(data: Array<Array<Verse>>) {
+    if (!data || !data.length) {
+        throw new Error("Verse does not exist.")
+    }
+
     const returnObj = {} as { [key: bibleVersion]: string }
     for (let versionIndex = 0; versionIndex < data.length; versionIndex += 1) {
         // Collect each verse near its translation (which is the key of the object)
@@ -84,6 +88,10 @@ export async function getBibleVersesFromMultipleTranslations({
             }),
         }
     })
+
+    if (!data || !data.length) {
+        throw new Error("Verse does not exist.")
+    }
 
     // Transform verse to readable data
     const returnObj = transformBibleVersesFromMultipleTranslations(data)
