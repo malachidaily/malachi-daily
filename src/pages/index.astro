@@ -451,14 +451,14 @@ const scriptureRef = verseRef;
 							</NativeFeelingDrawer>
 						</div>
 					</div>
-					<div class="flex gap-2 items-center">
-						<p class="text-muted text-center max-sm:hidden">
+					<div class="flex gap-2 items-center flex-wrap">
+						<p class="text-muted text-start max-sm:hidden">
 							Scripture memorization, together. New verse every
 							two weeks
 						</p>
 						<button
 							x-data={`{ passageNum: ${passageNum}}`}
-							class="badge canvas-tertiary text-primary py-3 dark:border-gray-700"
+							class="whitespace-nowrap badge canvas-tertiary text-primary py-3 dark:border-gray-700"
 							x-on:click="passageNum === 0 ? (window.location.href = '/') : null"
 							x-text="passageNum ? ('Passage ' + passageNum) : 'Go Back to Main Verse'"
 						>
