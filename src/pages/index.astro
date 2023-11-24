@@ -26,7 +26,8 @@ const nowAndPastVersesFromApi = await getAllVerses({
 		filters: [{ type: "boolean", field: "Past Start Date", value: "1" }],
 		groups: [],
 	}),
-	orderBy: "Start Date",
+	// The minus up front tells the API to order by the descending order.
+	orderBy: "-Start Date",
 	size: 1,
 });
 
@@ -60,8 +61,7 @@ const chapter = Number(verseToUse.Chapter) || 4;
 const verseNum = Number(verseToUse["Verse Number Start"]) || 4;
 
 // Anytime there's a new passage for Malachi Daily, this will increment by one.
-// TODO - Add a passage number to each verse!
-const passageNum = 13;
+const passageNum = Number(verseToUse["Passage Number"]) || 0;
 
 const verseRef = `${chapterName} ${chapter}:${verseNum}`;
 
