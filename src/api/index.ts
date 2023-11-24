@@ -36,3 +36,14 @@ export async function fetchAndCache({
         return data;
     }
 }
+
+export function clearCache(cacheKey?: string): void {
+    if (cacheKey) {
+        delete cache[cacheKey];
+    } else {
+        // Clear the entire cache
+        Object.keys(cache).forEach((key) => {
+            delete cache[key];
+        });
+    }
+}
