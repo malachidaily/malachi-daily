@@ -21,6 +21,9 @@ export default defineConfig({
       },
     })
   ],
+  redirects: {
+    '/admin': 'https://baserow.io/database/81919/table/222976/365623'
+  },
   output: 'server',
   adapter: netlify()
 });
