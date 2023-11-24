@@ -26,18 +26,41 @@ const nowAndPastVersesFromApi = await getAllVerses({
 		filters: [{ type: "boolean", field: "Past Start Date", value: "1" }],
 		groups: [],
 	}),
-	orderBy: "Past Start Date",
+	orderBy: "Start Date",
 	size: 1,
 });
 
+// This will get and cache the latest verses fom the API.
+const futureVersesFromApi = await getAllVerses({
+	filters: JSON.stringify({
+		filter_type: "AND",
+		filters: [{ type: "boolean", field: "Past Start Date", value: "0" }],
+		groups: [],
+	}),
+	orderBy: "Start Date",
+	size: 3,
+});
+
+const firstFutureVerseFromApi = futureVersesFromApi.results[0];
 const firstVerseFromApi = nowAndPastVersesFromApi.results[0];
+let verseToUse = firstVerseFromApi;
+
+const futureVerseStartTimeInMilliseconds = new Date(firstFutureVerseFromApi["Start Date"]).getTime() / 1000;
+const isFutureVerseActuallyNow = futureVerseStartTimeInMilliseconds >= Date.now();
+
+// This could happen due to cacheing, because I have a 1 day cache on most API calls.
+if (isFutureVerseActuallyNow) {
+	verseToUse = firstFutureVerseFromApi;
+}
+
 const translation: bibleVersion = "ESV";
-const chapterName: BookName = firstVerseFromApi.Book.value || "Matthew";
+const chapterName: BookName = verseToUse.Book.value || "Matthew";
 const bookId = books[chapterName].bookid;
-const chapter = Number(firstVerseFromApi.Chapter) || 4;
-const verseNum = Number(firstVerseFromApi["Verse Number Start"]) || 4;
+const chapter = Number(verseToUse.Chapter) || 4;
+const verseNum = Number(verseToUse["Verse Number Start"]) || 4;
 
 // Anytime there's a new passage for Malachi Daily, this will increment by one.
+// TODO - Add a passage number to each verse!
 const passageNum = 13;
 
 const verseRef = `${chapterName} ${chapter}:${verseNum}`;
