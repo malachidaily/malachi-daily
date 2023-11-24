@@ -19,75 +19,122 @@ import {
 } from "../api/bible/static/books";
 import { getAllVerses } from "../api/verses";
 
-// This will get the most recent verse from the API that's live.
-const nowAndPastVersesFromApi = await getAllVerses({
-	filters: JSON.stringify({
-		filter_type: "AND",
-		filters: [{ type: "boolean", field: "Past Start Date", value: "1" }],
-		groups: [],
-	}),
-	// The minus up front tells the API to order by the descending order.
-	orderBy: "-Start Date",
-	size: 1,
-});
-
-// This will get and cache the latest verses fom the API.
-const futureVersesFromApi = await getAllVerses({
-	filters: JSON.stringify({
-		filter_type: "AND",
-		filters: [{ type: "boolean", field: "Past Start Date", value: "0" }],
-		groups: [],
-	}),
-	orderBy: "Start Date",
-	size: 2,
-});
-
-function getMostCurrentVerse() {
-	const firstVerseFromApi = nowAndPastVersesFromApi.results[0];
-
-	const firstFutureVerseFromApi = futureVersesFromApi.results[0];
-	const secondFutureVerseFromApi = futureVersesFromApi.results?.[1] || null;
-
-	const firstFutureVerseStartTime = new Date(firstFutureVerseFromApi["Start Date"]).getTime() / 1000;
-	const secondFutureVerseStartTime = secondFutureVerseFromApi ? new Date(secondFutureVerseFromApi["Start Date"]).getTime() / 1000 : null;
-
-	let isFutureVerseActuallyNow = firstFutureVerseStartTime >= Date.now();
-
-	// This could happen due to cacheing, because I have a 1 day cache on most API calls.
-	if (isFutureVerseActuallyNow && (secondFutureVerseStartTime ? secondFutureVerseStartTime <= Date.now() : false)) {
-		return secondFutureVerseFromApi;
-	} else if (isFutureVerseActuallyNow) {
-		return firstFutureVerseFromApi;
-	} else {
-		return firstVerseFromApi;
+const urlSearchParams = Astro.url.searchParams;
+const searchParamBook = urlSearchParams.get("book");
+const searchParamChapter = urlSearchParams.get("chapter");
+const searchParamStartVerse = urlSearchParams.get("start-verse");
+const searchParamEndVerse = urlSearchParams.get("end-verse");
+let verseToUse;
+const getVerseFromUrlParams = Boolean(searchParamBook && searchParamChapter && searchParamStartVerse)
+if (getVerseFromUrlParams) {
+	// Return the verse from the params...
+	verseToUse = {
+		Book: {
+			value: searchParamBook,
+		},
+		Chapter: searchParamChapter,
+		"Verse Number Start": searchParamStartVerse,
+		"Verse Number End": searchParamEndVerse,
 	}
-}
+} else { // Nope, let's get the verse from the API!
+	// This will get the most recent verse from the API that's live.
+	const nowAndPastVersesFromApi = await getAllVerses({
+		filters: JSON.stringify({
+			filter_type: "AND",
+			filters: [
+				{ type: "boolean", field: "Past Start Date", value: "1" },
+			],
+			groups: [],
+		}),
+		// The minus up front tells the API to order by the descending order.
+		orderBy: "-Start Date",
+		size: 1,
+	});
 
-const verseToUse = getMostCurrentVerse();
+	// This will get and cache the latest verses fom the API.
+	const futureVersesFromApi = await getAllVerses({
+		filters: JSON.stringify({
+			filter_type: "AND",
+			filters: [
+				{ type: "boolean", field: "Past Start Date", value: "0" },
+			],
+			groups: [],
+		}),
+		orderBy: "Start Date",
+		size: 2,
+	});
+
+	function getMostCurrentVerse() {
+		const firstVerseFromApi = nowAndPastVersesFromApi.results[0];
+
+		const firstFutureVerseFromApi = futureVersesFromApi.results[0];
+		const secondFutureVerseFromApi =
+			futureVersesFromApi.results?.[1] || null;
+
+		const firstFutureVerseStartTime =
+			new Date(firstFutureVerseFromApi["Start Date"]).getTime() / 1000;
+		const secondFutureVerseStartTime = secondFutureVerseFromApi
+			? new Date(secondFutureVerseFromApi["Start Date"]).getTime() / 1000
+			: null;
+
+		let isFutureVerseActuallyNow = firstFutureVerseStartTime >= Date.now();
+
+		// This could happen due to cacheing, because I have a 1 day cache on most API calls.
+		if (
+			isFutureVerseActuallyNow &&
+			(secondFutureVerseStartTime
+				? secondFutureVerseStartTime <= Date.now()
+				: false)
+		) {
+			return secondFutureVerseFromApi;
+		} else if (isFutureVerseActuallyNow) {
+			return firstFutureVerseFromApi;
+		} else {
+			return firstVerseFromApi;
+		}
+	}
+
+	verseToUse = getMostCurrentVerse();
+}
 
 const translation: bibleVersion = "ESV";
 const chapterName: BookName = verseToUse.Book.value || "Matthew";
 const bookId = books[chapterName].bookid;
 const chapter = Number(verseToUse.Chapter) || 4;
 const verseNum = Number(verseToUse["Verse Number Start"]) || 4;
+const verseNumEnd = Number(verseToUse["Verse Number End"]) || 0;
+
+// Allow user to get multiple verses at once
+const verseNums: number[] = []
+verseNums.push(verseNum);
+if (verseNumEnd && verseNum < verseNumEnd) {
+	for (let i = verseNum + 1; i <= verseNumEnd; i++) {
+		verseNums.push(i);
+	}
+}
 
 // Anytime there's a new passage for Malachi Daily, this will increment by one.
-const passageNum = Number(verseToUse["Passage Number"]) || 0;
+const passageNum = verseToUse["Passage Number"] || "0";
 
-let verseRef = `${chapterName} ${chapter}:${verseNum}`;
+let verseRef = `${chapterName} ${chapter}:${verseNum}${verseNumEnd ? `-${verseNumEnd}` : ''}`;
 
 let verses: BibleVersesFromMultipleTranslations = {};
-let errorText = '';
+let errorText = "";
+let infoText = '';
+
+if (getVerseFromUrlParams) {
+	infoText = `Showing verse from URL Params: ${verseRef}`;
+}
 try {
 	verses = await getBibleVersesFromMultipleTranslations({
 		bookId: bookId,
 		chapter,
-		verses: [verseNum],
+		verses: verseNums,
 		translations: selectedBibleVersions,
 	});
 } catch (error) {
 	// User backup verse, instead.
-	errorText = `${verseRef} cannot be found. Returning Matthew 4:4`
+	errorText = `${verseRef} cannot be found. Returning Matthew 4:4`;
 	verses = await getBibleVersesFromMultipleTranslations({
 		bookId: books["Matthew"].bookid,
 		chapter: 4,
@@ -148,6 +195,7 @@ const scriptureRef = verseRef || SCRIPTURE_REF;
 			versesObj = ${JSON.stringify(verses)};
 			bibleVersionData = ${JSON.stringify(bibleVersionData)};
 			notificationAlert = '${errorText}';
+			notificationInfo = '${infoText}';
 		`.trim()}
 		x-clear
 		vaul-drawer-wrapper=""
@@ -932,7 +980,6 @@ const scriptureRef = verseRef || SCRIPTURE_REF;
 				isDarkMode: getIsDarkMode(),
 				isPWAInstalled: window.matchMedia("(display-mode: standalone)")
 					.matches,
-				errorMessageFromServer: '',
 				init() {
 					// Set the native operating system badge.
 					const setAppBadgeNative = (value: number) => {
