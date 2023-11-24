@@ -20,7 +20,7 @@ import {
 import { getAllVerses } from "../api/verses";
 
 // This will get the most recent verse from the API that's live.
-const versesFromApi = await getAllVerses({
+const nowAndPastVersesFromApi = await getAllVerses({
 	filters: JSON.stringify({
 		filter_type: "AND",
 		filters: [{ type: "boolean", field: "Past Start Date", value: "1" }],
@@ -30,14 +30,12 @@ const versesFromApi = await getAllVerses({
 	size: 1,
 });
 
-const firstVerseFromApi = versesFromApi.results[0];
+const firstVerseFromApi = nowAndPastVersesFromApi.results[0];
 const translation: bibleVersion = "ESV";
 const chapterName: BookName = firstVerseFromApi.Book.value || "Matthew";
 const bookId = books[chapterName].bookid;
 const chapter = Number(firstVerseFromApi.Chapter) || 4;
 const verseNum = Number(firstVerseFromApi["Verse Number Start"]) || 4;
-
-console.log(JSON.stringify(versesFromApi, null, 2));
 
 // Anytime there's a new passage for Malachi Daily, this will increment by one.
 const passageNum = 13;
