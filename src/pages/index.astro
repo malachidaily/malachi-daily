@@ -3,7 +3,7 @@ import { Image } from "astro:assets";
 
 import Layout from "../layouts/Layout.astro";
 import logoImgUrl from "../../public/logo.png";
-import { SCRIPTURE_TEXT, SCRIPTURE_REF } from "../utils/constants";
+import { backupVerse } from "../utils/constants";
 import NativeFeelingDrawer from "../components/react/NativeFeelingDrawer";
 import SectionLinks from "../components/astro/SectionLinks/index.astro";
 import {
@@ -25,7 +25,13 @@ const searchParamChapter = urlSearchParams.get("chapter");
 const searchParamStartVerse = urlSearchParams.get("start-verse");
 const searchParamEndVerse = urlSearchParams.get("end-verse");
 let verseToUse;
-const getVerseFromUrlParams = Boolean(searchParamBook && searchParamChapter && searchParamStartVerse)
+const getVerseFromUrlParams = Boolean(
+	searchParamBook && searchParamChapter && searchParamStartVerse,
+);
+
+let errorText = "";
+let infoText = "";
+
 if (getVerseFromUrlParams) {
 	// Return the verse from the params...
 	verseToUse = {
@@ -35,77 +41,86 @@ if (getVerseFromUrlParams) {
 		Chapter: searchParamChapter,
 		"Verse Number Start": searchParamStartVerse,
 		"Verse Number End": searchParamEndVerse,
-	}
-} else { // Nope, let's get the verse from the API!
-	// This will get the most recent verse from the API that's live.
-	const nowAndPastVersesFromApi = await getAllVerses({
-		filters: JSON.stringify({
-			filter_type: "AND",
-			filters: [
-				{ type: "boolean", field: "Past Start Date", value: "1" },
-			],
-			groups: [],
-		}),
-		// The minus up front tells the API to order by the descending order.
-		orderBy: "-Start Date",
-		size: 1,
-	});
+	};
+} else {
+	// Nope, let's get the verse from the API!
+	try {
+		// This will get the most recent verse from the API that's live.
+		const nowAndPastVersesFromApi = await getAllVerses({
+			filters: JSON.stringify({
+				filter_type: "AND",
+				filters: [
+					{ type: "boolean", field: "Past Start Date", value: "1" },
+				],
+				groups: [],
+			}),
+			// The minus up front tells the API to order by the descending order.
+			orderBy: "-Start Date",
+			size: 1,
+		});
 
-	// This will get and cache the latest verses fom the API.
-	const futureVersesFromApi = await getAllVerses({
-		filters: JSON.stringify({
-			filter_type: "AND",
-			filters: [
-				{ type: "boolean", field: "Past Start Date", value: "0" },
-			],
-			groups: [],
-		}),
-		orderBy: "Start Date",
-		size: 2,
-	});
+		// This will get and cache the latest verses fom the API.
+		const futureVersesFromApi = await getAllVerses({
+			filters: JSON.stringify({
+				filter_type: "AND",
+				filters: [
+					{ type: "boolean", field: "Past Start Date", value: "0" },
+				],
+				groups: [],
+			}),
+			orderBy: "Start Date",
+			size: 2,
+		});
 
-	function getMostCurrentVerse() {
-		const firstVerseFromApi = nowAndPastVersesFromApi.results[0];
+		function getMostCurrentVerse() {
+			const firstVerseFromApi = nowAndPastVersesFromApi.results[0];
 
-		const firstFutureVerseFromApi = futureVersesFromApi.results[0];
-		const secondFutureVerseFromApi =
-			futureVersesFromApi.results?.[1] || null;
+			const firstFutureVerseFromApi = futureVersesFromApi.results[0];
+			const secondFutureVerseFromApi =
+				futureVersesFromApi.results?.[1] || null;
 
-		const firstFutureVerseStartTime =
-			new Date(firstFutureVerseFromApi["Start Date"]).getTime() / 1000;
-		const secondFutureVerseStartTime = secondFutureVerseFromApi
-			? new Date(secondFutureVerseFromApi["Start Date"]).getTime() / 1000
-			: null;
+			const firstFutureVerseStartTime =
+				new Date(firstFutureVerseFromApi["Start Date"]).getTime() /
+				1000;
+			const secondFutureVerseStartTime = secondFutureVerseFromApi
+				? new Date(secondFutureVerseFromApi["Start Date"]).getTime() /
+				  1000
+				: null;
 
-		let isFutureVerseActuallyNow = firstFutureVerseStartTime >= Date.now();
+			let isFutureVerseActuallyNow =
+				firstFutureVerseStartTime >= Date.now();
 
-		// This could happen due to cacheing, because I have a 1 day cache on most API calls.
-		if (
-			isFutureVerseActuallyNow &&
-			(secondFutureVerseStartTime
-				? secondFutureVerseStartTime <= Date.now()
-				: false)
-		) {
-			return secondFutureVerseFromApi;
-		} else if (isFutureVerseActuallyNow) {
-			return firstFutureVerseFromApi;
-		} else {
-			return firstVerseFromApi;
+			// This could happen due to cacheing, because I have a 1 day cache on most API calls.
+			if (
+				isFutureVerseActuallyNow &&
+				(secondFutureVerseStartTime
+					? secondFutureVerseStartTime <= Date.now()
+					: false)
+			) {
+				return secondFutureVerseFromApi;
+			} else if (isFutureVerseActuallyNow) {
+				return firstFutureVerseFromApi;
+			} else {
+				return firstVerseFromApi;
+			}
 		}
-	}
 
-	verseToUse = getMostCurrentVerse();
+		verseToUse = getMostCurrentVerse();
+	} catch (error) {
+		errorText =	'An error occured. Returning backup verse: Matthew 4:4';
+		verseToUse = backupVerse;
+	}
 }
 
-const translation: bibleVersion = "ESV";
-const chapterName: BookName = verseToUse.Book.value || "Matthew";
+const translation: bibleVersion = "NLT";
+const chapterName: BookName = verseToUse.Book.value;
 const bookId = books[chapterName].bookid;
-const chapter = Number(verseToUse.Chapter) || 4;
-const verseNum = Number(verseToUse["Verse Number Start"]) || 4;
-const verseNumEnd = Number(verseToUse["Verse Number End"]) || 0;
+const chapter = Number(verseToUse.Chapter);
+const verseNum = Number(verseToUse["Verse Number Start"]);
+const verseNumEnd = Number(verseToUse["Verse Number End"]);
 
 // Allow user to get multiple verses at once
-const verseNums: number[] = []
+const verseNums: number[] = [];
 verseNums.push(verseNum);
 if (verseNumEnd && verseNum < verseNumEnd) {
 	for (let i = verseNum + 1; i <= verseNumEnd; i++) {
@@ -116,11 +131,11 @@ if (verseNumEnd && verseNum < verseNumEnd) {
 // Anytime there's a new passage for Malachi Daily, this will increment by one.
 const passageNum = verseToUse["Passage Number"] || "0";
 
-let verseRef = `${chapterName} ${chapter}:${verseNum}${verseNumEnd ? `-${verseNumEnd}` : ''}`;
+let verseRef = `${chapterName} ${chapter}:${verseNum}${
+	verseNumEnd ? `-${verseNumEnd}` : ""
+}`;
 
 let verses: BibleVersesFromMultipleTranslations = {};
-let errorText = "";
-let infoText = '';
 
 if (getVerseFromUrlParams) {
 	infoText = `Showing verse from URL Params: ${verseRef}`;
@@ -144,8 +159,8 @@ try {
 	verseRef = "Matthew 4:4";
 }
 
-const scriptureText = verses[translation] || SCRIPTURE_TEXT;
-const scriptureRef = verseRef || SCRIPTURE_REF;
+const scriptureText = verses[translation];
+const scriptureRef = verseRef;
 ---
 
 <Layout title="Malachi Daily: Memorize Bible Verses & Learn Their Context">
