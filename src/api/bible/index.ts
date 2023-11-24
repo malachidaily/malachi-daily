@@ -8,7 +8,6 @@ async function fetchAndCache(url: string, cacheKey: string, options?: RequestIni
     const cachedResponse = cache[cacheKey]
 
     if (cachedResponse) {
-        console.log('loaded from cache with key', cacheKey, cachedResponse)
         return cachedResponse;
     } else {
         const response = await fetch(url, options);

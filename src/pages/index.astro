@@ -12,18 +12,32 @@ import {
 } from "../api/bible";
 import {
 	books,
+	type BookName,
 	type bibleVersion,
 	selectedBibleVersions,
 	bibleVersionData,
 } from "../api/bible/static/books";
+import { getAllVerses } from "../api/verses";
 
-const isDebugModeEnabled = Astro.url.searchParams.get("debug") === "true";
+// This will get the most recent verse from the API that's live.
+const versesFromApi = await getAllVerses({
+	filters: JSON.stringify({
+		filter_type: "AND",
+		filters: [{ type: "boolean", field: "Past Start Date", value: "1" }],
+		groups: [],
+	}),
+	orderBy: "Past Start Date",
+	size: 1,
+});
 
+const firstVerseFromApi = versesFromApi.results[0];
 const translation: bibleVersion = "ESV";
-const chapterName = books.Matthew.name;
+const chapterName: BookName = firstVerseFromApi.Book.value || "Matthew";
 const bookId = books[chapterName].bookid;
-const chapter = 4;
-const verseNum = 4;
+const chapter = Number(firstVerseFromApi.Chapter) || 4;
+const verseNum = Number(firstVerseFromApi["Verse Number Start"]) || 4;
+
+console.log(JSON.stringify(versesFromApi, null, 2));
 
 // Anytime there's a new passage for Malachi Daily, this will increment by one.
 const passageNum = 13;
@@ -108,9 +122,7 @@ export const prerender = true;
 				x-transition
 				x-cloak
 			>
-				<p class="text-muted">
-					Your Firebase Cloud Messaging Token:
-				</p>
+				<p class="text-muted">Your Firebase Cloud Messaging Token:</p>
 				<p
 					x-text="$data.firebaseCMToken || 'No token available. Try requesting notification acccess.'"
 					class="select-all font-mono text-primary font-medium text-start break-all"
@@ -125,7 +137,7 @@ export const prerender = true;
 					class="w-full flex flex-col gap-2 items-start justify-start"
 				>
 					<div class="w-full flex gap-2 justify-between">
-						<div 
+						<div
 							x-data={`{ clickCount: 0}`}
 							x-on:click={`
 								clickCount += 1;
@@ -215,7 +227,8 @@ export const prerender = true;
 										class="form-control w-full max-w-xs mb-2"
 									>
 										<label class="label">
-											<span class="label-text text-primary"
+											<span
+												class="label-text text-primary"
 												>Select your preferred Bible
 												translation</span
 											>
@@ -256,7 +269,8 @@ export const prerender = true;
 													toggleDarkMode();
 												`
 											/>
-											<span class="label-text text-primary"
+											<span
+												class="label-text text-primary"
 												>Enable Dark Mode</span
 											>
 										</label>
@@ -275,7 +289,8 @@ export const prerender = true;
 												id="show-first-letter"
 												x-on:click="localStorage.setItem('showFirstLetter', JSON.stringify($el.checked));"
 											/>
-											<span class="label-text text-primary"
+											<span
+												class="label-text text-primary"
 												>Show the first letter in each
 												hidden word</span
 											>
@@ -295,7 +310,8 @@ export const prerender = true;
 												id="checkbox-randomize-hidden-words"
 												x-on:click="localStorage.setItem('shouldRandomizeOrderOfHiddenWords', JSON.stringify($el.checked));"
 											/>
-											<span class="label-text text-primary"
+											<span
+												class="label-text text-primary"
 												>Randomize the order of hidden
 												words</span
 											>
@@ -315,17 +331,19 @@ export const prerender = true;
 												id="checkbox-show-serif-font"
 												x-on:click="localStorage.setItem('showSerifFont', JSON.stringify($el.checked));"
 											/>
-											<span class="label-text text-primary"
+											<span
+												class="label-text text-primary"
 												>Use a more decorative font
 												(serif)</span
 											>
 										</label>
 									</div>
 									<div class="form-control w-fit mt-2">
-										<button 
+										<button
 											class="btn-sm btn btn-outline text-primary thin-line rounded-full normal-case"
 											x-on:click="if (window.confirm('Reload the app?')) { location.reload() }"
-										>Reload App</button>
+											>Reload App</button
+										>
 									</div>
 								</div>
 							</NativeFeelingDrawer>
@@ -336,7 +354,9 @@ export const prerender = true;
 							Scripture memorization, together. New verse every
 							two weeks
 						</p>
-						<div class="badge canvas-tertiary text-primary py-3 dark:border-gray-700">
+						<div
+							class="badge canvas-tertiary text-primary py-3 dark:border-gray-700"
+						>
 							Passage {passageNum}
 						</div>
 					</div>
@@ -429,14 +449,20 @@ export const prerender = true;
 								class="w-full flex justify-between gap-6 flex-grow-1"
 							>
 								<div class="flex items-center">
-									<div class="flex gap-2 items-baseline text-beautiful-gradient">
+									<div
+										class="flex gap-2 items-baseline text-beautiful-gradient"
+									>
 										<h1
 											x-text="scriptureRef"
 											class="text-xl font-medium"
 										>
 											{scriptureRef}
 										</h1>
-										<span class="text-xl font-medium cursor-pointer" x-on:click="$refs.settingsDrawerBtn.click();" x-text="bibleVersionPreference"></span>
+										<span
+											class="text-xl font-medium cursor-pointer"
+											x-on:click="$refs.settingsDrawerBtn.click();"
+											x-text="bibleVersionPreference"
+										></span>
 									</div>
 									<div
 										class="ml-1 tooltip tooltip-bottom h-[24px] w-[24px] flex items-center justify-center text-purple-700 dark:text-gray-300"
@@ -458,9 +484,7 @@ export const prerender = true;
 								</div>
 
 								<!-- Scripture Action Buttons -->
-								<div
-									class="text-muted flex gap-3 items-center"
-								>
+								<div class="text-muted flex gap-3 items-center">
 									<!-- Show Fullscreen Button -->
 									<button
 										x-show="!isFullscreen"
@@ -555,7 +579,9 @@ export const prerender = true;
 							class="range range-md"
 							step="10"
 						/>
-						<div class="w-full flex justify-between text-xs px-2 text-muted">
+						<div
+							class="w-full flex justify-between text-xs px-2 text-muted"
+						>
 							<span>|</span>
 							<span>|</span>
 							<span>|</span>
@@ -727,7 +753,7 @@ export const prerender = true;
 			messaging,
 			getUserFirebaseNotificationToken,
 		} from "../messaging_init_on_client.js";
-		import { removeAlpineAttributes } from '../utils'
+		import { removeAlpineAttributes } from "../utils";
 
 		declare global {
 			var Alpine: AlpineType;
@@ -750,7 +776,7 @@ export const prerender = true;
 		);
 
 		function toggleDarkMode() {
-			document.documentElement.classList.toggle('dark');
+			document.documentElement.classList.toggle("dark");
 		}
 
 		// create a function that gets "showFirstLetter" from localStorage
@@ -812,7 +838,7 @@ export const prerender = true;
 			} else {
 				return JSON.parse(isDarkMode);
 			}
-		}
+		};
 
 		if (getIsDarkMode()) {
 			toggleDarkMode();
@@ -867,12 +893,14 @@ export const prerender = true;
 				isDarkMode: getIsDarkMode(),
 				isPWAInstalled: window.matchMedia("(display-mode: standalone)")
 					.matches,
-				init() {					
+				init() {
 					// Set the native operating system badge.
 					const setAppBadgeNative = (value: number) => {
 						const supportsAppBadge = "setAppBadge" in navigator;
-						if (supportsAppBadge && matchMedia("(display-mode: standalone)")
-										.matches) {
+						if (
+							supportsAppBadge &&
+							matchMedia("(display-mode: standalone)").matches
+						) {
 							navigator.setAppBadge(value);
 						}
 					};
@@ -916,24 +944,27 @@ export const prerender = true;
 						setAppBadgeNative(0);
 
 						let lastRefresh = localStorage.getItem("lastRefresh");
-						
+
 						if (!lastRefresh) {
 							const lastRefresh = JSON.stringify(Date.now());
-							localStorage.setItem(
-								"lastRefresh",
-								lastRefresh,
-							);
+							localStorage.setItem("lastRefresh", lastRefresh);
 							return;
 						}
 
 						const isLastRefreshFromToday = lastRefresh
 							? new Date(Number(lastRefresh)).toDateString() ===
-								new Date().toDateString()
+							  new Date().toDateString()
 							: false;
-						const isLastRefreshAnHourOrMoreAgo = Boolean(lastRefresh && (Date.now() - Number(lastRefresh)) > 3600000)
+						const isLastRefreshAnHourOrMoreAgo = Boolean(
+							lastRefresh &&
+								Date.now() - Number(lastRefresh) > 3600000,
+						);
 
-						if (!isLastRefreshFromToday || isLastRefreshAnHourOrMoreAgo) {
-							localStorage.removeItem('lastRefresh');
+						if (
+							!isLastRefreshFromToday ||
+							isLastRefreshAnHourOrMoreAgo
+						) {
+							localStorage.removeItem("lastRefresh");
 							window.location.reload();
 						}
 					});
@@ -1117,7 +1148,8 @@ export const prerender = true;
 									class="opacity-40 animate-pulse text-blue-700 dark:text-gray-300"
 									x-on:mouseover="
 										$el.innerText = '${
-											showFirstCharacter && wordToBeReplaced.length > 1
+											showFirstCharacter &&
+											wordToBeReplaced.length > 1
 												? wordToBeReplaced.slice(1)
 												: wordToBeReplaced
 										}'
