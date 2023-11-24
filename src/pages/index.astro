@@ -496,6 +496,13 @@ const scriptureRef = verseRef;
 									getAndSetCardWidth($el);
 								})
 							})
+
+							// https://alpinejs.dev/magics/watch
+							$watch('bibleVersionPreference', (prevVal, newVal) => {
+								if (prevVal !== newVal) {
+									getAndSetCardWidth($el)
+								}
+							})
 						`.trim()}
 						x-data={`{ 
 							timeItTakesToReadVerse: 5000,
