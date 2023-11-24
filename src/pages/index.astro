@@ -579,7 +579,7 @@ const scriptureRef = verseRef;
 									<div
 										class="ml-1 tooltip tooltip-bottom h-[24px] w-[24px] flex items-center justify-center text-purple-700 dark:text-gray-300"
 										x-show="Boolean(bibleVersionData && bibleVersionPreference)"
-										x-bind:data-tip="bibleVersionData?.[bibleVersionPreference]?.attribution"
+										x-bind:data-tip="bibleVersionData?.[bibleVersionPreference]?.attribution + ' (Scripture sourced from https://bolls.life/api/)'"
 									>
 										<svg
 											width="16"
