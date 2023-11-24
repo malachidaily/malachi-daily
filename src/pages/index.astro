@@ -456,11 +456,14 @@ const scriptureRef = verseRef;
 							Scripture memorization, together. New verse every
 							two weeks
 						</p>
-						<div
+						<button
+							x-data={`{ passageNum: ${passageNum}}`}
 							class="badge canvas-tertiary text-primary py-3 dark:border-gray-700"
+							x-on:click="passageNum === 0 ? (window.location.href = '/') : null"
+							x-text="passageNum ? ('Passage ' + passageNum) : 'Go Back to Main Verse'"
 						>
-							Passage {passageNum}
-						</div>
+							Passage --
+						</button>
 					</div>
 				</div>
 
