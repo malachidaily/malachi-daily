@@ -217,6 +217,7 @@ const scriptureRef = verseRef;
 	>
 		<main
 			class="w-screen h-auto min-h-[calc(100vh-52px)] px-6 flex flex-col items-center canvas-secondary"
+			x-bind:class="{ 'h-screen': isFullscreen }"
 		>
 			<div
 				class="p-6 rounded-xl canvas-tertiary max-w-[600px] w-full"
@@ -460,9 +461,9 @@ const scriptureRef = verseRef;
 							x-data={`{ passageNum: ${passageNum}}`}
 							class="whitespace-nowrap badge canvas-tertiary text-primary py-3 dark:border-gray-700"
 							x-on:click="passageNum === 0 ? (window.location.href = '/') : null"
-							x-text="passageNum ? ('Passage ' + passageNum) : 'Go Back to Main Verse'"
+							x-text="passageNum ? ('Passage #' + passageNum) : 'Go Back to Main Verse'"
 						>
-							Passage --
+							Passage #--
 						</button>
 					</div>
 				</div>
@@ -477,7 +478,7 @@ const scriptureRef = verseRef;
 					class="rounded-md text-start max-sm:mx-[-24px]"
 				>
 					<div
-						class="surface-primary p-6 pb-8 flex justify-center items-center rounded-xl shadow-xl max-sm:shadow-sm max-sm:rounded-3xl transition-[height] duration-300"
+						class="surface-primary p-6 flex justify-center items-center rounded-xl shadow-xl max-sm:shadow-sm max-sm:rounded-3xl transition-[height] duration-300"
 						x-ref="scriptureCard"
 						x-clear
 						x-init={`
@@ -508,7 +509,6 @@ const scriptureRef = verseRef;
 							})
 						`.trim()}
 						x-data={`{ 
-							timeItTakesToReadVerse: 5000,
 							toggleAllowDocumentScroll() {
 								document.body.classList.toggle('overflow-hidden');
 							},
@@ -533,6 +533,7 @@ const scriptureRef = verseRef;
 								this.toggleAllowDocumentScroll();
 								$el.classList.add('!h-screen');
 								$el.classList.add('!w-screen');
+
 								window.scrollTo({
 									top: 0,
 									behavior: "smooth",
@@ -672,6 +673,58 @@ const scriptureRef = verseRef;
 								>
 									{scriptureText}
 								</h2>
+							</div>
+
+							<!-- Progress Bar -->
+							<div
+								class="w-full mt-4"
+								x-bind:class="{ '!h-fit': showProgressBar }"
+								x-data=`{
+									showProgressBar: false,
+									timeRemaining: 0,
+									setOneMinuteTimer() {
+										this.showProgressBar = true;
+										let currentCount = 0;
+										this.timeRemaining = 60;
+
+										const interval = setInterval(() => {
+											currentCount += 1;
+											$refs.progressBarEl.value = Math.round(100 * (currentCount / 60));
+
+											if (currentCount % 5 === 0) {
+												this.timeRemaining = 60 - currentCount;
+											}
+
+											if (currentCount >= 60) {
+												clearInterval(interval);
+												alert("Congrats! You just spent one minute memorizing God's Word");
+												this.showProgressBar = false;
+											}
+										}, 1000)
+									},
+								}`
+							>
+								<progress 
+									x-transition 
+									x-cloak 
+									x-show="showProgressBar"
+									x-ref="progressBarEl"  
+									class="z-30 absolute top-0 left-0 right-0 h-2 progress w-full dark:bg-white dark:bg-opacity-10 dark:text-white !text-gray-800 rounded-none" 
+									value="0" 
+									max="100" 
+									x-bind:style="isDarkMode ? '--bc: 0 0% 100%;' : ''"
+								></progress>
+								
+								<!-- Practice Button -->
+								<button 
+									x-bind:disabled="showProgressBar" 
+									x-bind:class="{ 'btn-disabled !text-opacity-40 dark:text-white dark:text-opacity-20': showProgressBar }" 
+									x-on:click="setOneMinuteTimer()" 
+									x-text="showProgressBar ? '~' + timeRemaining + 's left' : 'Practice for 1 min'"
+									class="btn rounded-full btn-sm w-fit whitespace-nowrap normal-case"
+								>
+									Practice for 1 min
+								</button>
 							</div>
 						</div>
 					</div>
