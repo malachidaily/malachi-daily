@@ -22,7 +22,8 @@ export default defineConfig({
     })
   ],
   redirects: {
-    '/admin': 'https://baserow.io/database/81919/table/222976/365623'
+    '/admin': 'https://baserow.io/database/81919/table/222976/365623',
+    '/example': '/?book=John&chapter=1&start-verse=1'
   },
   output: 'server',
   adapter: netlify()
