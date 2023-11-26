@@ -483,21 +483,23 @@ const scriptureRef = verseRef;
 					<div 
 						class="h-6"
 						x-data={`{ 
-							showInfoSubtext: true, 
-							showPassageInfo: false, 
+							showInfoSubtext: false, 
+							showPassageInfo: true, 
 							isNotCurrentVerseOfWeek: ${getVerseFromUrlParams},
 						}`.trim()}
 						x-init={`
+							const millisecondsTilTransition = 3000;
 							setTimeout(() => {
-								showInfoSubtext = false;
-							}, 2000);
+								showPassageInfo = false;
+							}, millisecondsTilTransition);
 
 							setTimeout(() => {
-								showPassageInfo = true;
-							}, 3000);
+								showInfoSubtext = true;
+							}, millisecondsTilTransition + 500);
 						`.trim()}
 					>
 						<p 
+							x-cloak
 							x-on:click={`
 								showInfoSubtext = false;
 								setTimeout(() => {
@@ -508,7 +510,7 @@ const scriptureRef = verseRef;
 							x-show="showInfoSubtext && !isNotCurrentVerseOfWeek" 
 							class="cursor-pointer text-muted text-start"
 						>
-							Scripture memorization, together.
+							Scripture memory, together.
 						</p>
 						<div 
 							x-cloak
@@ -786,24 +788,26 @@ const scriptureRef = verseRef;
 									x-bind:style="isDarkMode ? '--bc: 0 0% 100%;' : ''"
 								></progress>
 
-								<!-- Practice Button -->
-								<button
-									x-bind:disabled="showProgressBar"
-									x-bind:class="{ 'btn-disabled !text-opacity-60 dark:text-white': showProgressBar }"
-									x-on:click="setOneMinuteTimer()"
-									x-text="showProgressBar ? '~' + timeRemaining + 's left' : 'Practice for 1 min'"
-									class="btn rounded-full hover:text-gray-800 dark:hover:text-gray-500 bg-gray-700 dark:bg-gray-200 text-white dark:text-gray-800 border-transparent btn-sm w-fit whitespace-nowrap normal-case"
-								>
-									Practice for 1 min
-								</button>
+								<div class="items-center flex gap-3 flex-wrap">
+									<!-- Practice Button -->
+									<button
+										x-bind:disabled="showProgressBar"
+										x-bind:class="{ 'btn-disabled !text-opacity-60 dark:text-white': showProgressBar }"
+										x-on:click="setOneMinuteTimer()"
+										x-text="showProgressBar ? '~' + timeRemaining + 's left' : 'Practice for 1 min'"
+										class="btn rounded-full hover:text-gray-800 dark:hover:text-gray-500 bg-gray-700 dark:bg-gray-200 text-white dark:text-gray-800 border-transparent btn-sm w-fit whitespace-nowrap normal-case"
+									>
+										Practice for 1 min
+									</button>
 
-								<a
-									x-bind:href="bibleDotComUrl"
-									target="_blank"
-									class="ml-3 btn rounded-full btn-sm btn-outline border-gray-200 dark:text-gray-300 dark:border-gray-600 hover:bg-gray-100 hover:text-gray-800 hover:border-transparent dark:hover:bg-white dark:hover:bg-opacity-10 w-fit whitespace-nowrap normal-case"
-								>
-									Read Full Chapter
-								</a>
+									<a
+										x-bind:href="bibleDotComUrl"
+										target="_blank"
+										class="btn rounded-full btn-sm btn-outline border-gray-200 dark:text-gray-300 dark:border-gray-600 hover:bg-gray-100 hover:text-gray-800 hover:border-transparent dark:hover:bg-white dark:hover:bg-opacity-10 w-fit whitespace-nowrap normal-case"
+									>
+										Read Full Chapter
+									</a>
+								</div>
 							</div>
 						</div>
 					</div>
