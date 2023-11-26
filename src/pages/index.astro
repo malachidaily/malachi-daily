@@ -764,7 +764,7 @@ const scriptureRef = verseRef;
 								<!-- Practice Button -->
 								<button
 									x-bind:disabled="showProgressBar"
-									x-bind:class="{ 'btn-disabled !text-opacity-40 dark:text-white dark:text-opacity-20': showProgressBar }"
+									x-bind:class="{ 'btn-disabled !text-opacity-60 dark:text-white': showProgressBar }"
 									x-on:click="setOneMinuteTimer()"
 									x-text="showProgressBar ? '~' + timeRemaining + 's left' : 'Practice for 1 min'"
 									class="btn rounded-full hover:text-gray-800 dark:hover:text-gray-500 bg-gray-700 dark:bg-gray-200 text-white dark:text-gray-800 border-transparent btn-sm w-fit whitespace-nowrap normal-case"
