@@ -221,8 +221,23 @@ const scriptureRef = verseRef;
 		html.dark .range {
 			--range-shdw: 217 19% 27%;
 		}
+
+		.safe-area-bottom-padding {
+			padding-block-end: env(
+				safe-area-inset-bottom,
+				16px
+			);
+		}
+
+		.safe-area-bottom-padding-extra {
+			padding-block-end: calc(env(
+				safe-area-inset-bottom,
+				16px
+			) + 1rem);
+		}
 	</style>
 	<div
+		class="canvas-secondary"
 		x-init={`
 			versesObj = ${JSON.stringify(verses)};
 			bibleVersionData = ${JSON.stringify(bibleVersionData)};
@@ -236,7 +251,7 @@ const scriptureRef = verseRef;
 		vaul-drawer-wrapper=""
 	>
 		<main
-			class="w-screen h-auto min-h-[calc(100vh-52px)] px-6 flex flex-col items-center canvas-secondary"
+			class="w-screen h-auto min-h-[calc(100vh-52px)] px-6 flex flex-col items-center"
 			x-bind:class="{ 'min-h-screen': isFullscreen }"
 		>
 			<div
@@ -477,7 +492,7 @@ const scriptureRef = verseRef;
 										>
 									</div>
 								</div>
-								<footer class="w-full canvas-primary mt-2">
+								<footer class="w-full rounded-xl !bg-opacity-10 bg-gray-600 dark:bg-gray-100 mt-2">
 									<SectionLinks />
 								</footer>
 							</NativeFeelingDrawer>
@@ -992,7 +1007,7 @@ const scriptureRef = verseRef;
 			</div>
 		</main>
 		<!-- Footer -->
-		<footer class="w-full canvas-secondary">
+		<footer class="w-full max-sm:rounded-xl safe-area-bottom-padding !bg-opacity-10 bg-gray-800 dark:bg-gray-100">
 			<SectionLinks />
 		</footer>
 	</div>
