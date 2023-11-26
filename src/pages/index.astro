@@ -130,8 +130,8 @@ function getDiffBetweenDays() {
 
 const nextVerseComesInDays = getDiffBetweenDays() || 0;
 const translation: bibleVersion = "NLT";
-const chapterName: BookName = verseToUse.Book.value;
-const bookId = books[chapterName].bookid;
+const bookName: BookName = verseToUse.Book.value;
+const bookId = books[bookName].bookid;
 const chapter = Number(verseToUse.Chapter);
 const verseNum = Number(verseToUse["Verse Number Start"]);
 const verseNumEnd = Number(verseToUse["Verse Number End"]);
@@ -148,7 +148,7 @@ if (verseNumEnd && verseNum < verseNumEnd) {
 // Anytime there's a new passage for Malachi Daily, this will increment by one.
 const passageNum = verseToUse["Passage Number"] || "0";
 
-let verseRef = `${chapterName} ${chapter}:${verseNum}${
+let verseRef = `${bookName} ${chapter}:${verseNum}${
 	verseNumEnd ? `-${verseNumEnd}` : ""
 }`;
 
@@ -229,6 +229,8 @@ const scriptureRef = verseRef;
 			notificationAlert = '${errorText}';
 			notificationInfo = '${infoText}';
 			passageNum = ${passageNum};
+			bookName = '${bookName}';
+			chapter = ${chapter};
 		`.trim()}
 		x-clear
 		vaul-drawer-wrapper=""
@@ -765,10 +767,18 @@ const scriptureRef = verseRef;
 									x-bind:class="{ 'btn-disabled !text-opacity-40 dark:text-white dark:text-opacity-20': showProgressBar }"
 									x-on:click="setOneMinuteTimer()"
 									x-text="showProgressBar ? '~' + timeRemaining + 's left' : 'Practice for 1 min'"
-									class="btn rounded-full btn-sm w-fit whitespace-nowrap normal-case"
+									class="btn rounded-full hover:text-gray-800 dark:hover:text-gray-500 bg-gray-700 dark:bg-gray-200 text-white dark:text-gray-800 border-transparent btn-sm w-fit whitespace-nowrap normal-case"
 								>
 									Practice for 1 min
 								</button>
+
+								<a
+									x-bind:href="bibleDotComUrl"
+									target="_blank"
+									class="ml-3 btn rounded-full btn-sm btn-outline border-gray-200 dark:text-gray-300 dark:border-gray-600 hover:bg-gray-100 hover:text-gray-800 hover:border-transparent dark:hover:bg-white dark:hover:bg-opacity-10 w-fit whitespace-nowrap normal-case"
+								>
+									Read Full Chapter
+								</a>
 							</div>
 						</div>
 					</div>
@@ -962,6 +972,7 @@ const scriptureRef = verseRef;
 			messaging,
 			getUserFirebaseNotificationToken,
 		} from "../messaging_init_on_client.js";
+		import { constructBibleDotComChapterURL, type BookName } from '../api/bible/static/books.ts'
 		import { removeAlpineAttributes } from "../utils";
 
 		declare global {
@@ -1103,6 +1114,17 @@ const scriptureRef = verseRef;
 				isPWAInstalled: window.matchMedia("(display-mode: standalone)")
 					.matches,
 				passageNum: 0,
+				bookName: '',
+				chapter: 0,
+				get bibleDotComUrl() {
+					const bibleDotComChapterUrl = constructBibleDotComChapterURL({
+						book: this.bookName as BookName,
+						chapter: this.chapter,
+						versionShortCode: this.bibleVersionPreference
+					});
+
+					return bibleDotComChapterUrl;
+				},
 				init() {
 					// Set the native operating system badge.
 					const setAppBadgeNative = (value: number) => {
