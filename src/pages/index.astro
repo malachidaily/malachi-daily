@@ -107,7 +107,7 @@ if (getVerseFromUrlParams) {
 
 		verseToUse = getMostCurrentVerse();
 	} catch (error) {
-		errorText =	'An error occured. Returning backup verse: Matthew 4:4';
+		errorText = "An error occured. Returning backup verse: Matthew 4:4";
 		verseToUse = backupVerse;
 	}
 }
@@ -211,6 +211,7 @@ const scriptureRef = verseRef;
 			bibleVersionData = ${JSON.stringify(bibleVersionData)};
 			notificationAlert = '${errorText}';
 			notificationInfo = '${infoText}';
+			passageNum = ${passageNum};
 		`.trim()}
 		x-clear
 		vaul-drawer-wrapper=""
@@ -239,6 +240,14 @@ const scriptureRef = verseRef;
 				<div
 					class="w-full flex flex-col gap-2 items-start justify-start"
 				>
+						<a
+							x-cloak
+							x-show="!passageNum"
+							class="mb-4 whitespace-nowrap badge canvas-tertiary text-primary py-3 dark:border-gray-700"
+							href="/"
+						>
+							Go back to Main Verse
+						</a>
 					<div class="w-full flex gap-2 justify-between">
 						<div
 							x-data={`{ clickCount: 0}`}
@@ -457,14 +466,6 @@ const scriptureRef = verseRef;
 							Scripture memorization, together. New verse every
 							two weeks
 						</p>
-						<button
-							x-data={`{ passageNum: ${passageNum}}`}
-							class="whitespace-nowrap badge canvas-tertiary text-primary py-3 dark:border-gray-700"
-							x-on:click="passageNum === 0 ? (window.location.href = '/') : null"
-							x-text="passageNum ? ('Passage #' + passageNum) : 'Go Back to Main Verse'"
-						>
-							Passage #--
-						</button>
 					</div>
 				</div>
 
@@ -477,6 +478,12 @@ const scriptureRef = verseRef;
 					`}
 					class="rounded-md text-start max-sm:mx-[-24px]"
 				>
+					<p
+						class="mb-3 text-gray-600 dark:text-gray-500 uppercase"
+						x-text="'Passage #' + passageNum"
+					>
+						Passage #--
+					</p>
 					<div
 						class="surface-primary p-6 flex justify-center items-center rounded-xl shadow-xl max-sm:shadow-sm max-sm:rounded-3xl transition-[height] duration-300"
 						x-ref="scriptureCard"
@@ -562,37 +569,39 @@ const scriptureRef = verseRef;
 								class="w-full flex justify-between gap-6 flex-grow-1"
 							>
 								<div class="flex items-center">
-									<div
-										class="flex flex-wrap gap-2 items-baseline text-beautiful-gradient"
-									>
-										<h1
-											x-text="scriptureRef"
-											class="text-xl font-medium"
+									<div class="flex gap-0 flex-col">
+										<div
+											class="flex flex-wrap gap-2 items-baseline text-beautiful-gradient"
 										>
-											{scriptureRef}
-										</h1>
-										<span
-											class="text-xl font-medium cursor-pointer"
-											x-on:click="$refs.settingsDrawerBtn.click();"
-											x-text="bibleVersionPreference"
-										></span>
-									</div>
-									<div
-										class="ml-1 tooltip tooltip-bottom h-[24px] w-[24px] flex items-center justify-center text-purple-700 dark:text-gray-300"
-										x-show="Boolean(bibleVersionData && bibleVersionPreference)"
-										x-bind:data-tip="bibleVersionData?.[bibleVersionPreference]?.attribution + ' (Scripture sourced from https://bolls.life/api/)'"
-									>
-										<svg
-											width="16"
-											height="16"
-											viewBox="0 0 256 256"
-											xmlns="http://www.w3.org/2000/svg"
-										>
-											<path
-												fill="currentColor"
-												d="M108 84a16 16 0 1 1 16 16a16 16 0 0 1-16-16Zm128 44A108 108 0 1 1 128 20a108.12 108.12 0 0 1 108 108Zm-24 0a84 84 0 1 0-84 84a84.09 84.09 0 0 0 84-84Zm-72 36.68V132a20 20 0 0 0-20-20a12 12 0 0 0-4 23.32V168a20 20 0 0 0 20 20a12 12 0 0 0 4-23.32Z"
-											></path>
-										</svg>
+											<h1
+												x-text="scriptureRef"
+												class="text-xl font-medium"
+											>
+												{scriptureRef}
+											</h1>
+											<span
+												class="text-xl font-medium cursor-pointer"
+												x-on:click="$refs.settingsDrawerBtn.click();"
+												x-text="bibleVersionPreference"
+											></span>
+											<div
+												class="tooltip tooltip-bottom h-[24px] w-[24px] flex items-center justify-center text-purple-700 dark:text-gray-300"
+												x-show="Boolean(bibleVersionData && bibleVersionPreference)"
+												x-bind:data-tip="bibleVersionData?.[bibleVersionPreference]?.attribution + ' (Scripture sourced from https://bolls.life/api/)'"
+											>
+												<svg
+													width="16"
+													height="16"
+													viewBox="0 0 256 256"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<path
+														fill="currentColor"
+														d="M108 84a16 16 0 1 1 16 16a16 16 0 0 1-16-16Zm128 44A108 108 0 1 1 128 20a108.12 108.12 0 0 1 108 108Zm-24 0a84 84 0 1 0-84 84a84.09 84.09 0 0 0 84-84Zm-72 36.68V132a20 20 0 0 0-20-20a12 12 0 0 0-4 23.32V168a20 20 0 0 0 20 20a12 12 0 0 0 4-23.32Z"
+													></path>
+												</svg>
+											</div>
+										</div>
 									</div>
 								</div>
 
@@ -704,22 +713,22 @@ const scriptureRef = verseRef;
 									},
 								}`
 							>
-								<progress 
-									x-transition 
-									x-cloak 
+								<progress
+									x-transition
+									x-cloak
 									x-show="showProgressBar"
-									x-ref="progressBarEl"  
-									class="z-30 fixed top-0 left-0 right-0 h-2 progress w-full dark:bg-white dark:bg-opacity-10 dark:text-white !text-gray-800 rounded-none" 
-									value="0" 
-									max="100" 
+									x-ref="progressBarEl"
+									class="z-30 fixed top-0 left-0 right-0 h-2 progress w-full dark:bg-white dark:bg-opacity-10 dark:text-white !text-gray-800 rounded-none"
+									value="0"
+									max="100"
 									x-bind:style="isDarkMode ? '--bc: 0 0% 100%;' : ''"
 								></progress>
-								
+
 								<!-- Practice Button -->
-								<button 
-									x-bind:disabled="showProgressBar" 
-									x-bind:class="{ 'btn-disabled !text-opacity-40 dark:text-white dark:text-opacity-20': showProgressBar }" 
-									x-on:click="setOneMinuteTimer()" 
+								<button
+									x-bind:disabled="showProgressBar"
+									x-bind:class="{ 'btn-disabled !text-opacity-40 dark:text-white dark:text-opacity-20': showProgressBar }"
+									x-on:click="setOneMinuteTimer()"
 									x-text="showProgressBar ? '~' + timeRemaining + 's left' : 'Practice for 1 min'"
 									class="btn rounded-full btn-sm w-fit whitespace-nowrap normal-case"
 								>
@@ -1058,6 +1067,7 @@ const scriptureRef = verseRef;
 				isDarkMode: getIsDarkMode(),
 				isPWAInstalled: window.matchMedia("(display-mode: standalone)")
 					.matches,
+				passageNum: 0,
 				init() {
 					// Set the native operating system badge.
 					const setAppBadgeNative = (value: number) => {
