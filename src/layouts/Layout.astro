@@ -48,7 +48,9 @@ const {
 			This is how I can easily change the header in the PWA on light and dark mode. 
 			https://web.dev/learn/pwa/web-app-manifest 
 		-->
-		<meta name="theme-color" x-bind:content="isDarkMode ? '#1f2937' : '#f3f4f6'" />
+		<!-- <meta name="theme-color" x-bind:content="isDarkMode ? '#1f2937' : '#f3f4f6'" /> -->
+		<!-- TEST - I want this to look dark on light and dark mode, because it sometimes gets in the way, make it fade into the bg... -->
+		<meta name="theme-color" content="#000000" />
 		<link rel="manifest" href={isDebugModeEnabled ? "/site.webmanifest?debug=true" : "/site.webmanifest"} />
 
 		<!-- Favicon -->
