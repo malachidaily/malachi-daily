@@ -23,7 +23,7 @@ export const bibleVersionData: { [key in bibleVersion]: { readableName: string, 
         readableName: "MSG - The Message",
         attribution: "All Scripture quotations are taken from The Message, copyright © 1993, 2002, 2018 by Eugene H. Peterson. Used by permission of NavPress. . All rights reserved. Represented by Tyndale House Publishers."
     }
-} 
+}
 
 export type BookName = "Genesis" | "Exodus" | "Leviticus" | "Numbers" | "Deuteronomy" | "Joshua" | "Judges" | "Ruth" | "1 Samuel" | "2 Samuel" | "1 Kings" | "2 Kings" | "1 Chronicles" | "2 Chronicles" | "Ezra" | "Nehemiah" | "Esther" | "Job" | "Psalms" | "Proverbs" | "Ecclesiastes" | "Song of Solomon" | "Isaiah" | "Jeremiah" | "Lamentations" | "Ezekiel" | "Daniel" | "Hosea" | "Joel" | "Amos" | "Obadiah" | "Jonah" | "Micah" | "Nahum" | "Habakkuk" | "Zephaniah" | "Haggai" | "Zechariah" | "Malachi" | "Matthew" | "Mark" | "Luke" | "John" | "Acts" | "Romans" | "1 Corinthians" | "2 Corinthians" | "Galatians" | "Ephesians" | "Philippians" | "Colossians" | "1 Thessalonians" | "2 Thessalonians" | "1 Timothy" | "2 Timothy" | "Titus" | "Philemon" | "Hebrews" | "James" | "1 Peter" | "2 Peter" | "1 John" | "2 John" | "3 John" | "Jude" | "Revelation" | "Psalm"
 
@@ -42,3 +42,96 @@ export const books = {} as { [key in BookName]: Book }
 NLT_BOOKS.forEach(book => {
     books[book.name] = book
 })
+
+const bibleDotComVersionsAndIDs: { [key in bibleVersion]: number } = {
+    'NIV': 111,
+    'NLT': 116,
+    'ESV': 59,
+    'MSG': 97,
+    'KJV': 1
+}
+
+// https://ubsicap.github.io/usfm/identification/books.html
+const booksAndUsfmShortcodes: { [key in BookName]: string } = {
+    'Genesis': 'GEN',
+    'Exodus': 'EXO',
+    'Leviticus': 'LEV',
+    'Numbers': 'NUM',
+    'Deuteronomy': 'DEU',
+    'Joshua': 'JOS',
+    'Judges': 'JDG',
+    'Ruth': 'RUT',
+    '1 Samuel': '1SA',
+    '2 Samuel': '2SA',
+    '1 Kings': '1KI',
+    '2 Kings': '2KI',
+    '1 Chronicles': '1CH',
+    '2 Chronicles': '2CH',
+    'Ezra': 'EZR',
+    'Nehemiah': 'NEH',
+    'Esther': 'EST',
+    'Job': 'JOB',
+    'Psalms': 'PSA',
+    'Psalm': 'PSA',
+    'Proverbs': 'PRO',
+    'Ecclesiastes': 'ECC',
+    'Song of Solomon': 'SNG',
+    'Isaiah': 'ISA',
+    'Jeremiah': 'JER',
+    'Lamentations': 'LAM',
+    'Ezekiel': 'EZK',
+    'Daniel': 'DAN',
+    'Hosea': 'HOS',
+    'Joel': 'JOL',
+    'Amos': 'AMO',
+    'Obadiah': 'OBA',
+    'Jonah': 'JON',
+    'Micah': 'MIC',
+    'Nahum': 'NAM',
+    'Habakkuk': 'HAB',
+    'Zephaniah': 'ZEP',
+    'Haggai': 'HAG',
+    'Zechariah': 'ZEC',
+    'Malachi': 'MAL',
+    'Matthew': 'MAT',
+    'Mark': 'MRK',
+    'Luke': 'LUK',
+    'John': 'JHN',
+    'Acts': 'ACT',
+    'Romans': 'ROM',
+    '1 Corinthians': '1CO',
+    '2 Corinthians': '2CO',
+    'Galatians': 'GAL',
+    'Ephesians': 'EPH',
+    'Philippians': 'PHP',
+    'Colossians': 'COL',
+    '1 Thessalonians': '1TH',
+    '2 Thessalonians': '2TH',
+    '1 Timothy': '1TI',
+    '2 Timothy': '2TI',
+    'Titus': 'TIT',
+    'Philemon': 'PHM',
+    'Hebrews': 'HEB',
+    'James': 'JAS',
+    '1 Peter': '1PE',
+    '2 Peter': '2PE',
+    '1 John': '1JN',
+    '2 John': '2JN',
+    '3 John': '3JN',
+    'Jude': 'JUD',
+    'Revelation': 'REV'
+}
+
+export function constructBibleDotComChapterURL({
+    book,
+    chapter,
+    versionShortCode
+}: {
+    book: BookName,
+    chapter: number,
+    versionShortCode: bibleVersion
+}) {
+    const originUrl = 'https://www.bible.com';
+    const bookShortCode = booksAndUsfmShortcodes[book];
+    return `${originUrl}/bible/${bibleDotComVersionsAndIDs[versionShortCode]}/${bookShortCode}.${chapter}.${versionShortCode}?utm_source=malachi-daily-web-app&utm_medium=referral`;
+}
