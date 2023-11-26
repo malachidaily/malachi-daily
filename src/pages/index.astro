@@ -31,6 +31,7 @@ const getVerseFromUrlParams = Boolean(
 
 let errorText = "";
 let infoText = "";
+let whenIsNextVerse = "";
 
 if (getVerseFromUrlParams) {
 	// Return the verse from the params...
@@ -97,10 +98,13 @@ if (getVerseFromUrlParams) {
 					? secondFutureVerseStartTime <= Date.now()
 					: false)
 			) {
+				whenIsNextVerse = secondFutureVerseFromApi["Start Date"];
 				return secondFutureVerseFromApi;
 			} else if (isFutureVerseActuallyNow) {
+				whenIsNextVerse = firstFutureVerseFromApi["Start Date"];
 				return firstFutureVerseFromApi;
 			} else {
+				whenIsNextVerse = firstFutureVerseFromApi["Start Date"];
 				return firstVerseFromApi;
 			}
 		}
@@ -112,6 +116,25 @@ if (getVerseFromUrlParams) {
 	}
 }
 
+// Get days from now
+// const daysFromNow = 
+// 	new Date((Date.now() - new Date(verseToUse["Start Date"]).getTime() / 1000)).,
+
+// console.log(whenIsNextVerse, daysFromNow);
+
+function getDiffBetweenDays() {
+	if (!whenIsNextVerse) {
+		return 0;
+	}
+
+	const date1 = new Date();
+	const date2 = new Date(whenIsNextVerse);
+	const diffTime: number = Math.abs(date2.getTime() - date1.getTime());
+	const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+	return diffDays;
+}
+
+const nextVerseComesInDays = getDiffBetweenDays() || 0;
 const translation: bibleVersion = "NLT";
 const chapterName: BookName = verseToUse.Book.value;
 const bookId = books[chapterName].bookid;
@@ -461,11 +484,34 @@ const scriptureRef = verseRef;
 							</NativeFeelingDrawer>
 						</div>
 					</div>
-					<div class="flex gap-2 items-center flex-wrap">
-						<p class="text-muted text-start max-sm:hidden">
-							Scripture memorization, together. New verse every
-							two weeks
+					<div 
+						class="h-6"
+						x-data="{ showInfoSubtext: true, showPassageInfo: false }"
+						x-init=`
+							setTimeout(() => {
+								showInfoSubtext = false;
+							}, 2000);
+
+							setTimeout(() => {
+								showPassageInfo = true;
+							}, 3000);
+						`
+					>
+						<p x-transition x-show="showInfoSubtext" class="text-muted text-start">
+							Scripture memorization, together.
 						</p>
+						<div x-cloak x-transition x-show="showPassageInfo"  class="gap-1 flex text-muted  flex-wrap">
+							<p
+								class="whitespace-nowrap inline"
+								x-show="passageNum > 0"
+								x-text="'Passage #' + passageNum + ' • '"
+							>
+								Passage #--
+							</p>
+							<p class="whitespace-nowrap inline" x-text=`${nextVerseComesInDays} + ' days until next verse'`>
+								Next verse coming on 
+							</p>
+						</div>
 					</div>
 				</div>
 
@@ -478,12 +524,6 @@ const scriptureRef = verseRef;
 					`}
 					class="rounded-md text-start max-sm:mx-[-24px]"
 				>
-					<p
-						class="mb-3 text-gray-600 dark:text-gray-500 uppercase"
-						x-text="'Passage #' + passageNum"
-					>
-						Passage #--
-					</p>
 					<div
 						class="surface-primary p-6 flex justify-center items-center rounded-xl shadow-xl max-sm:shadow-sm max-sm:rounded-3xl transition-[height] duration-300"
 						x-ref="scriptureCard"
