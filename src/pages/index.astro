@@ -486,8 +486,8 @@ const scriptureRef = verseRef;
 					</div>
 					<div 
 						class="h-6"
-						x-data="{ showInfoSubtext: true, showPassageInfo: false }"
-						x-init=`
+						x-data=`{ showInfoSubtext: true, showPassageInfo: false, isNotCurrentVerseOfWeek: ${getVerseFromUrlParams} }`
+						x-init={`
 							setTimeout(() => {
 								showInfoSubtext = false;
 							}, 2000);
@@ -495,12 +495,12 @@ const scriptureRef = verseRef;
 							setTimeout(() => {
 								showPassageInfo = true;
 							}, 3000);
-						`
+						`.trim()}
 					>
-						<p x-transition x-show="showInfoSubtext" class="text-muted text-start">
+						<p x-transition x-show="showInfoSubtext && !isNotCurrentVerseOfWeek" class="text-muted text-start">
 							Scripture memorization, together.
 						</p>
-						<div x-cloak x-transition x-show="showPassageInfo"  class="gap-1 flex text-muted  flex-wrap">
+						<div x-cloak x-transition x-show="showPassageInfo && !isNotCurrentVerseOfWeek"  class="gap-1 flex text-muted  flex-wrap">
 							<p
 								class="whitespace-nowrap inline"
 								x-show="passageNum > 0"
@@ -512,6 +512,7 @@ const scriptureRef = verseRef;
 								Next verse coming on 
 							</p>
 						</div>
+						<p class="text-muted text-start" x-show="isNotCurrentVerseOfWeek" x-transition x-cloak>You are previewing a verse</p>
 					</div>
 				</div>
 
