@@ -237,7 +237,7 @@ const scriptureRef = verseRef;
 		}
 	</style>
 	<div
-		class="canvas-secondary"
+		class="canvas-secondary max-sm:rounded-2xl"
 		x-init={`
 			versesObj = ${JSON.stringify(verses)};
 			bibleVersionData = ${JSON.stringify(bibleVersionData)};
@@ -492,7 +492,7 @@ const scriptureRef = verseRef;
 										>
 									</div>
 								</div>
-								<footer class="w-full rounded-xl !bg-opacity-10 bg-gray-600 dark:bg-gray-100 mt-2">
+								<footer class="w-full rounded-xl !bg-opacity-10 bg-gray-500 dark:bg-gray-100 mt-2">
 									<SectionLinks />
 								</footer>
 							</NativeFeelingDrawer>
@@ -1007,7 +1007,7 @@ const scriptureRef = verseRef;
 			</div>
 		</main>
 		<!-- Footer -->
-		<footer class="w-full max-sm:rounded-xl safe-area-bottom-padding !bg-opacity-10 bg-gray-800 dark:bg-gray-100">
+		<footer class="w-full safe-area-bottom-padding !bg-opacity-10 bg-gray-800 dark:bg-gray-100">
 			<SectionLinks />
 		</footer>
 	</div>
