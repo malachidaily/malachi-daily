@@ -285,7 +285,7 @@ const isOffWeek = true;
 				>
 						<a
 							x-cloak
-							x-show="!passageNum"
+							x-show="!passageNum && !isOffWeek"
 							class="mb-4 whitespace-nowrap badge canvas-tertiary text-primary py-3 dark:border-gray-700"
 							href="/"
 						>
@@ -542,7 +542,7 @@ const isOffWeek = true;
 						<div 
 							x-cloak
 							x-transition
-							x-show="showPassageInfo && !isNotCurrentVerseOfWeek" 
+							x-show="showPassageInfo && !isNotCurrentVerseOfWeek && !isOffWeek" 
 							class="cursor-pointer gap-1 flex text-muted  flex-wrap"
 							x-on:click={`
 								showPassageInfo = false;
