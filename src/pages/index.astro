@@ -181,7 +181,8 @@ const scriptureText = verses[translation];
 const scriptureRef = verseRef;
 
 // Off weeks are every other week. Therefore, it'll be one week before the next verse.
-const isOffWeek = Boolean(nextVerseComesInDays <= 7);
+// const isOffWeek = Boolean(nextVerseComesInDays <= 7);
+const isOffWeek = true; // TEST
 ---
 
 <Layout title="Malachi Daily: Memorize Bible Verses & Learn Their Context">
@@ -260,7 +261,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 		vaul-drawer-wrapper=""
 	>
 		<main
-			class="w-screen h-auto min-h-[calc(100vh-52px)] px-6 flex flex-col items-center"
+			class="w-screen h-auto min-h-[calc(100vh-48px)] px-6 flex flex-col items-center"
 			x-bind:class="{ 'min-h-screen': isFullscreen }"
 		>
 			<div
