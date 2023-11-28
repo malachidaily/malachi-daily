@@ -49,7 +49,5 @@ export async function getAllVerses({
     }
   });
 
-  console.log(JSON.stringify(data, null, 2));
-  
   return data;
 }

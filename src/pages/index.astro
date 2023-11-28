@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 
 import Layout from "../layouts/Layout.astro";
+import OffWeek from '../layouts/sections/OffWeek.astro';
 import logoImgUrl from "../../public/logo.png";
 import { backupVerse } from "../utils/constants";
 import NativeFeelingDrawer from "../components/react/NativeFeelingDrawer";
@@ -178,6 +179,9 @@ try {
 
 const scriptureText = verses[translation];
 const scriptureRef = verseRef;
+
+// TEST
+const isOffWeek = true;
 ---
 
 <Layout title="Malachi Daily: Memorize Bible Verses & Learn Their Context">
@@ -235,6 +239,10 @@ const scriptureRef = verseRef;
 				16px
 			) + 1rem);
 		}
+
+		.btn-filled-contrast {
+			@apply btn rounded-full hover:text-gray-800 dark:hover:text-gray-500 bg-gray-700 dark:bg-gray-200 text-white dark:text-gray-800 border-transparent w-fit whitespace-nowrap normal-case;
+		}
 	</style>
 	<div
 		class="canvas-secondary max-sm:rounded-2xl"
@@ -246,6 +254,7 @@ const scriptureRef = verseRef;
 			passageNum = ${passageNum};
 			bookName = '${bookName}';
 			chapter = ${chapter};
+			isOffWeek = ${isOffWeek};
 		`.trim()}
 		x-clear
 		vaul-drawer-wrapper=""
@@ -564,6 +573,8 @@ const scriptureRef = verseRef;
 						scriptureRef = '${scriptureRef}';
 						fidelity = fidelityOfTheDay;
 					`}
+					x-show="!isOffWeek"
+					x-transition
 					class="rounded-md text-start max-sm:mx-[-24px]"
 				>
 					<div
@@ -813,7 +824,7 @@ const scriptureRef = verseRef;
 										x-bind:class="{ 'btn-disabled !text-opacity-60 dark:text-white': showProgressBar }"
 										x-on:click="setOneMinuteTimer()"
 										x-text="showProgressBar ? '~' + timeRemaining + 's left' : 'Practice for 1 min'"
-										class="btn rounded-full hover:text-gray-800 dark:hover:text-gray-500 bg-gray-700 dark:bg-gray-200 text-white dark:text-gray-800 border-transparent btn-sm w-fit whitespace-nowrap normal-case"
+										class="btn-filled-contrast !btn-sm"
 									>
 										Practice for 1 min
 									</button>
@@ -917,6 +928,8 @@ const scriptureRef = verseRef;
 						class="font-mono whitespace-pre text-muted text-start break-all overflow-x-scroll">
 					</pre>
 				</div>
+
+				<OffWeek nextVerseComesInDays={nextVerseComesInDays} />
 
 				<!-- Notification Alert -->
 				<div
@@ -1156,6 +1169,7 @@ const scriptureRef = verseRef;
 		document.addEventListener("alpine:init", () => {
 			const Alpine = window["Alpine"] || {};
 			Alpine.data("malachi", () => ({
+				isOffWeek: false,
 				toggleDarkMode: toggleDarkMode,
 				isDarkMode: getIsDarkMode(),
 				isPWAInstalled: window.matchMedia("(display-mode: standalone)")
