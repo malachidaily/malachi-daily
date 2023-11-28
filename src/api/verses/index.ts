@@ -12,7 +12,7 @@ export const verseTableHeaders = {
   verseNumberStart: 'Verse Number Start',
   verseNumberEnd: 'Verse Number End',
   pastStartDate: 'Past Start Date',
-  passageNumber: 'Passage Number',
+  passageNumber: 'Passage Num',
   previewVerse: 'Preview Verse'
 }
 

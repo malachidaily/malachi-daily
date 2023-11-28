@@ -180,8 +180,8 @@ try {
 const scriptureText = verses[translation];
 const scriptureRef = verseRef;
 
-// TEST
-const isOffWeek = true;
+// Off weeks are every other week. Therefore, it'll be one week before the next verse.
+const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 ---
 
 <Layout title="Malachi Daily: Memorize Bible Verses & Learn Their Context">
@@ -930,7 +930,7 @@ const isOffWeek = true;
 					</pre>
 				</div>
 
-				<OffWeek nextVerseComesInDays={nextVerseComesInDays} />
+				{isOffWeek ? <OffWeek nextVerseComesInDays={nextVerseComesInDays} /> : null}
 
 				<!-- Notification Alert -->
 				<div
