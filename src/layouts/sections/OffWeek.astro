@@ -1,5 +1,19 @@
 ---
 import PoppyVacationSvg from '../../components/astro/illustration/poppy-vacation.astro';
+import { getAllVerses, verseTableHeaders } from "../../api/verses";
+
+const nowAndPastVersesFromApi = await getAllVerses({
+    filters: JSON.stringify({
+        filter_type: "AND",
+        filters: [
+            { type: "boolean", field: verseTableHeaders.pastStartDate, value: "1" },
+        ],
+        groups: [],
+    }),
+    // The minus up front tells the API to order by the descending order.
+    orderBy: '-' + verseTableHeaders.startDate,
+    size: 100
+});
 
 const { nextVerseComesInDays = 0, } = Astro.props;
 ---
@@ -14,9 +28,16 @@ const { nextVerseComesInDays = 0, } = Astro.props;
             -
         </p>
     </div>
-    <button
-        class="mt-4 btn btn-md rounded-full hover:text-gray-800 dark:hover:text-gray-500 bg-gray-700 dark:bg-gray-200 text-white dark:text-gray-800 border-transparent w-fit whitespace-nowrap normal-case"
+    <select
+        class="select mt-4 btn-filled-contrast !btn-md !pr-10 w-fit"
     >
-        Review a Past Verse
-    </button>
+        <option disabled selected>Review a Past Verse</option>
+        {nowAndPastVersesFromApi.results.map((verse) => {
+            return (
+                <option>
+                    {verse[verseTableHeaders.passageNumber]}.{' '}{verse[verseTableHeaders.readableVerseRef] || ''}
+                </option>
+            )
+        })}
+    </select>
 </section>
