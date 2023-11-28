@@ -29,15 +29,66 @@ const { nextVerseComesInDays = 0, } = Astro.props;
         </p>
     </div>
     <select
+        id="select-previous-verse"
         class="select mt-4 btn-filled-contrast !btn-md !pr-10 w-fit"
     >
         <option disabled selected>Review a Past Verse</option>
         {nowAndPastVersesFromApi.results.map((verse) => {
             return (
-                <option>
+                <option data-book-id={verse[verseTableHeaders.book].id} data-chapter={verse[verseTableHeaders.chapter]} data-start-verse={verse[verseTableHeaders.verseNumberStart]} data-end-verse={verse[verseTableHeaders.verseNumberEnd]}>
                     {verse[verseTableHeaders.passageNumber]}.{' '}{verse[verseTableHeaders.readableVerseRef] || ''}
                 </option>
             )
         })}
     </select>
 </section>
+
+<script>
+    import {
+        type BibleVersesFromMultipleTranslations,
+        getBibleVersesFromMultipleTranslations,
+    } from "../../api/bible";
+    import {
+        selectedBibleVersions,
+    } from "../../api/bible/static/books";
+
+    async function getSelectedVerse({
+        bookId,
+        chapter,
+        verseNum,
+        verseNumEnd,
+    }) {
+        let verseNums: number[] = [];
+        verseNums.push(verseNum);
+        if (verseNumEnd && verseNum < verseNumEnd) {
+            for (let i = verseNum + 1; i <= verseNumEnd; i++) {
+                verseNums.push(i);
+            }
+        }
+
+        // TODO I need to have my server to do the work of getting the verse and 
+        // not try to do it client-side. I'm getting a weird CORS error.
+        // const verses = await getBibleVersesFromMultipleTranslations({
+        //     bookId: bookId,
+        //     chapter,
+        //     verses: verseNums,
+        //     translations: selectedBibleVersions,
+        // });
+
+        console.log(verses)
+
+        return verses;
+    }
+
+    const selectInputEl = document.getElementById('select-previous-verse')
+    selectInputEl.addEventListener('change', async (event) => {
+        const { bookId, chapter, startVerse, endVerse } = event.target.selectedOptions[0].dataset;
+        console.log(event.target.selectedOptions[0].dataset)
+        const verses = await getSelectedVerse({
+            bookId: Number(bookId),
+            chapter: Number(chapter),
+            verseNum: Number(startVerse),
+            verseNumEnd: Number(endVerse || 0)
+        });
+    });
+</script>
