@@ -4,6 +4,18 @@ const BASEROW_AUTH_TOKEN = `Token ${import.meta.env.BASEROW_TOKEN}`;
 const VERSES_TABLE_ID = 222976;
 const GET_VERSES_ENDPOINT = `https://api.baserow.io/api/database/rows/table/${VERSES_TABLE_ID}/?user_field_names=true`;
 
+export const verseTableHeaders = {
+  startDate: 'Start Date',
+  adminNotes: 'Admin Notes',
+  book: 'Book',
+  chapter: 'Chapter',
+  verseNumberStart: 'Verse Number Start',
+  verseNumberEnd: 'Verse Number End',
+  pastStartDate: 'Past Start Date',
+  passageNumber: 'Passage Number',
+  previewVerse: 'Preview Verse'
+}
+
 export async function getAllVerses({
   pageNum = 1,
   size = 100,
@@ -36,6 +48,8 @@ export async function getAllVerses({
       }
     }
   });
+
+  console.log(JSON.stringify(data, null, 2));
   
   return data;
 }
