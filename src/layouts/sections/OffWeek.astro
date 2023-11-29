@@ -1,6 +1,7 @@
 ---
 import PoppyVacationSvg from '../../components/astro/illustration/poppy-vacation.astro';
 import { getAllVerses, verseTableHeaders } from "../../api/verses";
+import { books, type BookName, type Book } from '../../api/bible/static/books';
 
 const nowAndPastVersesFromApi = await getAllVerses({
     filters: JSON.stringify({
@@ -33,9 +34,16 @@ const { nextVerseComesInDays = 0, } = Astro.props;
         class="select mt-4 btn-filled-contrast !btn-md !pr-10 w-fit"
     >
         <option disabled selected>Review a Past Verse</option>
-        {nowAndPastVersesFromApi.results.map((verse) => {
+        {nowAndPastVersesFromApi.results.map((verse: any) => {
+            const book = verse[verseTableHeaders.book];
+            const bookId = books[book.value as BookName]?.bookid;
+
+            if (!bookId) {
+                return;
+            }
+
             return (
-                <option data-book-id={verse[verseTableHeaders.book].id} data-chapter={verse[verseTableHeaders.chapter]} data-start-verse={verse[verseTableHeaders.verseNumberStart]} data-end-verse={verse[verseTableHeaders.verseNumberEnd]}>
+                <option data-book-id={bookId} data-chapter={verse[verseTableHeaders.chapter]} data-start-verse={verse[verseTableHeaders.verseNumberStart]} data-end-verse={verse[verseTableHeaders.verseNumberEnd]}>
                     {verse[verseTableHeaders.passageNumber]}.{' '}{verse[verseTableHeaders.readableVerseRef] || ''}
                 </option>
             )
@@ -44,14 +52,8 @@ const { nextVerseComesInDays = 0, } = Astro.props;
 </section>
 
 <script>
-    import {
-        type BibleVersesFromMultipleTranslations,
-        getBibleVersesFromMultipleTranslations,
-    } from "../../api/bible";
-    import {
-        selectedBibleVersions,
-    } from "../../api/bible/static/books";
-
+    import { fetchAndCache } from '../../api';
+    
     async function getSelectedVerse({
         bookId,
         chapter,
@@ -66,14 +68,18 @@ const { nextVerseComesInDays = 0, } = Astro.props;
             }
         }
 
-        // TODO I need to have my server to do the work of getting the verse and 
-        // not try to do it client-side. I'm getting a weird CORS error.
-        // const verses = await getBibleVersesFromMultipleTranslations({
-        //     bookId: bookId,
-        //     chapter,
-        //     verses: verseNums,
-        //     translations: selectedBibleVersions,
-        // });
+        const fetchUrl = '/api/verses?' + new URLSearchParams({
+            bookId: bookId.toString(),
+            chapter: chapter.toString(),
+            verses: verseNums.join(','),
+        });
+
+        console.log(fetchUrl)
+
+        const verses = await fetchAndCache({
+            url: fetchUrl,
+            cacheKey: fetchUrl
+        });
 
         console.log(verses)
 
