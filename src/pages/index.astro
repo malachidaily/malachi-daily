@@ -931,7 +931,11 @@ const isOffWeek = true; // TEST
 					</pre>
 				</div>
 
-				{isOffWeek ? <OffWeek nextVerseComesInDays={nextVerseComesInDays} /> : null}
+				{isOffWeek ? (
+					<div class="w-full max-sm:mt-8">
+						<OffWeek nextVerseComesInDays={nextVerseComesInDays} /> 
+					</div>
+				): null}
 
 				<!-- Notification Alert -->
 				<div
