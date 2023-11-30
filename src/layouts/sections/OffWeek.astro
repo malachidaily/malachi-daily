@@ -111,10 +111,6 @@ const { nextVerseComesInDays = 0, } = Astro.props;
     }
 
     const selectInputEl: HTMLSelectElement = document.getElementById('select-previous-verse') as HTMLSelectElement;
-
-    declare global {
-        var Alpine: AlpineType;
-    }
     
     if (Boolean(selectInputEl)) {
         selectInputEl.addEventListener('change', async () => {
