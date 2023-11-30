@@ -13,7 +13,8 @@ export const verseTableHeaders = {
   verseNumberEnd: 'Verse Number End',
   pastStartDate: 'Past Start Date',
   passageNumber: 'Passage Num',
-  previewVerse: 'Preview Verse'
+  previewVerse: 'Preview Verse',
+  readableVerseRef: 'Verse Ref'
 }
 
 export async function getAllVerses({
@@ -40,7 +41,7 @@ export async function getAllVerses({
 
   const data = await fetchAndCache({
     url: constructedEndpoint.toString(), 
-    cacheKey: `get-verses-${filters}`,
+    cacheKey: `get-verses-${filters}-${size}`,
     options: {
       method: "GET",
       headers: {
@@ -49,7 +50,5 @@ export async function getAllVerses({
     }
   });
 
-  console.log(JSON.stringify(data, null, 2));
-  
   return data;
 }
