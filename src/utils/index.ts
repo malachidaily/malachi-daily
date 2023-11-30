@@ -104,6 +104,7 @@ declare global {
     var Alpine: AlpineType;
 }
 
+// TODO - make it where I can see the old value of the state...
 /**
  * Sets the value of a specific key in the AlpineJS state.
  *
