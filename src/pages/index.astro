@@ -1370,8 +1370,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								continue;
 							}
 
-							console.log({ key, value });
-							setAlpineState(key, JSON.stringify(value));
+							setAlpineState(key, JSON.parse(value));
 						}
 					}, 500)
 				},
