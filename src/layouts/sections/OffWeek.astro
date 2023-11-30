@@ -53,6 +53,7 @@ const { nextVerseComesInDays = 0, } = Astro.props;
 
 <script>
     import { fetchAndCache } from '../../api';
+    import { type bibleVersion } from '../../api/bible/static/books.ts';
 
     async function getSelectedVerse({
         bookId,
@@ -64,7 +65,7 @@ const { nextVerseComesInDays = 0, } = Astro.props;
         chapter: number,
         verseNum: number,
         verseNumEnd: number,
-    }) {
+    }) : Promise<{ [key in bibleVersion]: string; }> {
         let verseNums: number[] = [];
         verseNums.push(verseNum);
         if (verseNumEnd && verseNum < verseNumEnd) {
@@ -79,14 +80,22 @@ const { nextVerseComesInDays = 0, } = Astro.props;
             verses: verseNums.join(','),
         });
 
-        console.log(fetchUrl)
-
-        const verses = await fetchAndCache({
-            url: fetchUrl,
-            cacheKey: fetchUrl
-        });
-
-        console.log(verses);
+        let verses;
+        try {
+            verses = await fetchAndCache({
+                url: fetchUrl,
+                cacheKey: fetchUrl
+            });
+        } catch (error) {
+            throw new Error(
+                'Could not find the following verse: ' + 
+                JSON.stringify({
+                    bookId: bookId.toString(),
+                    chapter: chapter.toString(),
+                    verses: verseNums.join(','),
+                }, null, 2)
+            )
+        }
 
         return verses;
     }
