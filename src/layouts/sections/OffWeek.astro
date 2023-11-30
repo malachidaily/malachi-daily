@@ -1,7 +1,7 @@
 ---
 import PoppyVacationSvg from '../../components/astro/illustration/poppy-vacation.astro';
 import { getAllVerses, verseTableHeaders } from "../../api/verses";
-import { books, type BookName, type Book } from '../../api/bible/static/books';
+import { books, type BookName } from '../../api/bible/static/books';
 
 const nowAndPastVersesFromApi = await getAllVerses({
     filters: JSON.stringify({
@@ -20,14 +20,16 @@ const { nextVerseComesInDays = 0, } = Astro.props;
 ---
 
 <section class="gap-4 w-full flex flex-col items-center">
-    <div class="text-primary w-full max-w-[250px] tooltip tooltip-top" data-tip="Illustration source: popsy.co">
-        <PoppyVacationSvg />
-    </div>
-    <div class="flex flex-col gap-1">
-        <h2 class="text-2xl text-primary font-bold">It's an Off Week</h2>
-        <p class="text-muted whitespace-nowrap inline" x-text=`${nextVerseComesInDays} + ' days until next verse'`>
-            -
-        </p>
+    <div x-show="!hasPreviewVerse" class="gap-4 w-full flex flex-col items-center">
+        <div class="text-primary w-full max-w-[250px] tooltip tooltip-top" data-tip="Illustration source: popsy.co">
+            <PoppyVacationSvg />
+        </div>
+        <div class="flex flex-col gap-1">
+            <h2 class="text-2xl text-primary font-bold">It's an Off Week</h2>
+            <p class="text-muted whitespace-nowrap inline" x-text=`${nextVerseComesInDays} + ' days until next verse'`>
+                -
+            </p>
+        </div>
     </div>
     <select
         id="select-previous-verse"
@@ -36,14 +38,21 @@ const { nextVerseComesInDays = 0, } = Astro.props;
         <option disabled selected>Review a Past Verse</option>
         {nowAndPastVersesFromApi.results.map((verse: any) => {
             const book = verse[verseTableHeaders.book];
-            const bookId = books[book.value as BookName]?.bookid;
+            const bookName = book.value as BookName;
+            const bookId = books[bookName]?.bookid;
 
             if (!bookId) {
                 return;
             }
 
             return (
-                <option data-book-id={bookId} data-chapter={verse[verseTableHeaders.chapter]} data-start-verse={verse[verseTableHeaders.verseNumberStart]} data-end-verse={verse[verseTableHeaders.verseNumberEnd]}>
+                <option 
+                    data-book-id={bookId} 
+                    data-chapter={verse[verseTableHeaders.chapter]} 
+                    data-start-verse={verse[verseTableHeaders.verseNumberStart]} 
+                    data-end-verse={verse[verseTableHeaders.verseNumberEnd]}
+                    data-book-name={bookName}
+                >
                     {verse[verseTableHeaders.passageNumber]}.{' '}{verse[verseTableHeaders.readableVerseRef] || ''}
                 </option>
             )
@@ -52,6 +61,7 @@ const { nextVerseComesInDays = 0, } = Astro.props;
 </section>
 
 <script>
+    import { type Alpine as AlpineType, type AlpineComponent } from "alpinejs";
     import { fetchAndCache } from '../../api';
     import { type bibleVersion } from '../../api/bible/static/books.ts';
 
@@ -101,10 +111,14 @@ const { nextVerseComesInDays = 0, } = Astro.props;
     }
 
     const selectInputEl: HTMLSelectElement = document.getElementById('select-previous-verse') as HTMLSelectElement;
+
+    declare global {
+        var Alpine: AlpineType;
+    }
     
     if (Boolean(selectInputEl)) {
         selectInputEl.addEventListener('change', async () => {
-            const { bookId, chapter, startVerse, endVerse } = selectInputEl.selectedOptions[0].dataset;
+            const { bookId, chapter, startVerse, endVerse, bookName = '' } = selectInputEl.selectedOptions[0].dataset;
 
             const verses = await getSelectedVerse({
                 bookId: Number(bookId),
@@ -112,6 +126,22 @@ const { nextVerseComesInDays = 0, } = Astro.props;
                 verseNum: Number(startVerse),
                 verseNumEnd: Number(endVerse || 0)
             });
+
+            type OffWeekAlpineData = {
+                versesObj: { [key in bibleVersion]: string },
+                scriptureRef: string,
+                bookName: string,
+                chapter: number,
+                hasPreviewVerse: boolean,
+            }
+
+            // Add the verses to the versesObj in AlpineJS.
+            const alpineData : AlpineComponent<OffWeekAlpineData> = window.Alpine.$data(document.documentElement) as AlpineComponent<OffWeekAlpineData>;
+            alpineData.versesObj = verses;
+            alpineData.scriptureRef = `${bookName} ${chapter}:${startVerse}${endVerse ? `-${endVerse}` : ''}`;
+            alpineData.bookName = bookName;
+            alpineData.chapter = Number(chapter);
+            alpineData.hasPreviewVerse = true;
         });
     }
 </script>

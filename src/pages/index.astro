@@ -576,7 +576,7 @@ const isOffWeek = true; // TEST
 						fidelity = fidelityOfTheDay;
 					`}
 					x-cloak
-					x-show="!isOffWeek"
+					x-show="Boolean(!isOffWeek || hasPreviewVerse)"
 					x-transition
 					class="rounded-md text-start max-sm:mx-[-24px]"
 				>
@@ -602,6 +602,15 @@ const isOffWeek = true; // TEST
 									localStorage.setItem('showSerifFont', showSerifFont);
 									getAndSetCardWidth($el);
 								})
+
+								// This allows the card to update anytime the verse changes,
+								// so that it can have animation abilities (thanks, flexbox... lol)
+								$watch('scriptureRef', () => {
+									resetCardInlineHeightAndWidth();
+									setTimeout(() => {
+										getAndSetCardWidth($el);	
+									}, 300);
+								}, { passive: true })
 							})
 
 							// https://alpinejs.dev/magics/watch
@@ -614,6 +623,10 @@ const isOffWeek = true; // TEST
 						x-data={`{ 
 							toggleAllowDocumentScroll() {
 								document.body.classList.toggle('overflow-hidden');
+							},
+							resetCardInlineHeightAndWidth() {
+								$el.style.height = '';
+								$el.style.width = '';
 							},
 							getAndSetCardWidth(cardElement) {
 								if (this.isFullscreen) {
@@ -946,7 +959,7 @@ const isOffWeek = true; // TEST
 				</div>
 
 				{isOffWeek ? (
-					<div class="w-full max-sm:mt-8">
+					<div x-cloak x-transition x-show="isOffWeek" class="w-full max-sm:mt-8">
 						<OffWeek nextVerseComesInDays={nextVerseComesInDays} /> 
 					</div>
 				): null}
@@ -1240,6 +1253,7 @@ const isOffWeek = true; // TEST
 				passageNum: 0,
 				bookName: '',
 				chapter: 0,
+				hasPreviewVerse: false,
 				get bibleDotComUrl() {
 					const bibleDotComChapterUrl = constructBibleDotComChapterURL({
 						book: this.bookName as BookName,
