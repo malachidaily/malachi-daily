@@ -1,3 +1,5 @@
+import { type Alpine as AlpineType, type AlpineComponent } from "alpinejs";
+
 /**
  * Removes all Alpine.js attributes from the DOM elements.
  *
@@ -96,4 +98,31 @@ export const registerServiceWorkers = async () => {
         navigator.serviceWorker.register('/service.js'),
         navigator.serviceWorker.register('/firebase-messaging-sw.js')
     ])
+}
+
+declare global {
+    var Alpine: AlpineType;
+}
+
+/**
+ * Sets the value of a specific key in the AlpineJS state.
+ *
+ * @param {string} key - The key of the AlpineJS state to be updated.
+ * @param {any} value - The new value to assign to the specified key.
+ * @param {HTMLElement} alpineStateTargetEl - The target element on which the AlpineJS state is attached. Defaults to document.documentElement.
+ * @throws {Error} If the specified key does not exist in the existing AlpineJS state.
+ * @return {void}
+ */
+export function setAlpineState(
+    key: string, 
+    value: any,
+    alpineStateTargetEl: HTMLElement = document.documentElement
+): void {
+    const alpineData : AlpineComponent<any> = window.Alpine.$data(alpineStateTargetEl);
+
+    try {
+        alpineData[key] = value;
+    } catch {
+        throw new Error('That key does not exist in your existing AlpineJS state.')
+    }
 }

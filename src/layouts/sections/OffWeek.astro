@@ -61,9 +61,9 @@ const { nextVerseComesInDays = 0, } = Astro.props;
 </section>
 
 <script>
-    import { type Alpine as AlpineType, type AlpineComponent } from "alpinejs";
     import { fetchAndCache } from '../../api';
     import { type bibleVersion } from '../../api/bible/static/books.ts';
+    import { setAlpineState } from '../../utils';
 
     async function getSelectedVerse({
         bookId,
@@ -127,21 +127,12 @@ const { nextVerseComesInDays = 0, } = Astro.props;
                 verseNumEnd: Number(endVerse || 0)
             });
 
-            type OffWeekAlpineData = {
-                versesObj: { [key in bibleVersion]: string },
-                scriptureRef: string,
-                bookName: string,
-                chapter: number,
-                hasPreviewVerse: boolean,
-            }
-
             // Add the verses to the versesObj in AlpineJS.
-            const alpineData : AlpineComponent<OffWeekAlpineData> = window.Alpine.$data(document.documentElement) as AlpineComponent<OffWeekAlpineData>;
-            alpineData.versesObj = verses;
-            alpineData.scriptureRef = `${bookName} ${chapter}:${startVerse}${endVerse ? `-${endVerse}` : ''}`;
-            alpineData.bookName = bookName;
-            alpineData.chapter = Number(chapter);
-            alpineData.hasPreviewVerse = true;
+            setAlpineState('versesObj', verses);
+            setAlpineState('scriptureRef', `${bookName} ${chapter}:${startVerse}${endVerse ? `-${endVerse}` : ''}`);
+            setAlpineState('bookName', bookName);
+            setAlpineState('chapter', Number(chapter));
+            setAlpineState('hasPreviewVerse', true);
         });
     }
 </script>

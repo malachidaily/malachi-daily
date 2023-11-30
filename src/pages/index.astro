@@ -957,11 +957,9 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					</pre>
 				</div>
 
-				{isOffWeek ? (
-					<div x-cloak x-transition x-show="isOffWeek" class="w-full max-sm:mt-8">
-						<OffWeek nextVerseComesInDays={nextVerseComesInDays} /> 
-					</div>
-				): null}
+				<div x-cloak x-transition x-show="isOffWeek" class="w-full max-sm:mt-8">
+					<OffWeek nextVerseComesInDays={nextVerseComesInDays} /> 
+				</div>
 
 				<!-- Notification Alert -->
 				<div
@@ -1107,11 +1105,12 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 			getUserFirebaseNotificationToken,
 		} from "../messaging_init_on_client.js";
 		import { constructBibleDotComChapterURL, type BookName } from '../api/bible/static/books.ts'
-		import { removeAlpineAttributes } from "../utils";
+		import { removeAlpineAttributes, setAlpineState } from "../utils";
 		import { MALACHI_BLOG_URL } from "../utils/constants";
 
 		declare global {
 			var Alpine: AlpineType;
+			var setAlpineState: Function;
 		}
 
 		async function enableNoSleepMode() {
@@ -1240,6 +1239,9 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 
 		// Get the Alpine data connected to the DOM.
 		document.documentElement.setAttribute("x-data", "malachi");
+
+		// Make it where I can easily update the alpine state when testing.
+		window.setAlpineState = setAlpineState;
 
 		document.addEventListener("alpine:init", () => {
 			const Alpine = window["Alpine"] || {};
