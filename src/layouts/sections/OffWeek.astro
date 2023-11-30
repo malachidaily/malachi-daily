@@ -53,12 +53,17 @@ const { nextVerseComesInDays = 0, } = Astro.props;
 
 <script>
     import { fetchAndCache } from '../../api';
-    
+
     async function getSelectedVerse({
         bookId,
         chapter,
         verseNum,
         verseNumEnd,
+    } : {
+        bookId: number,
+        chapter: number,
+        verseNum: number,
+        verseNumEnd: number,
     }) {
         let verseNums: number[] = [];
         verseNums.push(verseNum);
@@ -81,20 +86,23 @@ const { nextVerseComesInDays = 0, } = Astro.props;
             cacheKey: fetchUrl
         });
 
-        console.log(verses)
+        console.log(verses);
 
         return verses;
     }
 
-    const selectInputEl = document.getElementById('select-previous-verse')
-    selectInputEl.addEventListener('change', async (event) => {
-        const { bookId, chapter, startVerse, endVerse } = event.target.selectedOptions[0].dataset;
-        console.log(event.target.selectedOptions[0].dataset)
-        const verses = await getSelectedVerse({
-            bookId: Number(bookId),
-            chapter: Number(chapter),
-            verseNum: Number(startVerse),
-            verseNumEnd: Number(endVerse || 0)
+    const selectInputEl: HTMLSelectElement = document.getElementById('select-previous-verse') as HTMLSelectElement;
+    
+    if (Boolean(selectInputEl)) {
+        selectInputEl.addEventListener('change', async () => {
+            const { bookId, chapter, startVerse, endVerse } = selectInputEl.selectedOptions[0].dataset;
+
+            const verses = await getSelectedVerse({
+                bookId: Number(bookId),
+                chapter: Number(chapter),
+                verseNum: Number(startVerse),
+                verseNumEnd: Number(endVerse || 0)
+            });
         });
-    });
+    }
 </script>
