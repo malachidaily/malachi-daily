@@ -256,6 +256,13 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 			bookName = '${bookName}';
 			chapter = ${chapter};
 			isOffWeek = ${isOffWeek};
+			daysUntilNextVerse = '${nextVerseComesInDays}';
+
+			$watch('daysUntilNextVerse', () => {
+				if (daysUntilNextVerse <= 7) {
+					isOffWeek = true;
+				}
+			});
 		`.trim()}
 		x-clear
 		vaul-drawer-wrapper=""
@@ -566,7 +573,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							>
 								Passage #--
 							</p>
-							<p class="whitespace-nowrap inline" x-text=`${nextVerseComesInDays} + ' days until next verse'`>
+							<p class="whitespace-nowrap inline" x-text="daysUntilNextVerse + ' days until next verse'">
 								Next verse coming on 
 							</p>
 						</div>
@@ -1285,6 +1292,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 
 					return url;
 				},
+				daysUntilNextVerse: 0,
 				init() {
 					// Set the native operating system badge.
 					const setAppBadgeNative = (value: number) => {
@@ -1362,7 +1370,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					});
 
 					setTimeout(() => {
-						const allowedKeys = ['isOffWeek'];
+						const allowedKeys = ['isOffWeek', 'daysUntilNextVerse'];
 						// Get URL params and try to setAlpineState
 						const urlParams = new URLSearchParams(window.location.search);
 						for (const [key, value] of urlParams.entries()) {
