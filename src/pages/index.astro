@@ -1132,10 +1132,17 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 		}
 
 		async function enableNoSleepMode() {
+			// The wake lock sentinel.
+			let wakeLock = null;
+			
 			try {
-				const wakeLock = await navigator.wakeLock.request("screen");
-			} catch {
-				// Do nothing...
+				wakeLock = await navigator.wakeLock.request('screen');
+				wakeLock.addEventListener('release', () => {
+					console.log('Wake Lock was disabled');
+				});
+				console.log('Wake Lock is enabled');
+			} catch (err: Error | any) {
+				console.error(`${err?.name}, ${err?.message}`);
 			}
 		}
 
