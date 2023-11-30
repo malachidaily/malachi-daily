@@ -1360,6 +1360,20 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							window.location.reload();
 						}
 					});
+
+					setTimeout(() => {
+						const allowedKeys = ['isOffWeek'];
+						// Get URL params and try to setAlpineState
+						const urlParams = new URLSearchParams(window.location.search);
+						for (const [key, value] of urlParams.entries()) {
+							if (!allowedKeys.includes(key)) {
+								continue;
+							}
+
+							console.log({ key, value });
+							setAlpineState(key, JSON.stringify(value));
+						}
+					}, 500)
 				},
 				showDebug: (() => {
 					// Get url param debug = true
