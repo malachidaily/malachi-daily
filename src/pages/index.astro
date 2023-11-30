@@ -662,6 +662,8 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								this.toggleAllowDocumentScroll();
 								$el.classList.add('!h-screen');
 								$el.classList.add('!w-screen');
+								$el.classList.add('!h-[100svh]');
+								$el.classList.add('!w-[100svw]');
 
 								window.scrollTo({
 									top: 0,
@@ -674,6 +676,8 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								this.toggleAllowDocumentScroll();
 								$el.classList.remove('!h-screen');
 								$el.classList.remove('!w-screen');
+								$el.classList.remove('!h-[100svh]');
+								$el.classList.remove('!w-[100svw]');
 								this.isFullscreen = false;
 
 								// Allow the close animation to play fully
