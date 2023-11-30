@@ -934,11 +934,32 @@ const scriptureRef = verseRef;
 
 				<!-- Notification Alert -->
 				<div
-					x-on:click="notificationAlert = ''"
+					x-data={`{ 
+						showAlert: false,
+						shouldShowAlert() {
+							if (notificationAlert.length) {
+								setTimeout(() => {
+									this.showAlert = true;
+								}, 1000)
+							} else {
+								this.showAlert = false;
+							}
+						},
+						hideAlert() {
+							this.showAlert = false; 
+							setTimeout(() => notificationAlert = '', 1000)
+						},
+						init() {
+							this.shouldShowAlert();
+				
+							$watch('notificationAlert', this.shouldShowAlert);
+						},
+					}`}
+					x-on:click="hideAlert"
 					x-cloak
 					x-transition
-					x-show="notificationAlert"
-					class="text-primary alert alert-warning dark:bg-red-900 dark:border-red-900 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-sm:max-w-full"
+					x-show="showAlert"
+					class="text-primary alert alert-warning dark:bg-red-900 dark:border-red-900 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-2xl w-fit max-sm:w-auto max-sm:max-w-full"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -958,11 +979,32 @@ const scriptureRef = verseRef;
 
 				<!-- Notification Info -->
 				<div
-					x-on:click="notificationInfo = ''"
+					x-data={`{ 
+						showAlert: false,
+						shouldShowAlert() {
+							if (notificationInfo.length) {
+								setTimeout(() => {
+									this.showAlert = true;
+								}, 1000)
+							} else {
+								this.showAlert = false;
+							}
+						},
+						hideAlert() {
+							this.showAlert = false; 
+							setTimeout(() => notificationInfo = '', 1000)
+						},
+						init() {
+							this.shouldShowAlert();
+				
+							$watch('notificationInfo', this.shouldShowAlert);
+						},
+					}`}
+					x-on:click="hideAlert"
 					x-cloak
 					x-transition
-					x-show="notificationInfo"
-					class="text-primary alert alert-info surface-primary border-white dark:border-gray-600 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-sm:max-w-full"
+					x-show="showAlert"
+					class="text-primary alert alert-info surface-primary border-white dark:border-gray-600 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-2xl w-fit max-sm:w-auto max-sm:max-w-full"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
