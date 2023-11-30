@@ -9,3 +9,6 @@ export const backupVerse = {
     "Verse Number Start": 4,
     "Verse Number End": 0,
 }
+
+// Can be paired with 'q' query param to help search
+export const MALACHI_BLOG_URL = 'https://blog.malachidaily.com';

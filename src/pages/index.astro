@@ -158,6 +158,7 @@ let verses: BibleVersesFromMultipleTranslations = {};
 if (getVerseFromUrlParams) {
 	infoText = `Showing verse from URL Params: ${verseRef}`;
 }
+
 try {
 	verses = await getBibleVersesFromMultipleTranslations({
 		bookId: bookId,
@@ -286,7 +287,7 @@ const isOffWeek = true; // TEST
 				>
 						<a
 							x-cloak
-							x-show="!passageNum && !isOffWeek"
+							x-show="!isScheduledVerse && !isOffWeek"
 							class="mb-4 whitespace-nowrap badge canvas-tertiary text-primary py-3 dark:border-gray-700"
 							href="/"
 						>
@@ -831,13 +832,26 @@ const isOffWeek = true; // TEST
 										Practice for 1 min
 									</button>
 
-									<a
-										x-bind:href="bibleDotComUrl"
-										target="_blank"
-										class="btn rounded-full btn-sm btn-outline border-gray-200 dark:text-gray-300 dark:border-gray-600 hover:bg-gray-100 hover:text-gray-800 hover:border-transparent dark:hover:bg-white dark:hover:bg-opacity-10 w-fit whitespace-nowrap normal-case"
-									>
-										Read Full Chapter
-									</a>
+									<div class="flex items-center gap-2">
+										<a
+											x-cloak
+											x-transition
+											x-show="isScheduledVerse"
+											x-bind:href="malachiDailyBlogUrl"
+											target="_blank"
+											class="btn rounded-full btn-xs btn-outline border-gray-200 dark:text-gray-300 dark:border-gray-600 hover:bg-gray-100 hover:text-gray-800 hover:border-transparent dark:hover:bg-white dark:hover:bg-opacity-10 w-fit whitespace-nowrap normal-case"
+										>
+											Learn Context
+										</a>
+
+										<a
+											x-bind:href="bibleDotComUrl"
+											target="_blank"
+											class="btn rounded-full btn-xs btn-outline border-gray-200 dark:text-gray-300 dark:border-gray-600 hover:bg-gray-100 hover:text-gray-800 hover:border-transparent dark:hover:bg-white dark:hover:bg-opacity-10 w-fit whitespace-nowrap normal-case"
+										>
+											Read Full Chapter
+										</a>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -939,11 +953,32 @@ const isOffWeek = true; // TEST
 
 				<!-- Notification Alert -->
 				<div
-					x-on:click="notificationAlert = ''"
+					x-data={`{ 
+						showAlert: false,
+						shouldShowAlert() {
+							if (notificationAlert.length) {
+								setTimeout(() => {
+									this.showAlert = true;
+								}, 1000)
+							} else {
+								this.showAlert = false;
+							}
+						},
+						hideAlert() {
+							this.showAlert = false; 
+							setTimeout(() => notificationAlert = '', 1000)
+						},
+						init() {
+							this.shouldShowAlert();
+				
+							$watch('notificationAlert', this.shouldShowAlert);
+						},
+					}`}
+					x-on:click="hideAlert"
 					x-cloak
 					x-transition
-					x-show="notificationAlert"
-					class="text-primary alert alert-warning dark:bg-red-900 dark:border-red-900 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-sm:max-w-full"
+					x-show="showAlert"
+					class="text-primary alert alert-warning dark:bg-red-900 dark:border-red-900 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-2xl w-fit max-sm:w-auto max-sm:max-w-full"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -963,11 +998,32 @@ const isOffWeek = true; // TEST
 
 				<!-- Notification Info -->
 				<div
-					x-on:click="notificationInfo = ''"
+					x-data={`{ 
+						showAlert: false,
+						shouldShowAlert() {
+							if (notificationInfo.length) {
+								setTimeout(() => {
+									this.showAlert = true;
+								}, 1000)
+							} else {
+								this.showAlert = false;
+							}
+						},
+						hideAlert() {
+							this.showAlert = false; 
+							setTimeout(() => notificationInfo = '', 1000)
+						},
+						init() {
+							this.shouldShowAlert();
+				
+							$watch('notificationInfo', this.shouldShowAlert);
+						},
+					}`}
+					x-on:click="hideAlert"
 					x-cloak
 					x-transition
-					x-show="notificationInfo"
-					class="text-primary alert alert-info surface-primary border-white dark:border-gray-600 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-xl w-fit max-sm:w-auto max-sm:max-w-full"
+					x-show="showAlert"
+					class="text-primary alert alert-info surface-primary border-white dark:border-gray-600 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-2xl w-fit max-sm:w-auto max-sm:max-w-full"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -1040,6 +1096,7 @@ const isOffWeek = true; // TEST
 		} from "../messaging_init_on_client.js";
 		import { constructBibleDotComChapterURL, type BookName } from '../api/bible/static/books.ts'
 		import { removeAlpineAttributes } from "../utils";
+		import { MALACHI_BLOG_URL } from "../utils/constants";
 
 		declare global {
 			var Alpine: AlpineType;
@@ -1191,6 +1248,20 @@ const isOffWeek = true; // TEST
 					});
 
 					return bibleDotComChapterUrl;
+				},
+				// This tells me the verse is not a one-off from a URL param, 
+				// which means it has devotional content created from Malachi Daily.
+				get isScheduledVerse() {
+					return this.passageNum;
+				},
+				get malachiDailyBlogUrl() {
+					const url = new URL(MALACHI_BLOG_URL);
+					url.searchParams.set('q', this.scriptureRef);
+					url.searchParams.set('referring_domain', 'app.malachidaily.com');
+					url.searchParams.set('utm_source', 'malachi-daily-web-app');
+					url.searchParams.set('utm_medium', 'referral');
+
+					return url;
 				},
 				init() {
 					// Set the native operating system badge.
