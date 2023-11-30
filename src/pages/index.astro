@@ -535,7 +535,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								}, 500);
 							`.trim()}
 							x-transition 
-							x-show="showInfoSubtext && !isNotCurrentVerseOfWeek" 
+							x-show="showInfoSubtext && !isNotCurrentVerseOfWeek && !hasPreviewVerse" 
 							class="cursor-pointer text-muted text-start"
 						>
 							Scripture memory, together.
@@ -543,7 +543,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 						<div 
 							x-cloak
 							x-transition
-							x-show="showPassageInfo && !isNotCurrentVerseOfWeek && !isOffWeek" 
+							x-show="showPassageInfo && !isNotCurrentVerseOfWeek && !isOffWeek || (isOffWeek && hasPreviewVerse)" 
 							class="cursor-pointer gap-1 flex text-muted  flex-wrap"
 							x-on:click={`
 								showPassageInfo = false;
@@ -556,6 +556,13 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								class="whitespace-nowrap inline"
 								x-show="passageNum > 0"
 								x-text="'Passage #' + passageNum + ' • '"
+								x-init={`
+									$watch('hasPreviewVerse', () => {
+										if (hasPreviewVerse && isOffWeek) {
+											$el.innerText = 'Off Week Review • '
+										}
+									})
+								`.trim()}
 							>
 								Passage #--
 							</p>
