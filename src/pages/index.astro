@@ -1587,7 +1587,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							return `
 								<span
 									id="${!hasFirstHiddenInputSet ? "" : "firstHiddenWordInput"}"
-									contenteditable="true"
+									contenteditable="plaintext-only"
 									x-data="{
 										index: ${index},
 										correctWord: '${wordToBeReplaced.substring(
@@ -1686,6 +1686,9 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 											return Boolean($el.innerText === this.correctWord);
 										},
 									}"
+									autocomplete="off"
+									autocapitalize="off"
+									spellcheck="false"
 									x-bind:data-solved="wordIsCorrect ? true : false"
 									data-index="${index}"
 									data-underscores="${underscores}"
