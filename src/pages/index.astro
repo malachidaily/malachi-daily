@@ -725,7 +725,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								</div>
 
 								<!-- Scripture Action Buttons -->
-								<div class="text-muted flex gap-3 items-center">
+								<div class="text-muted flex gap-4 items-center">
 									<!-- Show Fullscreen Button -->
 									<button
 										x-show="!isFullscreen"
@@ -1586,6 +1586,11 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 													particleCount: 150,
 													spread: 100
 												});
+												setTimeout(() => {
+													if (confirm('Congratulations, you guessed all of the words! Refresh the page to clear the words?')) {
+														window.location.reload();
+													}
+												}, 1500);
 											}
 										},
 										get hiddenWordElsAsArray() {
