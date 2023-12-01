@@ -609,7 +609,11 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 									getAndSetCardWidth($el)
 								}, { passive: true });
 
-								getAndSetCardWidth($el);
+								// Hack to allow the event loop to allow the UI to render
+								// before setting the card's width.
+								setTimeout(() => {
+									getAndSetCardWidth($el);
+								}, 0);
 
 								// When the showSerifFont state changes, update the localStorage
 								$watch('showSerifFont', () => {
