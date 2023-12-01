@@ -1575,7 +1575,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 										calculateResults() {
 											// Get where data-solved exists
 											const words = Array.from(document.querySelectorAll('[data-solved]'));
-											if (words.length + 1 === this.numOfWordsToGuess) {
+											if (words.length === this.numOfWordsToGuess) {
 												alert('confetti, you did it!')
 											}
 										},
