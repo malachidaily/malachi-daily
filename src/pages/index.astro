@@ -1572,6 +1572,13 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 											const words = document.querySelectorAll('[contenteditable]');
 											return words.length;
 										},
+										calculateResults() {
+											// Get where data-solved exists
+											const words = Array.from(document.querySelectorAll('[data-solved]'));
+											if (words.length + 1 === this.numOfWordsToGuess) {
+												alert('confetti, you did it!')
+											}
+										},
 										get hiddenWordElsAsArray() {
 											const nextWords = document.querySelectorAll('[data-index]');
 											return Array.from(nextWords);
@@ -1599,6 +1606,8 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 												if (nextWordEl) {
 													console.log('actually moving to next word')
 													nextWordEl.focus();
+												} else {
+													$el.blur();
 												}
 											}
 										},
@@ -1611,8 +1620,8 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 												// Check if the word is correct
 												if ($el.innerText.toLowerCase() === this.correctWord.toLowerCase()) {
 													// If the word is correct, then make the outline green
-													this.showWordIsCorrect();
 													this.wordIsCorrect = true;
+													this.showWordIsCorrect();
 													this.goToNextWord();
 												} else {
 													this.wordIsCorrect = false;
@@ -1638,6 +1647,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 										$el.style.minWidth = ${underscores.length} + 'ch';
 										$el.style.width = '100%';
 									"
+									x-on:blur="calculateResults()"
 									x-on:input="validateWord()"
 									x-on:focus="$el.innerText = ''"
 								></span>
@@ -1675,7 +1685,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								return word;
 							}
 
-							if (fidelityAsNumber === 60) {
+							if (fidelityAsNumber === 60 && word.length) {
 								return convertWordToUnderscores(word, this.showFirstLetter, index);
 							}
 
@@ -1703,7 +1713,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								}
 							}
 
-							if (indicesToReplace.includes(index)) {
+							if (indicesToReplace.includes(index) && word.length) {
 								return convertWordToUnderscores(word, this.showFirstLetter, index);
 							}
 
