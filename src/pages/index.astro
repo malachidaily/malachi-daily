@@ -810,7 +810,11 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								x-data=`{
 									showProgressBar: false,
 									timeRemaining: 0,
+									focusOnFirstHiddenWordInput() {
+										document.getElementById('firstHiddenWordInput').focus();
+									},
 									setOneMinuteTimer() {
+										this.focusOnFirstHiddenWordInput();
 										this.showProgressBar = true;
 										let currentCount = 0;
 										this.timeRemaining = 60;
@@ -1523,6 +1527,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					// when fideltiy is at 0, we just return the original
 					// when fidelity is at 60, we return every word with underscores for each character
 					const words = this.scriptureTextOriginal.split(" ");
+					let hasFirstHiddenInputSet = false;
 
 					function convertWordToUnderscores(
 						word: string,
@@ -1541,6 +1546,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 						const makeUnderscoresVisible = () => {
 							return `
 								<span
+									id="${!hasFirstHiddenInputSet ? "" : "firstHiddenWordInput"}"
 									contenteditable="true"
 									x-data="{
 										index: ${index},
@@ -1653,6 +1659,8 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								></span>
 							`.trim();
 						};
+
+						hasFirstHiddenInputSet = true;
 
 						const bookendsOfTheWord = word.replace(
 							wordToBeReplaced,
