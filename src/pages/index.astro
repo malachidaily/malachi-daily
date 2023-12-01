@@ -1581,8 +1581,11 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 										calculateResults() {
 											// Get where data-solved exists
 											const words = Array.from(document.querySelectorAll('[data-solved]'));
-											if (words.length === this.numOfWordsToGuess) {
-												alert('confetti, you did it!')
+											if (words.length + 1 === this.numOfWordsToGuess) {
+												window.confetti({
+													particleCount: 150,
+													spread: 100
+												});
 											}
 										},
 										get hiddenWordElsAsArray() {
@@ -1595,22 +1598,17 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 											});
 										},
 										goToNextWord() {
-											console.log('going to next word...')
-
 											// Find the next word if it exists.
 											if (this.index < ${words.length}) {
-												console.log('there is a next word')
 												let nextWordIndex = this.index + 1;
 												let nextWordEl;
 
 												while (!nextWordEl && nextWordIndex < ${words.length}) {
-													console.log(nextWordIndex)
 													nextWordEl = this.getHiddenWordFromIndex(nextWordIndex);
 													nextWordIndex += 1;
 												}
 
 												if (nextWordEl) {
-													console.log('actually moving to next word')
 													nextWordEl.focus();
 												} else {
 													$el.blur();
