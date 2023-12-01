@@ -1672,6 +1672,8 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 													this.showWordIsCorrect();
 													this.goToNextWord();
 												} else {
+													// Incorrect word. Fix by resetting it.
+													$el.innerText = '';
 													this.wordIsCorrect = false;
 													this.showWordIsIncorrect();
 												}
@@ -1687,7 +1689,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 									x-bind:data-solved="wordIsCorrect ? true : false"
 									data-index="${index}"
 									data-underscores="${underscores}"
-									class="h-[1.25em] cursor-text self-baseline mask-underscores opacity-60 outline-0 rounded-sm overflow-hidden inline-flex text-blue-700 dark:text-gray-300"
+									class="h-[1.25em] cursor-text self-baseline mask-underscores opacity-60 outline-0 rounded-sm inline-flex text-blue-700 dark:text-gray-300"
 									x-init="
 										setTimeout(() => {
 											// Set the width of the element
