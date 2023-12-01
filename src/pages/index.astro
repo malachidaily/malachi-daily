@@ -2,7 +2,7 @@
 import { Image } from "astro:assets";
 
 import Layout from "../layouts/Layout.astro";
-import OffWeek from '../layouts/sections/OffWeek.astro';
+import OffWeek from "../layouts/sections/OffWeek.astro";
 import logoImgUrl from "../../public/logo.png";
 import { backupVerse } from "../utils/constants";
 import NativeFeelingDrawer from "../components/react/NativeFeelingDrawer";
@@ -52,12 +52,16 @@ if (getVerseFromUrlParams) {
 			filters: JSON.stringify({
 				filter_type: "AND",
 				filters: [
-					{ type: "boolean", field: verseTableHeaders.pastStartDate, value: "1" },
+					{
+						type: "boolean",
+						field: verseTableHeaders.pastStartDate,
+						value: "1",
+					},
 				],
 				groups: [],
 			}),
 			// The minus up front tells the API to order by the descending order.
-			orderBy: '-' + verseTableHeaders.startDate,
+			orderBy: "-" + verseTableHeaders.startDate,
 			size: 1,
 		});
 
@@ -66,7 +70,11 @@ if (getVerseFromUrlParams) {
 			filters: JSON.stringify({
 				filter_type: "AND",
 				filters: [
-					{ type: "boolean", field: verseTableHeaders.pastStartDate, value: "0" },
+					{
+						type: "boolean",
+						field: verseTableHeaders.pastStartDate,
+						value: "0",
+					},
 				],
 				groups: [],
 			}),
@@ -78,19 +86,19 @@ if (getVerseFromUrlParams) {
 			const firstVerseFromApi = nowAndPastVersesFromApi.results[0];
 
 			const firstFutureVerseFromApi = futureVersesFromApi.results[0];
-			const secondFutureVerseFromApi =
-				futureVersesFromApi.results?.[1] || null;
+			const secondFutureVerseFromApi = futureVersesFromApi.results?.[1] || null;
 
 			const firstFutureVerseStartTime =
-				new Date(firstFutureVerseFromApi[verseTableHeaders.startDate]).getTime() /
-				1000;
+				new Date(
+					firstFutureVerseFromApi[verseTableHeaders.startDate],
+				).getTime() / 1000;
 			const secondFutureVerseStartTime = secondFutureVerseFromApi
-				? new Date(secondFutureVerseFromApi[verseTableHeaders.startDate]).getTime() /
-				  1000
+				? new Date(
+						secondFutureVerseFromApi[verseTableHeaders.startDate],
+				  ).getTime() / 1000
 				: null;
 
-			let isFutureVerseActuallyNow =
-				firstFutureVerseStartTime >= Date.now();
+			let isFutureVerseActuallyNow = firstFutureVerseStartTime >= Date.now();
 
 			// This could happen due to cacheing, because I have a 1 day cache on most API calls.
 			if (
@@ -228,21 +236,21 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 		}
 
 		.safe-area-bottom-padding {
-			padding-block-end: env(
-				safe-area-inset-bottom,
-				16px
-			);
+			padding-block-end: env(safe-area-inset-bottom, 16px);
 		}
 
 		.safe-area-bottom-padding-extra {
-			padding-block-end: calc(env(
-				safe-area-inset-bottom,
-				16px
-			) + 1rem);
+			padding-block-end: calc(env(safe-area-inset-bottom, 16px) + 1rem);
 		}
 
 		.btn-filled-contrast {
 			@apply btn rounded-full hover:!brightness-110 bg-gray-700 hover:bg-gray-700 dark:bg-gray-200 hover:dark:bg-gray-200 text-white dark:text-gray-800 border-transparent w-fit whitespace-nowrap normal-case;
+		}
+
+		.mask-underscores:after {
+			/* I want the underscores to be visible. It's stored in a data attribute */
+			content: attr(data-underscores);
+			@apply outline-0 pointer-events-none absolute animate-pulse opacity-40;
 		}
 	</style>
 	<div
@@ -288,17 +296,15 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 				class="max-w-[600px] w-full flex flex-col py-12 max-sm:py-6 gap-12 max-sm:gap-6"
 			>
 				<!-- LOGO -->
-				<div
-					class="w-full flex flex-col gap-2 items-start justify-start"
-				>
-						<a
-							x-cloak
-							x-show="!isScheduledVerse && !isOffWeek"
-							class="mb-4 whitespace-nowrap badge canvas-tertiary text-primary py-3 dark:border-gray-700"
-							href="/"
-						>
-							Go back to Main Verse
-						</a>
+				<div class="w-full flex flex-col gap-2 items-start justify-start">
+					<a
+						x-cloak
+						x-show="!isScheduledVerse && !isOffWeek"
+						class="mb-4 whitespace-nowrap badge canvas-tertiary text-primary py-3 dark:border-gray-700"
+						href="/"
+					>
+						Go back to Main Verse
+					</a>
 					<div class="w-full flex gap-2 justify-between">
 						<div
 							x-data={`{ clickCount: 0}`}
@@ -386,14 +392,10 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							</button>
 							<NativeFeelingDrawer client:idle>
 								<div class="flex flex-col gap-2">
-									<div
-										class="form-control w-full max-w-xs mb-2"
-									>
+									<div class="form-control w-full max-w-xs mb-2">
 										<label class="label">
-											<span
-												class="label-text text-primary"
-												>Select your preferred Bible
-												translation</span
+											<span class="label-text text-primary"
+												>Select your preferred Bible translation</span
 											>
 										</label>
 										<select
@@ -402,26 +404,20 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 											x-on:change="localStorage.setItem('bibleVersionPreference', JSON.stringify($el.value));"
 										>
 											{
-												selectedBibleVersions.map(
-													(bibleVersion) => (
-														<option
-															value={bibleVersion}
-															x-bind:selected={`'${bibleVersion}' === bibleVersionPreference`}
-														>
-															{bibleVersionData?.[
-																bibleVersion
-															]?.readableName ||
-																bibleVersion}
-														</option>
-													),
-												)
+												selectedBibleVersions.map((bibleVersion) => (
+													<option
+														value={bibleVersion}
+														x-bind:selected={`'${bibleVersion}' === bibleVersionPreference`}
+													>
+														{bibleVersionData?.[bibleVersion]?.readableName ||
+															bibleVersion}
+													</option>
+												))
 											}
 										</select>
 									</div>
 									<div class="form-control w-fit">
-										<label
-											class="label cursor-pointer flex gap-2 items-center"
-										>
+										<label class="label cursor-pointer flex gap-2 items-center">
 											<input
 												x-model="isDarkMode"
 												type="checkbox"
@@ -432,8 +428,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 													toggleDarkMode();
 												`
 											/>
-											<span
-												class="label-text text-primary"
+											<span class="label-text text-primary"
 												>Enable Dark Mode</span
 											>
 										</label>
@@ -452,10 +447,8 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 												id="show-first-letter"
 												x-on:click="localStorage.setItem('showFirstLetter', JSON.stringify($el.checked));"
 											/>
-											<span
-												class="label-text text-primary"
-												>Show the first letter in each
-												hidden word</span
+											<span class="label-text text-primary"
+												>Show the first letter in each hidden word</span
 											>
 										</label>
 									</div>
@@ -473,10 +466,8 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 												id="checkbox-randomize-hidden-words"
 												x-on:click="localStorage.setItem('shouldRandomizeOrderOfHiddenWords', JSON.stringify($el.checked));"
 											/>
-											<span
-												class="label-text text-primary"
-												>Randomize the order of hidden
-												words</span
+											<span class="label-text text-primary"
+												>Randomize the order of hidden words</span
 											>
 										</label>
 									</div>
@@ -494,10 +485,8 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 												id="checkbox-show-serif-font"
 												x-on:click="localStorage.setItem('showSerifFont', JSON.stringify($el.checked));"
 											/>
-											<span
-												class="label-text text-primary"
-												>Use a more decorative font
-												(serif)</span
+											<span class="label-text text-primary"
+												>Use a more decorative font (serif)</span
 											>
 										</label>
 									</div>
@@ -509,13 +498,15 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 										>
 									</div>
 								</div>
-								<footer class="w-full rounded-xl !bg-opacity-10 bg-gray-500 dark:bg-gray-100 mt-2">
+								<footer
+									class="w-full rounded-xl !bg-opacity-10 bg-gray-500 dark:bg-gray-100 mt-2"
+								>
 									<SectionLinks />
 								</footer>
 							</NativeFeelingDrawer>
 						</div>
 					</div>
-					<div 
+					<div
 						class="h-6"
 						x-data={`{ 
 							showInfoSubtext: false, 
@@ -533,7 +524,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							}, millisecondsTilTransition + 500);
 						`.trim()}
 					>
-						<p 
+						<p
 							x-cloak
 							x-on:click={`
 								showInfoSubtext = false;
@@ -541,17 +532,17 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 									showPassageInfo = true;
 								}, 500);
 							`.trim()}
-							x-transition 
-							x-show="showInfoSubtext && !isNotCurrentVerseOfWeek && !hasPreviewVerse" 
+							x-transition
+							x-show="showInfoSubtext && !isNotCurrentVerseOfWeek && !hasPreviewVerse"
 							class="cursor-pointer text-muted text-start"
 						>
 							Scripture memory, together.
 						</p>
-						<div 
+						<div
 							x-cloak
 							x-transition
-							x-show="showPassageInfo && !isNotCurrentVerseOfWeek && !isOffWeek || (isOffWeek && hasPreviewVerse)" 
-							class="cursor-pointer gap-1 flex text-muted  flex-wrap"
+							x-show="showPassageInfo && !isNotCurrentVerseOfWeek && !isOffWeek || (isOffWeek && hasPreviewVerse)"
+							class="cursor-pointer gap-1 flex text-muted flex-wrap"
 							x-on:click={`
 								showPassageInfo = false;
 								setTimeout(() => {
@@ -573,11 +564,21 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							>
 								Passage #--
 							</p>
-							<p class="whitespace-nowrap inline" x-text="daysUntilNextVerse + ' days until next verse'">
-								Next verse coming on 
+							<p
+								class="whitespace-nowrap inline"
+								x-text="daysUntilNextVerse + ' days until next verse'"
+							>
+								Next verse coming on
 							</p>
 						</div>
-						<p class="text-muted text-start" x-show="isNotCurrentVerseOfWeek" x-transition x-cloak>You are previewing a verse</p>
+						<p
+							class="text-muted text-start"
+							x-show="isNotCurrentVerseOfWeek"
+							x-transition
+							x-cloak
+						>
+							You are previewing a verse
+						</p>
 					</div>
 				</div>
 
@@ -688,28 +689,20 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 						}`}
 						x-bind:class="{ 'absolute top-0 left-0 bottom-0 right-0 z-30': isFullscreen }"
 					>
-						<div
-							class="max-w-[calc(600px-24px*2)] w-full flex flex-col gap-4"
-						>
-							<div
-								class="w-full flex justify-between gap-6 flex-grow-1"
-							>
+						<div class="max-w-[calc(600px-24px*2)] w-full flex flex-col gap-4">
+							<div class="w-full flex justify-between gap-6 flex-grow-1">
 								<div class="flex items-center">
 									<div class="flex gap-0 flex-col">
 										<div
 											class="flex flex-wrap gap-2 items-baseline text-beautiful-gradient"
 										>
-											<h1
-												x-text="scriptureRef"
-												class="text-xl font-medium"
-											>
+											<h1 x-text="scriptureRef" class="text-xl font-medium">
 												{scriptureRef}
 											</h1>
 											<span
 												class="text-xl font-medium cursor-pointer"
 												x-on:click="$refs.settingsDrawerBtn.click();"
-												x-text="bibleVersionPreference"
-											></span>
+												x-text="bibleVersionPreference"></span>
 											<div
 												class="tooltip tooltip-bottom h-[24px] w-[24px] flex items-center justify-center text-purple-700 dark:text-gray-300"
 												x-show="Boolean(bibleVersionData && bibleVersionPreference)"
@@ -888,10 +881,8 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					</div>
 
 					<!-- Scrubbing Input -->
-					<section
-						class="w-full mt-12
-						max-sm:mx-6 max-sm:w-auto max-sm:mt-8"
-					>
+					<section class="w-full mt-12
+						max-sm:mx-6 max-sm:w-auto max-sm:mt-8">
 						<input
 							x-model="fidelity"
 							type="range"
@@ -902,9 +893,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							class="range range-md"
 							step="10"
 						/>
-						<div
-							class="w-full flex justify-between text-xs px-2 text-muted"
-						>
+						<div class="w-full flex justify-between text-xs px-2 text-muted">
 							<span>|</span>
 							<span>|</span>
 							<span>|</span>
@@ -976,7 +965,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 				</div>
 
 				<div x-cloak x-transition x-show="isOffWeek" class="w-full max-sm:mt-8">
-					<OffWeek nextVerseComesInDays={nextVerseComesInDays} /> 
+					<OffWeek nextVerseComesInDays={nextVerseComesInDays} />
 				</div>
 
 				<!-- Notification Alert -->
@@ -1110,7 +1099,9 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 			</div>
 		</main>
 		<!-- Footer -->
-		<footer class="w-full safe-area-bottom-padding !bg-opacity-10 bg-gray-800 dark:bg-gray-100">
+		<footer
+			class="w-full safe-area-bottom-padding !bg-opacity-10 bg-gray-800 dark:bg-gray-100"
+		>
 			<SectionLinks />
 		</footer>
 	</div>
@@ -1122,7 +1113,10 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 			messaging,
 			getUserFirebaseNotificationToken,
 		} from "../messaging_init_on_client.js";
-		import { constructBibleDotComChapterURL, type BookName } from '../api/bible/static/books.ts'
+		import {
+			constructBibleDotComChapterURL,
+			type BookName,
+		} from "../api/bible/static/books.ts";
 		import { removeAlpineAttributes, setAlpineState } from "../utils";
 		import { MALACHI_BLOG_URL } from "../utils/constants";
 
@@ -1134,13 +1128,13 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 		async function enableNoSleepMode() {
 			// The wake lock sentinel.
 			let wakeLock = null;
-			
+
 			try {
-				wakeLock = await navigator.wakeLock.request('screen');
-				wakeLock.addEventListener('release', () => {
-					console.log('Wake Lock was disabled');
+				wakeLock = await navigator.wakeLock.request("screen");
+				wakeLock.addEventListener("release", () => {
+					console.log("Wake Lock was disabled");
 				});
-				console.log('Wake Lock is enabled');
+				console.log("Wake Lock is enabled");
 			} catch (err: Error | any) {
 				console.error(`${err?.name}, ${err?.message}`);
 			}
@@ -1181,9 +1175,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 		};
 
 		const getShowSubscribeSection = () => {
-			const showSubscribeSection = localStorage.getItem(
-				"showSubscribeSection",
-			);
+			const showSubscribeSection = localStorage.getItem("showSubscribeSection");
 			if (showSubscribeSection === null) {
 				return true;
 			} else {
@@ -1274,32 +1266,31 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 				isOffWeek: false,
 				toggleDarkMode: toggleDarkMode,
 				isDarkMode: getIsDarkMode(),
-				isPWAInstalled: window.matchMedia("(display-mode: standalone)")
-					.matches,
+				isPWAInstalled: window.matchMedia("(display-mode: standalone)").matches,
 				passageNum: 0,
-				bookName: '',
+				bookName: "",
 				chapter: 0,
 				hasPreviewVerse: false,
 				get bibleDotComUrl() {
 					const bibleDotComChapterUrl = constructBibleDotComChapterURL({
 						book: this.bookName as BookName,
 						chapter: this.chapter,
-						versionShortCode: this.bibleVersionPreference
+						versionShortCode: this.bibleVersionPreference,
 					});
 
 					return bibleDotComChapterUrl;
 				},
-				// This tells me the verse is not a one-off from a URL param, 
+				// This tells me the verse is not a one-off from a URL param,
 				// which means it has devotional content created from Malachi Daily.
 				get isScheduledVerse() {
 					return this.passageNum;
 				},
 				get malachiDailyBlogUrl() {
 					const url = new URL(MALACHI_BLOG_URL);
-					url.searchParams.set('q', this.scriptureRef);
-					url.searchParams.set('referring_domain', 'app.malachidaily.com');
-					url.searchParams.set('utm_source', 'malachi-daily-web-app');
-					url.searchParams.set('utm_medium', 'referral');
+					url.searchParams.set("q", this.scriptureRef);
+					url.searchParams.set("referring_domain", "app.malachidaily.com");
+					url.searchParams.set("utm_source", "malachi-daily-web-app");
+					url.searchParams.set("utm_medium", "referral");
 
 					return url;
 				},
@@ -1367,21 +1358,17 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							  new Date().toDateString()
 							: false;
 						const isLastRefreshAnHourOrMoreAgo = Boolean(
-							lastRefresh &&
-								Date.now() - Number(lastRefresh) > 3600000,
+							lastRefresh && Date.now() - Number(lastRefresh) > 3600000,
 						);
 
-						if (
-							!isLastRefreshFromToday ||
-							isLastRefreshAnHourOrMoreAgo
-						) {
+						if (!isLastRefreshFromToday || isLastRefreshAnHourOrMoreAgo) {
 							localStorage.removeItem("lastRefresh");
 							window.location.reload();
 						}
 					});
 
 					setTimeout(() => {
-						const allowedKeys = ['isOffWeek', 'daysUntilNextVerse'];
+						const allowedKeys = ["isOffWeek", "daysUntilNextVerse"];
 						// Get URL params and try to setAlpineState
 						const urlParams = new URLSearchParams(window.location.search);
 						for (const [key, value] of urlParams.entries()) {
@@ -1391,7 +1378,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 
 							setAlpineState(key, JSON.parse(value));
 						}
-					}, 500)
+					}, 500);
 				},
 				showDebug: (() => {
 					// Get url param debug = true
@@ -1499,16 +1486,12 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 
 						// Request notification permissions
 						try {
-							const currentToken =
-								await requestNotificationPermission();
+							const currentToken = await requestNotificationPermission();
 							this.firebaseCMToken = currentToken;
-							this.notificationInfo =
-								"Notification permissions granted.";
+							this.notificationInfo = "Notification permissions granted.";
 						} catch (error: Error | any) {
 							if (
-								error?.message.includes(
-									"Can't find variable: Notification",
-								)
+								error?.message.includes("Can't find variable: Notification")
 							) {
 								const isUserOniOS = isUserAgentOniOS();
 								if (isUserOniOS) {
@@ -1532,10 +1515,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					}
 				},
 				get scriptureWithUnderscores() {
-					return (
-						document.getElementById("verse-current")?.innerText ||
-						""
-					);
+					return document.getElementById("verse-current")?.innerText || "";
 				},
 				get scriptureText() {
 					// Replace some words from the original with underscores for each character
@@ -1547,15 +1527,13 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					function convertWordToUnderscores(
 						word: string,
 						showFirstCharacter: boolean = false,
+						index: number,
 					): string {
-						const wordToBeReplaced =
-							word.match(/([A-Za-z]+)/gi)?.[0] || "";
+						const wordToBeReplaced = word.match(/([A-Za-z]+)/gi)?.[0] || "";
 
 						let underscores = "_".repeat(wordToBeReplaced.length);
 						if (showFirstCharacter && word.length > 1) {
-							underscores = "_".repeat(
-								wordToBeReplaced.length - 1,
-							);
+							underscores = "_".repeat(wordToBeReplaced.length - 1);
 						} else if (wordToBeReplaced.length === 1) {
 							underscores = "_";
 						}
@@ -1563,25 +1541,106 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 						const makeUnderscoresVisible = () => {
 							return `
 								<span
-									x-data="{ 
-										resetText() {
-											$el.innerText = '${underscores}'
-											$el.classList.remove('opacity-80')
+									contenteditable="true"
+									x-data="{
+										index: ${index},
+										correctWord: '${wordToBeReplaced.substring(
+											showFirstCharacter && word.length > 1 ? 1 : 0,
+											wordToBeReplaced.length,
+										)}',
+										showWordIsCorrect() {
+											$el.classList.add('focus:outline');
+											$el.classList.add('outline-green-400');
+											$el.classList.add('outline-2');
+										},
+										showWordIsIncorrect() {
+											$el.classList.add('focus:outline');
+											$el.classList.add('outline-red-400');
+											$el.classList.add('outline-2');
+										},
+										hideWordIsCorrect() {
+											$el.classList.remove('focus:outline');
+											$el.classList.remove('outline-green-400');
+											$el.classList.remove('outline-2');
+										},
+										hideWordIsIncorrect() {
+											$el.classList.remove('focus:outline');
+											$el.classList.remove('outline-red-400');
+											$el.classList.remove('outline-2');
+										},
+										get numOfWordsToGuess() {
+											const words = document.querySelectorAll('[contenteditable]');
+											return words.length;
+										},
+										get hiddenWordElsAsArray() {
+											const nextWords = document.querySelectorAll('[data-index]');
+											return Array.from(nextWords);
+										},
+										getHiddenWordFromIndex(index) {
+											return this.hiddenWordElsAsArray.find((word) => {
+												return word.getAttribute('data-index') === index.toString();
+											});
+										},
+										goToNextWord() {
+											console.log('going to next word...')
+
+											// Find the next word if it exists.
+											if (this.index < ${words.length}) {
+												console.log('there is a next word')
+												let nextWordIndex = this.index + 1;
+												let nextWordEl;
+
+												while (!nextWordEl && nextWordIndex < ${words.length}) {
+													console.log(nextWordIndex)
+													nextWordEl = this.getHiddenWordFromIndex(nextWordIndex);
+													nextWordIndex += 1;
+												}
+
+												if (nextWordEl) {
+													console.log('actually moving to next word')
+													nextWordEl.focus();
+												}
+											}
+										},
+										wordIsCorrect: false,
+										validateWord() {
+											if ($el.innerText.length >= this.correctWord.length) {
+												this.hideWordIsCorrect();
+												this.hideWordIsIncorrect();
+												
+												// Check if the word is correct
+												if ($el.innerText.toLowerCase() === this.correctWord.toLowerCase()) {
+													// If the word is correct, then make the outline green
+													this.showWordIsCorrect();
+													this.wordIsCorrect = true;
+													this.goToNextWord();
+												} else {
+													this.wordIsCorrect = false;
+													this.showWordIsIncorrect();
+												}
+											} else {
+												this.wordIsCorrect = false;
+												this.hideWordIsCorrect();
+												this.hideWordIsIncorrect();
+											}
+
+											return Boolean($el.innerText === this.correctWord);
 										},
 									}"
-									class="opacity-40 animate-pulse text-blue-700 dark:text-gray-300"
-									x-on:mouseover="
-										$el.innerText = '${
-											showFirstCharacter &&
-											wordToBeReplaced.length > 1
-												? wordToBeReplaced.slice(1)
-												: wordToBeReplaced
-										}'
-										$el.classList.add('opacity-80')
+									x-bind:data-solved="wordIsCorrect ? true : false"
+									data-index="${index}"
+									data-underscores="${underscores}"
+									class="mask-underscores opacity-60 outline-0 rounded-sm overflow-hidden inline-flex text-blue-700 dark:text-gray-300"
+									x-init="
+										setTimeout(() => null, 0);
+										// Set the width of the element
+										$el.style.maxWidth = ${underscores.length} + 'ch';
+										$el.style.minWidth = ${underscores.length} + 'ch';
+										$el.style.width = '100%';
 									"
-									x-on:mouseleave="resetText()"
-									x-on:click.outside="resetText()"
-								>${underscores}</span>
+									x-on:input="validateWord()"
+									x-on:focus="$el.innerText = ''"
+								></span>
 							`.trim();
 						};
 
@@ -1602,31 +1661,25 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 						}
 
 						return `
-							<span class="text-[inherit] cursor-default align-bottom inline-block whitespace-nowrap rounded-md focus:outline-2 focus:outline-blue-400">
+							<div class="text-[inherit] cursor-default align-bottom inline-flex whitespace-nowrap rounded-md focus:outline-2 focus:outline-blue-400">
 								${replacedWord}
-							</span>
+							</div>
 						`.trim();
 					}
 
 					return words
 						.map((word: string, index: number) => {
-							const fidelityAsNumber: number = Number(
-								this.fidelity,
-							);
+							const fidelityAsNumber: number = Number(this.fidelity);
 
 							if (fidelityAsNumber === 0) {
 								return word;
 							}
 
 							if (fidelityAsNumber === 60) {
-								return convertWordToUnderscores(
-									word,
-									this.showFirstLetter,
-								);
+								return convertWordToUnderscores(word, this.showFirstLetter, index);
 							}
 
-							const percentOfWordsHidden: number =
-								fidelityAsNumber / 60;
+							const percentOfWordsHidden: number = fidelityAsNumber / 60;
 							const numOfWordsToReplace: number = Math.round(
 								percentOfWordsHidden * words.length,
 							);
@@ -1637,8 +1690,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								// This function evenly disperses the hidden words
 								for (let i = 0; i < words.length; i += 1) {
 									const index: number = Math.floor(
-										(i * words.length) /
-											numOfWordsToReplace,
+										(i * words.length) / numOfWordsToReplace,
 									);
 									indicesToReplace.push(index);
 								}
@@ -1652,10 +1704,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							}
 
 							if (indicesToReplace.includes(index)) {
-								return convertWordToUnderscores(
-									word,
-									this.showFirstLetter,
-								);
+								return convertWordToUnderscores(word, this.showFirstLetter, index);
 							}
 
 							return word;
