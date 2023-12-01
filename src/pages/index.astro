@@ -726,6 +726,28 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 
 								<!-- Scripture Action Buttons -->
 								<div class="text-muted flex gap-4 items-center">
+									<!-- Reset Text Button -->
+									<button
+										title="Reset the text-fields"
+										x-on:click="resetScriptureGuessInputs"
+										x-transition
+									>
+										<svg
+											class="cursor-pointer"
+											width="24"
+											height="24"
+											viewBox="0 0 20 20"
+											xmlns="http://www.w3.org/2000/svg"
+										>
+											<g fill="currentColor">
+													<path d="M5.05 14.95a1 1 0 1 1 1.414-1.414A5 5 0 0 0 15 10a1 1 0 1 1 2 0a7 7 0 0 1-11.95 4.95Z"/>
+													<path d="M13.559 12.832a1 1 0 1 1-1.11-1.664l3-2a1 1 0 1 1 1.11 1.664l-3 2Z"/>
+													<path d="M18.832 12.445a1 1 0 0 1-1.664 1.11l-2-3a1 1 0 1 1 1.664-1.11l2 3Zm-3.975-7.594a1 1 0 1 1-1.414 1.414a5 5 0 0 0-8.536 3.536a1 1 0 1 1-2 0a7 7 0 0 1 11.95-4.95Z"/>
+													<path d="M6.349 6.969a1 1 0 0 1 1.11 1.664l-3.001 2a1 1 0 1 1-1.11-1.664l3-2Z"/>
+													<path d="M1.075 7.356a1 1 0 1 1 1.664-1.11l2 3a1 1 0 1 1-1.664 1.11l-2-3Z"/>
+											</g>
+										</svg>
+									</button>
 									<!-- Show Fullscreen Button -->
 									<button
 										x-show="!isFullscreen"
@@ -1275,6 +1297,16 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 				bookName: "",
 				chapter: 0,
 				hasPreviewVerse: false,
+				resetScriptureGuessInputs() {
+					document.querySelectorAll('[data-underscores]').forEach((el: any) => {
+						el.innerText = "";
+						el.removeAttribute('data-solved');
+						el.classList.remove('focus:outline');
+						el.classList.remove('outline-2');
+						el.classList.remove('outline-green-400');
+						el.classList.remove('outline-red-400');
+					});
+				},
 				get bibleDotComUrl() {
 					const bibleDotComChapterUrl = constructBibleDotComChapterURL({
 						book: this.bookName as BookName,
@@ -1544,6 +1576,10 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 						}
 
 						const makeUnderscoresVisible = () => {
+							if (!underscores.length) {
+								return '';
+							}
+
 							return `
 								<span
 									id="${!hasFirstHiddenInputSet ? "" : "firstHiddenWordInput"}"
@@ -1586,11 +1622,10 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 													particleCount: 150,
 													spread: 100
 												});
+												// The timeout lets the confetti fall.
 												setTimeout(() => {
-													if (confirm('Congratulations, you guessed all of the words! Refresh the page to clear the words?')) {
-														window.location.reload();
-													}
-												}, 1500);
+													alert('Well done! Hope to see you tomorrow 😄');
+												}, 1500)
 											}
 										},
 										get hiddenWordElsAsArray() {
