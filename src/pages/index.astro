@@ -1338,9 +1338,16 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					const installDialogEl = document.getElementById('install-dialog') as HTMLElement & { show: () => void };
 					installDialogEl?.show();
 				},
+				// https://webmasters.stackexchange.com/a/142231
+				get isUsingArcBrowser() {
+					return !!window
+						.getComputedStyle(document.documentElement)
+						.getPropertyValue('--arc-palette-background')
+				},
 				init() {
 					document.getElementById("install-dialog")?.addEventListener("ready", () => {
-						if (!this.isPWAInstalled) {
+						// Arc browser does not support PWA installs.
+						if (!this.isPWAInstalled && !this.isUsingArcBrowser) {
 							this.showPWAInstallDrawer()
 						}
 					})		
