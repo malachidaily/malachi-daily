@@ -18,6 +18,7 @@
     "@astrojs/sitemap": "^3.0.3",
     "@astrojs/tailwind": "^5.0.2",
     "@fontsource/inconsolata": "^5.0.15",
+    "@storedotapp/pwa-install-dialog": "^1.1.2",
     "@types/alpinejs": "^3.13.5",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",

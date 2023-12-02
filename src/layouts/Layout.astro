@@ -116,6 +116,15 @@ const {
 		</style>
 	</head>
 	<body>
+		<script>
+			import "@storedotapp/pwa-install-dialog";
+			console.log('imported pwa-install-dialog');
+		</script>
+		<pwa-install-dialog 
+			id="install-dialog"
+			app="app-malachidaily-com" 
+			x-bind:theme="isDarkMode ? 'dark' : 'light'"
+		></pwa-install-dialog>
 		<slot />
 	</body>
 </html>

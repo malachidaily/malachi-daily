@@ -1151,7 +1151,6 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 		import { MALACHI_BLOG_URL } from "../utils/constants";
 
 		declare global {
-			var Alpine: AlpineType;
 			var setAlpineState: Function;
 		}
 
@@ -1335,7 +1334,17 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					return url;
 				},
 				daysUntilNextVerse: 0,
+				showPWAInstallDrawer() {
+					const installDialogEl = document.getElementById('install-dialog') as HTMLElement & { show: () => void };
+					installDialogEl?.show();
+				},
 				init() {
+					document.getElementById("install-dialog")?.addEventListener("ready", () => {
+						if (!this.isPWAInstalled) {
+							this.showPWAInstallDrawer()
+						}
+					})		
+
 					// Set the native operating system badge.
 					const setAppBadgeNative = (value: number) => {
 						const supportsAppBadge = "setAppBadge" in navigator;

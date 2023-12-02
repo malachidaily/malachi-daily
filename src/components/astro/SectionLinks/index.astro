@@ -45,6 +45,17 @@
         Malachi Daily
       </a>
     </li>
+    <li class="leading-3 flex items-center">
+      <button
+        class="link whitespace-nowrap text-xs"
+        x-cloak
+        x-show="!isPWAInstalled"
+        x-on:click="showPWAInstallDrawer()"
+      >
+        Install the App
+      </button>
+    </li>
+    
 
     <!-- Hiding socials right now because they're not as active... -->
     <!-- <li class="flex gap-3 leading-3 flex items-center">
