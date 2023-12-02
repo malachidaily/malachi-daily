@@ -49,7 +49,7 @@
       <button
         class="link whitespace-nowrap text-xs"
         x-cloak
-        x-show="!isPWAInstalled"
+        x-show="!isPWAInstalled && !isUsingArcBrowser"
         x-on:click="showPWAInstallDrawer()"
       >
         Install the App
