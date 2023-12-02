@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.malachidaily.app",
+      "sha256_cert_fingerprints": [
+        "17:38:76:AC:1E:4C:E3:1D:7E:7C:8C:8A:D9:04:B4:51:34:3C:4D:5A:93:9B:53:A0:B3:75:9D:10:A1:E3:98:33"
+      ]
+    }
+  }
+]
