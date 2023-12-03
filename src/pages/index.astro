@@ -267,7 +267,11 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 			daysUntilNextVerse = '${nextVerseComesInDays}';
 
 			$watch('daysUntilNextVerse', () => {
-				if (daysUntilNextVerse <= 7) {
+				// While it looks like it's searching for 6 days, it's actually 7.
+				// Because, sometimes 7 can be 7 days and 23 hours.
+				// And, since I'm not getting the hours, this is th easiest way to know
+				// if it's 7 days until the next verse.
+				if (daysUntilNextVerse < 7) {
 					isOffWeek = true;
 				}
 			});
