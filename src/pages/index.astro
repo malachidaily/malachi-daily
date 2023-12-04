@@ -892,27 +892,6 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 									>
 										Practice 1 min
 									</button>
-
-									<div class="flex items-center gap-2">
-										<a
-											x-cloak
-											x-transition
-											x-show="isScheduledVerse"
-											x-bind:href="malachiDailyBlogUrl"
-											target="_blank"
-											class="btn rounded-full btn-xs btn-outline border-gray-200 dark:text-gray-300 dark:border-gray-600 hover:bg-gray-100 hover:text-gray-800 hover:border-transparent dark:hover:bg-white dark:hover:bg-opacity-10 w-fit whitespace-nowrap normal-case"
-										>
-											Learn Context
-										</a>
-
-										<a
-											x-bind:href="bibleDotComUrl"
-											target="_blank"
-											class="btn rounded-full btn-xs btn-outline border-gray-200 dark:text-gray-300 dark:border-gray-600 hover:bg-gray-100 hover:text-gray-800 hover:border-transparent dark:hover:bg-white dark:hover:bg-opacity-10 w-fit whitespace-nowrap normal-case"
-										>
-											Read Chapter
-										</a>
-									</div>
 								</div>
 							</div>
 						</div>
@@ -1002,9 +981,35 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					</pre>
 				</div>
 
+				<!-- OffWeek Section -->
 				<div x-cloak x-transition x-show="isOffWeek" class="w-full max-sm:mt-8">
 					<OffWeek nextVerseComesInDays={nextVerseComesInDays} />
 				</div>
+
+				<!-- More Actions Bible Verse -->
+				<ul class="menu text-primary menu-lg surface-primary w-full rounded-box" x-transition x-show="Boolean(hasPreviewVerse)" x-cloak>
+					<li class="!bg-[inherit] text-primary !text-[inherit]">
+						<a 
+							class="flex gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 active:!brightness-85"
+							x-show="isScheduledVerse"
+							x-bind:href="malachiDailyBlogUrl"
+							target="_blank"
+						>
+							Learn Context
+							<svg class="text-muted" width="24px" height="24px" stroke-width="2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+						</a>
+					</li>
+					<li class="!bg-[inherit] text-primary !text-[inherit]">
+						<a 
+							class="flex gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 active:!brightness-85"
+							x-bind:href="bibleDotComUrl"
+							target="_blank"
+						>
+							Read Full Chapter
+							<svg class="text-muted" width="24px" height="24px" stroke-width="2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+						</a>
+					</li>
+				</ul>
 
 				<!-- Notification Alert -->
 				<div
