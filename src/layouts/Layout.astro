@@ -87,23 +87,23 @@ const {
 
 		<!-- Styles -->
 		<style is:global>
-			.font-scripture {
+			div.font-scripture {
 				font-family: "Inconsolata";
 				word-spacing: -4px;
 				letter-spacing: normal;
-				@apply text-4xl max-sm:text-3xl;
+				font-size: clamp(1.75rem, 3vw, 4rem) !important;
 			}
 
 			body {
 				@apply max-sm:overflow-x-hidden;
 			}
 
-			.font-scripture-serif {
+			div.font-scripture-serif {
 				font-family: 'IBM Plex Mono', monospace;
 				font-style: italic;
 				word-spacing: -8px;
 				letter-spacing: -2px;
-				@apply text-4xl max-sm:text-3xl;
+				font-size: clamp(1.75rem, 3vw, 4rem) !important;
 			}
 
 			[x-cloak] {
