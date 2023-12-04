@@ -637,9 +637,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 
 							// https://alpinejs.dev/magics/watch
 							$watch('bibleVersionPreference', (prevVal, newVal) => {
-								if (prevVal !== newVal) {
-									getAndSetCardWidth($el)
-								}
+								getAndSetCardWidth($el);
 							})
 						`.trim()}
 						x-data={`{ 
@@ -649,23 +647,33 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							resetCardInlineHeightAndWidth() {
 								$el.style.height = '';
 								$el.style.width = '';
+								$el.classList.add('w-full');
+								$el.classList.remove('!h-screen');
+								$el.classList.remove('!w-screen');
+								$el.classList.remove('!h-[100svh]');
+								$el.classList.remove('!w-[100svw]');
 							},
-							getAndSetCardWidth(cardElement) {
+							getAndSetCardWidth(cardElement = $el) {
 								if (this.isFullscreen) {
 									return;
 								}
 								
-								cardElement.style.height = '';
-								cardElement.style.width = '';
+								this.resetCardInlineHeightAndWidth();
 
-								// Get height of element
-								const height = cardElement.offsetHeight;
-								const width = cardElement.offsetWidth;
+								setTimeout(() => {
+									// Get height of element
+									const height = cardElement.offsetHeight;
+									const width = cardElement.offsetWidth;
 
-								// Setting the height and width of the element allow for it
-								// to animate properly using CSS transitions.
-								cardElement.style.height = height + 'px';
-								cardElement.style.width = width + 'px';
+									if (!height || !width) {
+										return;
+									}
+	
+									// Setting the height and width of the element allow for it
+									// to animate properly using CSS transitions.
+									cardElement.style.height = height + 'px';
+									cardElement.style.width = width + 'px';
+								}, 1000);
 							},
 							handleShowFullscreen() {
 								this.toggleAllowDocumentScroll();
@@ -682,11 +690,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							},
 							handleHideFullscreen() {
 								const ANIMATION_DURATION = 300
-								this.toggleAllowDocumentScroll();
-								$el.classList.remove('!h-screen');
-								$el.classList.remove('!w-screen');
-								$el.classList.remove('!h-[100svh]');
-								$el.classList.remove('!w-[100svw]');
+								this.resetCardInlineHeightAndWidth();
 								this.isFullscreen = false;
 
 								// Allow the close animation to play fully
@@ -1720,7 +1724,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 											$el.style.minWidth =  $el.offsetWidth + 'px';
 											$el.style.width = '100%';
 											$el.innerText = '';
-										}, 0);
+										}, 100);
 									"
 									x-on:blur="calculateResults()"
 									x-on:input="validateWord()"
