@@ -34,10 +34,10 @@ const { nextVerseComesInDays = 0 } = Astro.props;
         >
             <PoppyVacationSvg />
         </div>
-        <div class="flex flex-col gap-1">
-            <h2 class="text-2xl text-primary font-bold">It's an Off Week</h2>
+        <div class="flex flex-col gap-1 justify-center">
+            <h2 class="text-center text-2xl text-primary font-bold">It's an Off Week</h2>
             <p
-                class="text-muted whitespace-nowrap inline"
+                class="text-center text-muted whitespace-nowrap inline"
                 x-text="daysUntilNextVerse + ' days until next verse'"
             >
                 -
@@ -172,6 +172,10 @@ const { nextVerseComesInDays = 0 } = Astro.props;
             setAlpineState("bookName", bookName);
             setAlpineState("chapter", Number(chapter));
             setAlpineState("hasPreviewVerse", true);
+            // This resets the number of hidden words to zero when reviewing
+            // a previous verse. It makes it easier to read the verse first
+            // and then hide words to memorize or remember.
+            setAlpineState('fidelity', 0);
         });
     }
 </script>
