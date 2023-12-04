@@ -1710,6 +1710,14 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 
 											return Boolean($el.innerText === this.correctWord);
 										},
+										// The input must be a max and min width, so that it doesn't
+										// grow or shrink. It must maintain its original width.	
+										recalculateWidth() {
+											$el.style.maxWidth = $el.offsetWidth + 'px';
+											$el.style.minWidth =  $el.offsetWidth + 'px';
+											$el.style.width = '100%';
+											$el.innerText = '';
+										},
 									}"
 									autocomplete="off"
 									autocapitalize="off"
@@ -1720,13 +1728,10 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 									class="h-[1.25em] focus-visible:outline-0 cursor-text self-baseline mask-underscores opacity-60 outline-0 rounded-sm inline-flex text-blue-700 dark:text-gray-300"
 									x-init="
 										setTimeout(() => {
-											// Set the width of the element
-											$el.style.maxWidth = $el.offsetWidth + 'px';
-											$el.style.minWidth =  $el.offsetWidth + 'px';
-											$el.style.width = '100%';
-											$el.innerText = '';
+											recalculateWidth();
 										}, 100);
 									"
+									x-on:resize.window="recalculateWidth()"
 									x-on:blur="calculateResults()"
 									x-on:input="validateWord()"
 									x-on:focus="$el.innerText = ''"
