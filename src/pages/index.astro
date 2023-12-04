@@ -1348,9 +1348,9 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 				},
 				// https://webmasters.stackexchange.com/a/142231
 				get isUsingArcBrowser() {
-					return !!window
+					return Boolean(window
 						.getComputedStyle(document.documentElement)
-						.getPropertyValue('--arc-palette-background')
+						.getPropertyValue('--arc-palette-background'))
 				},
 				init() {
 					document.getElementById("install-dialog")?.addEventListener("ready", () => {
