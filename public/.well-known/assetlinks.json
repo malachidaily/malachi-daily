@@ -7,7 +7,8 @@
       "namespace": "android_app",
       "package_name": "com.malachidaily.app.twa",
       "sha256_cert_fingerprints": [
-        "9A:EA:13:1F:D8:90:F8:C0:E0:8F:2D:D2:56:4D:90:02:D0:F9:12:CD:6F:85:1F:26:D8:D3:A1:BE:ED:B3:BE:7F"
+        "9A:EA:13:1F:D8:90:F8:C0:E0:8F:2D:D2:56:4D:90:02:D0:F9:12:CD:6F:85:1F:26:D8:D3:A1:BE:ED:B3:BE:7F",
+        "2D:42:DC:69:20:AA:81:F7:70:CF:A0:BB:67:80:99:89:4B:8E:3A:81:1A:D1:C6:5D:76:C8:BB:B7:CE:D4:3F:8A"
       ]
     }
   }
