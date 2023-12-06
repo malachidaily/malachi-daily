@@ -1203,79 +1203,26 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 			document.documentElement.classList.toggle("dark");
 		}
 
-		// create a function that gets "showFirstLetter" from localStorage
-		// if it doesn't exist, set it to true
-		const getShowFirstLetter = () => {
-			const showFirstLetter = localStorage.getItem("showFirstLetter");
-			if (showFirstLetter === null) {
-				return false;
+		function getFromLocalStorage(key: string, defaultValue: any) {
+			const value = localStorage.getItem(key);
+			if (value === null) {
+				return defaultValue;
 			} else {
-				return JSON.parse(showFirstLetter);
+				return JSON.parse(value);
 			}
-		};
-
-		// create a function that gets "showSerifFont" from localStorage
-		// if it doesn't exist, set it to false
-		const getShowSerifFont = () => {
-			const showSerifFont = localStorage.getItem("showSerifFont");
-			if (showSerifFont === null) {
-				return false;
-			} else {
-				return JSON.parse(showSerifFont);
-			}
-		};
-
-		const getShowSubscribeSection = () => {
-			const showSubscribeSection = localStorage.getItem("showSubscribeSection");
-			if (showSubscribeSection === null) {
-				return true;
-			} else {
-				return JSON.parse(showSubscribeSection);
-			}
-		};
-
-		const getShouldRandomizeOrderOfHiddenWords = () => {
-			const shouldRandomizeOrderOfHiddenWords = localStorage.getItem(
-				"shouldRandomizeOrderOfHiddenWords",
-			);
-			if (shouldRandomizeOrderOfHiddenWords === null) {
-				return false;
-			} else {
-				return JSON.parse(shouldRandomizeOrderOfHiddenWords);
-			}
-		};
-
-		const getIsDarkMode = () => {
-			const isDarkMode = localStorage.getItem("isDarkMode");
-			if (isDarkMode === null) {
-				// Does user's media prefer dark mode?
-				if (
-					window.matchMedia &&
-					window.matchMedia("(prefers-color-scheme: dark)").matches
-				) {
-					return true;
-				}
-
-				return false;
-			} else {
-				return JSON.parse(isDarkMode);
-			}
-		};
-
-		if (getIsDarkMode()) {
-			toggleDarkMode();
 		}
 
-		const getUserBibleVersionPreference = () => {
-			const bibleVersionPreference = localStorage.getItem(
-				"bibleVersionPreference",
-			);
-			if (bibleVersionPreference === null) {
-				return "NIV";
-			} else {
-				return JSON.parse(bibleVersionPreference);
-			}
-		};
+		// Local storage values
+		const showFirstLetter = getFromLocalStorage('showFirstLetter', false);
+		const showSerifFont = getFromLocalStorage('showSerifFont', false);
+		const showSubscribeSection = getFromLocalStorage('showSubscribeSection', true);
+		const shouldRandomizeOrderOfHiddenWords = getFromLocalStorage('shouldRandomizeOrderOfHiddenWords', false);
+		const isDarkMode = getFromLocalStorage('isDarkMode', Boolean(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches));
+		const bibleVersionPreference = getFromLocalStorage('bibleVersionPreference', 'NIV');
+
+		if (isDarkMode) {
+			toggleDarkMode();
+		}
 
 		const isUserAgentOniOS = (): boolean => {
 			const iOS = window.navigator.userAgent
@@ -1316,7 +1263,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 			Alpine.data("malachi", () => ({
 				isOffWeek: false,
 				toggleDarkMode: toggleDarkMode,
-				isDarkMode: getIsDarkMode(),
+				isDarkMode,
 				isPWAInstalled: window.matchMedia("(display-mode: standalone)").matches,
 				passageNum: 0,
 				bookName: "",
@@ -1470,7 +1417,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					return false;
 				})(),
 				bibleVersionData: undefined,
-				bibleVersionPreference: getUserBibleVersionPreference(),
+				bibleVersionPreference,
 				versesObj: undefined,
 				notificationAlert: "",
 				notificationInfo: "",
@@ -1478,7 +1425,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					return this.versesObj?.[this.bibleVersionPreference] || "";
 				},
 				scriptureRef: "",
-				showSerifFont: getShowSerifFont(),
+				showSerifFont,
 				iOSVersion: getiOSVersion(),
 				get isEligibleForNotificationPermission() {
 					const IOS_VERSION_WITH_NOTIFICATIONS = 16.4;
@@ -1508,10 +1455,9 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					return dayOfWeekAsNumber * 10;
 				},
 				fidelity: 0,
-				showFirstLetter: getShowFirstLetter(),
-				shouldRandomizeOrderOfHiddenWords:
-					getShouldRandomizeOrderOfHiddenWords(),
-				showSubscribeSection: getShowSubscribeSection(),
+				showFirstLetter,
+				shouldRandomizeOrderOfHiddenWords,
+				showSubscribeSection,
 				handleHideSubscribeSection() {
 					const subscribeSection = this.$refs.subscribeSection;
 					subscribeSection.style.display = "none";
