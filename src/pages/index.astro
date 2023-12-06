@@ -929,42 +929,49 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								class="cursor-pointer p-1 px-2 rounded-md"
 								x-on:click="fidelity = 10 * 0"
 								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 0 || dayOfWeek === 7 }"
+								x-text="isOffWeek ? 'Easy' : 'Sun'"
 								>Sun</span
 							>
 							<span
 								class="cursor-pointer p-1 px-2 rounded-md"
 								x-on:click="fidelity = 10 * 1"
 								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 1 }"
+								x-show="!isOffWeek"
 								>Mon</span
 							>
 							<span
 								class="cursor-pointer p-1 px-2 rounded-md"
 								x-on:click="fidelity = 10 * 2"
 								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 2 }"
+								x-show="!isOffWeek"
 								>Tue</span
 							>
 							<span
 								class="cursor-pointer p-1 px-2 rounded-md"
 								x-on:click="fidelity = 10 * 3"
 								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 3 }"
+								x-show="!isOffWeek"
 								>Wed</span
 							>
 							<span
 								class="cursor-pointer p-1 px-2 rounded-md"
 								x-on:click="fidelity = 10 * 4"
 								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 4 }"
+								x-show="!isOffWeek"
 								>Thu</span
 							>
 							<span
 								class="cursor-pointer p-1 px-2 rounded-md"
 								x-on:click="fidelity = 10 * 5"
 								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 5 }"
+								x-show="!isOffWeek"
 								>Fri</span
 							>
 							<span
 								class="cursor-pointer p-1 px-2 rounded-md"
 								x-on:click="fidelity = 10 * 6"
 								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 6 }"
+								x-text="isOffWeek ? 'Hard' : 'Sat'"
 								>Sat</span
 							>
 						</div>
