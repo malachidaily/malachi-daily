@@ -1231,8 +1231,6 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 		const offWeekScriptureRef = getFromLocalStorage('offWeekScriptureRef', '');
 		const offWeekScriptureVersesObj = getFromLocalStorage('offWeekScriptureVersesObj', undefined);
 
-		console.log({ offWeekScriptureRef, offWeekScriptureVersesObj })
-
 		if (isDarkMode) {
 			toggleDarkMode();
 		}
@@ -1427,6 +1425,10 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							this.versesObj = offWeekScriptureVersesObj;
 							this.hasPreviewVerse = true;
 							this.fidelity = 0;
+						} else if (offWeekScriptureRef && offWeekScriptureVersesObj) {
+							// Remove the off week data when it's an on week.
+							localStorage.removeItem('offWeekScriptureRef');
+							localStorage.removeItem('offWeekScriptureVersesObj');
 						}
 					})
 				},
