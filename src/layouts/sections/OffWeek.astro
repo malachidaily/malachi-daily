@@ -161,14 +161,13 @@ const { nextVerseComesInDays = 0 } = Astro.props;
                 verseNumEnd: Number(endVerse || 0),
             });
 
+            const scriptureRef = `${bookName} ${chapter}:${startVerse}${endVerse ? `-${endVerse}` : ""}`;
+
             // Add the verses to the versesObj in AlpineJS.
             setAlpineState("versesObj", verses);
-            setAlpineState(
-                "scriptureRef",
-                `${bookName} ${chapter}:${startVerse}${
-                    endVerse ? `-${endVerse}` : ""
-                }`,
-            );
+            localStorage.setItem('offWeekScriptureVersesObj', JSON.stringify(verses));
+            setAlpineState("scriptureRef", scriptureRef);
+            localStorage.setItem('offWeekScriptureRef', scriptureRef);
             setAlpineState("bookName", bookName);
             setAlpineState("chapter", Number(chapter));
             setAlpineState("hasPreviewVerse", true);

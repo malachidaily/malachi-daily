@@ -1160,6 +1160,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 	</div>
 
 	<script>
+		import { type AlpineComponent } from "alpinejs";
 		import {
 			requestNotificationPermission,
 			messaging,
@@ -1205,10 +1206,18 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 
 		function getFromLocalStorage(key: string, defaultValue: any) {
 			const value = localStorage.getItem(key);
-			if (value === null) {
+			if ((!value && (typeof value === 'number' && value !== 0)) || value === 'undefined' || value === null) {
 				return defaultValue;
+			} else if (typeof value === 'number') {
+				return value;
 			} else {
-				return JSON.parse(value);
+				let returnValue;
+				try {
+					returnValue = JSON.parse(value || '');
+				} catch {
+					returnValue = value;
+				}
+				return returnValue;
 			}
 		}
 
@@ -1219,6 +1228,10 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 		const shouldRandomizeOrderOfHiddenWords = getFromLocalStorage('shouldRandomizeOrderOfHiddenWords', false);
 		const isDarkMode = getFromLocalStorage('isDarkMode', Boolean(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches));
 		const bibleVersionPreference = getFromLocalStorage('bibleVersionPreference', 'NIV');
+		const offWeekScriptureRef = getFromLocalStorage('offWeekScriptureRef', '');
+		const offWeekScriptureVersesObj = getFromLocalStorage('offWeekScriptureVersesObj', undefined);
+
+		console.log({ offWeekScriptureRef, offWeekScriptureVersesObj })
 
 		if (isDarkMode) {
 			toggleDarkMode();
@@ -1404,6 +1417,18 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							setAlpineState(key, JSON.parse(value));
 						}
 					}, 500);
+
+					// Display the off week scripture when it's an off week.
+					const alpineState: AlpineComponent<any> = window.Alpine.$data(document.documentElement);
+					alpineState.$watch('isOffWeek', () => {
+						// If it's an off week, set the review scripture ref to what's been set.
+						if (this.isOffWeek && offWeekScriptureRef && offWeekScriptureVersesObj) {
+							this.scriptureRef = offWeekScriptureRef;
+							this.versesObj = offWeekScriptureVersesObj;
+							this.hasPreviewVerse = true;
+							this.fidelity = 0;
+						}
+					})
 				},
 				iconRightArrowSVG: '<svg class="text-muted" width="24px" height="24px" stroke-width="2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
 				showDebug: (() => {
