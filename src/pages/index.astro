@@ -546,7 +546,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							x-cloak
 							x-transition
 							x-show="showPassageInfo && !isNotCurrentVerseOfWeek && !isOffWeek || (isOffWeek && hasPreviewVerse)"
-							class="cursor-pointer gap-1 flex text-muted flex-wrap"
+							class="gap-1 flex text-muted flex-wrap items-center"
 							x-on:click={`
 								showPassageInfo = false;
 								setTimeout(() => {
@@ -555,21 +555,23 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							`.trim()}
 						>
 							<p
-								class="whitespace-nowrap inline"
-								x-show="passageNum > 0"
-								x-text="'Passage #' + passageNum + ' • '"
-								x-init={`
-									$watch('hasPreviewVerse', () => {
-										if (hasPreviewVerse && isOffWeek) {
-											$el.innerText = 'Off Week Review • '
-										}
-									})
-								`.trim()}
+								class="cursor-pointer whitespace-nowrap inline"
+								x-show="passageNum > 0 && !isOffWeek"
+								x-text="'Passage #' + passageNum"
 							>
 								Passage #--
 							</p>
 							<p
-								class="whitespace-nowrap inline"
+								class="text-sm pointer-events-none px-3 py-1 whitespace-nowrap inline rounded-box bg-blue-100 text-blue-600"
+								x-show="isOffWeek"
+								x-cloak
+								x-transition
+							>
+								Off Week Review
+							</p>
+							<p x-show="passageNum > 0" x-cloak x-transition>{' • '}</p>
+							<p
+								class="pointer-events-none whitespace-nowrap inline"
 								x-text="daysUntilNextVerse + ' days until next verse'"
 							>
 								Next verse coming on
