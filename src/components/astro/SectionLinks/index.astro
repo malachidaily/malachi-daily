@@ -45,15 +45,31 @@
         Malachi Daily
       </a>
     </li>
-    <li class="leading-3 flex items-center">
+    <li
+      class="leading-3 flex items-center"
+      x-cloak
+      x-show="!isPWAInstalled && !isUsingArcBrowser"
+    >
       <button
         class="link whitespace-nowrap text-xs"
-        x-cloak
-        x-show="!isPWAInstalled && !isUsingArcBrowser"
         x-on:click="showPWAInstallDrawer()"
       >
         Install the App
       </button>
+    </li>
+    <!-- Show rate the app once it's been installed -->
+    <li 
+      class="leading-3 flex items-center"
+      x-cloak
+      x-show="isPWAInstalled"
+    >
+      <a
+        class="link whitespace-nowrap text-xs"
+        href="https://store.app/app-malachidaily-com?utm_source=app-malachidaily-com"
+        target="_blank"
+      >
+        Rate the App
+      </a>
     </li>
     
 
