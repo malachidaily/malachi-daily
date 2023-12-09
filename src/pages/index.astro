@@ -624,9 +624,8 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							// This allows the card to update anytime the verse changes,
 							// so that it can have animation abilities (thanks, flexbox... lol)
 							$watch('scriptureRef', () => {
-								setTimeout(() => {
-									getAndSetCardWidth($el);	
-								}, 300);
+								clearInlineHeightAndWidth();
+								getAndSetCardWidth($el);	
 							});
 
 							// https://alpinejs.dev/magics/watch
@@ -655,6 +654,12 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								$el.classList.remove('!w-screen');
 								$el.classList.remove('!h-[100svh]');
 								$el.classList.remove('!w-[100svw]');
+							},
+							clearInlineHeightAndWidth() {
+								$el.style.height = '';
+								$el.style.width = '';
+								this.intrinsicHeight = 0;
+								this.intrinsicWidth = 0;
 							},
 							getAndSetCardWidth(cardElement = $el) {
 								if (this.isFullscreen) {
