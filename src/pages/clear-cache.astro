@@ -1,0 +1,9 @@
+---
+import { clearCache } from '../api/index';
+
+// This makes it where the server cache gets
+// reset for any reason I may need that to happen.
+clearCache();
+
+return Astro.redirect('/');
+---
