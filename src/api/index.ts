@@ -14,9 +14,9 @@ type FetchCache = {
 }
 
 export async function fetchAndCache({
-    url, 
-    cacheKey, 
-    options, 
+    url,
+    cacheKey,
+    options,
     maxCacheDurationInMilliseconds = ONE_DAY_IN_MILLISECONDS
 } : FetchCache): Promise<any> {
     const cachedResponse = cache[cacheKey]
