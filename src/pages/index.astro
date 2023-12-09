@@ -601,54 +601,55 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					class="rounded-md text-start max-sm:mx-[-24px]"
 				>
 					<div
-						class="surface-primary p-6 flex justify-center items-center rounded-xl shadow-xl max-sm:shadow-sm max-sm:rounded-3xl transition-[height] duration-300"
+						class="surface-primary p-6 flex justify-center items-center rounded-xl shadow-xl max-sm:shadow-sm max-sm:rounded-3xl transition-[height] duration-500"
 						x-ref="scriptureCard"
 						x-clear
+						x-on:resize.window="getAndSetCardWidth($el)"
 						x-init={`
 							// https://alpinejs.dev/directives/init#next-tick
 							$nextTick(() => {
-								document.body.classList.add('transition');
-
-								// I have to manually listen to resizes so that I can get and set 
-								// the scripture card's dimensions for animation's sake.
-								window.addEventListener('resize', () => {
-									getAndSetCardWidth($el)
-								}, { passive: true });
-
 								// Hack to allow the event loop to allow the UI to render
 								// before setting the card's width.
 								setTimeout(() => {
 									getAndSetCardWidth($el);
 								}, 0);
-
-								// When the showSerifFont state changes, update the localStorage
-								$watch('showSerifFont', () => {
-									localStorage.setItem('showSerifFont', showSerifFont);
-									getAndSetCardWidth($el);
-								})
-
-								// This allows the card to update anytime the verse changes,
-								// so that it can have animation abilities (thanks, flexbox... lol)
-								$watch('scriptureRef', () => {
-									resetCardInlineHeightAndWidth();
-									setTimeout(() => {
-										getAndSetCardWidth($el);	
-									}, 300);
-								}, { passive: true })
 							})
+
+							// When the showSerifFont state changes, update the localStorage
+							$watch('showSerifFont', () => {
+								localStorage.setItem('showSerifFont', showSerifFont);
+								getAndSetCardWidth($el);
+							});
+
+							// This allows the card to update anytime the verse changes,
+							// so that it can have animation abilities (thanks, flexbox... lol)
+							$watch('scriptureRef', () => {
+								setTimeout(() => {
+									getAndSetCardWidth($el);	
+								}, 300);
+							});
 
 							// https://alpinejs.dev/magics/watch
 							$watch('bibleVersionPreference', (prevVal, newVal) => {
+								if (prevVal === newVal) {
+									return;
+								}
+
 								getAndSetCardWidth($el);
-							})
+							});
 						`.trim()}
 						x-data={`{ 
+							ANIMATION_DURATION: 500,
+							intrinsicHeight: 0,
+							intrinsicWidth: 0,
 							toggleAllowDocumentScroll() {
 								document.body.classList.toggle('overflow-hidden');
 							},
 							resetCardInlineHeightAndWidth() {
-								$el.style.height = '';
-								$el.style.width = '';
+								if (this.intrinsicHeight && this.intrinsicWidth) {
+									$el.style.height = this.intrinsicHeight + 'px';
+									$el.style.width = this.intrinsicWidth + 'px';
+								}
 								$el.classList.add('w-full');
 								$el.classList.remove('!h-screen');
 								$el.classList.remove('!w-screen');
@@ -659,7 +660,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								if (this.isFullscreen) {
 									return;
 								}
-								
+
 								this.resetCardInlineHeightAndWidth();
 
 								setTimeout(() => {
@@ -670,31 +671,40 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 									if (!height || !width) {
 										return;
 									}
+
+									this.intrinsicHeight = height;
+									this.intrinsicWidth = width;
 	
 									// Setting the height and width of the element allow for it
 									// to animate properly using CSS transitions.
 									cardElement.style.height = height + 'px';
 									cardElement.style.width = width + 'px';
-								}, 1000);
+								}, this.ANIMATION_DURATION);
 							},
 							handleShowFullscreen() {
+								window.scrollTo({
+									top: 0,
+									behavior: "smooth",
+								});
+
 								this.toggleAllowDocumentScroll();
+								
 								$el.classList.add('!h-screen');
 								$el.classList.add('!w-screen');
 								$el.classList.add('!h-[100svh]');
 								$el.classList.add('!w-[100svw]');
 
-								window.scrollTo({
-									top: 0,
-									behavior: "smooth",
-								})
+								$el.style.height = '100svh';
+								$el.style.width = '100svw';
 								
 								this.isFullscreen = true;
 							},
 							handleHideFullscreen() {
 								this.toggleAllowDocumentScroll();
-								const ANIMATION_DURATION = 300
 								this.resetCardInlineHeightAndWidth();
+
+								const ANIMATION_DURATION = 300
+								
 								this.isFullscreen = false;
 
 								// Allow the close animation to play fully
