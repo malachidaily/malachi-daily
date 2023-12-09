@@ -7,6 +7,7 @@ import logoImgUrl from "../../public/logo.png";
 import { backupVerse } from "../utils/constants";
 import NativeFeelingDrawer from "../components/react/NativeFeelingDrawer";
 import SectionLinks from "../components/astro/SectionLinks/index.astro";
+import LinkListItem from '../components/astro/list/LinkListItem.astro';
 import {
 	type BibleVersesFromMultipleTranslations,
 	getBibleVersesFromMultipleTranslations,
@@ -1049,27 +1050,27 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 				</div>
 
 				<!-- More Actions Bible Verse -->
-				<ul class="menu text-primary menu-lg surface-primary w-full rounded-box" x-transition x-show="Boolean(hasPreviewVerse)" x-cloak>
-					<li class="!bg-[inherit] text-primary !text-[inherit]">
+				<ul class="menu text-primary pr-2 menu-lg surface-primary w-full rounded-box" x-transition x-show="Boolean(hasPreviewVerse)" x-cloak>
+					<li class="w-full !bg-[inherit] text-primary !text-[inherit]" role="button">
 						<a 
-							class="flex gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 active:!brightness-85"
+							class="flex flex-nowrap gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
 							x-show="isScheduledVerse"
 							x-bind:href="malachiDailyBlogUrl"
 							target="_blank"
-							x-html="'Learn the context of ' + scriptureRef + iconRightArrowSVG"
 						>
-							Learn Context
+							<span class="flex items-center gap-2" x-html="iconArticle + 'Learn the context of ' + scriptureRef"></span>
+							<span x-html="iconRightArrowSVG"></span>
 						</a>
 					</li>
-					<div class="ml-2 bg-gray-200 dark:bg-gray-600 h-[2px] w-full" role="separator" />
-					<li class="!bg-[inherit] text-primary !text-[inherit]">
+					<div class="ml-2 bg-gray-100 dark:bg-gray-600 h-[2px] w-full" role="separator" />
+					<li class="w-full !bg-[inherit] text-primary !text-[inherit]" role="button">
 						<a 
-							class="flex gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 active:!brightness-85"
+							class="flex gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
 							x-bind:href="bibleDotComUrl"
 							target="_blank"
-							x-html="'Read ' + (scriptureRef ? scriptureRef.split(':')[0] : '') + ' on Bible.com' + iconRightArrowSVG"
 						>
-							Read Full Chapter
+							<span class="flex items-center gap-2" x-html="iconYVBible + 'Read ' + (scriptureRef ? scriptureRef.split(':')[0] : '') + ' on Bible.com'"></span>
+							<span x-html="iconRightArrowSVG"></span>
 						</a>
 					</li>
 				</ul>
@@ -1485,6 +1486,8 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 						}
 					})
 				},
+				iconArticle: '<svg class="text-muted inline-flex" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zm4 2h10M7 12h10M7 16h10"/></svg>',
+				iconYVBible: '<svg class="text-muted inline-flex" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.344 21.836c-1.31-.177-2.567-.574-3.587-1.593-1.019-1.02-1.416-2.276-1.593-3.587C2 15.432 2 13.905 2 12.132v-.264c0-1.773 0-3.3.164-4.524.177-1.31.574-2.567 1.593-3.587 1.02-1.019 2.276-1.416 3.587-1.593C8.568 2 10.095 2 11.868 2h.264c1.773 0 3.3 0 4.524.164 1.31.177 2.567.574 3.587 1.593 1.019 1.02 1.416 2.276 1.593 3.587C22 8.568 22 10.095 22 11.868v.264c0 1.773 0 3.3-.164 4.524-.177 1.31-.574 2.567-1.593 3.587-1.02 1.019-2.276 1.416-3.587 1.593-1.224.164-2.751.164-4.524.164h-.264c-1.773 0-3.3 0-4.524-.164ZM5.172 5.172C4 6.343 4 8.229 4 12c0 3.771 0 5.657 1.172 6.828C6.343 20 8.229 20 12 20c3.771 0 5.657 0 6.828-1.172C20 17.657 20 15.771 20 12c0-3.771 0-5.657-1.172-6.828C17.657 4 15.771 4 12 4 8.229 4 6.343 4 5.172 5.172Z" fill="currentColor"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M7.978 18h6.404c1.317 0 2.169.057 2.956-.861.676-.782.62-2.097.662-3.139-.762 1.323-2.161 1.278-3.242 1.278H7.095c-1.89.004-1.163 2.721.883 2.721Z" fill="currentColor"></path></svg>',
 				iconRightArrowSVG: '<svg class="text-muted" width="24px" height="24px" stroke-width="2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
 				showDebug: (() => {
 					// Get url param debug = true
