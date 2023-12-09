@@ -1,8 +1,13 @@
 import { Drawer } from 'vaul';
 
-function NativeFeelingDrawer({ children }) {
+// This makes it where the drawer doesn't focus the outline on the trigger button.
+function blurOnClose() {
+  document.documentElement.blur();
+}
+
+function NativeFeelingDrawer({ children } : { children: React.ReactNode }) {
   return (
-    <Drawer.Root shouldScaleBackground={true}>
+    <Drawer.Root onClose={blurOnClose} shouldScaleBackground={true}>
       <Drawer.Trigger asChild>
         <button title="Open Settings" x-ref="settingsDrawerBtn">
           <svg className="text-muted flex-shrink-0" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

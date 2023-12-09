@@ -394,7 +394,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 									></path>
 								</svg>
 							</button>
-							<NativeFeelingDrawer client:idle>
+							<NativeFeelingDrawer client:load>
 								<div class="flex flex-col gap-2">
 									<div class="form-control w-full max-w-xs mb-2">
 										<label class="label">
@@ -688,9 +688,11 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 									top: 0,
 									behavior: "smooth",
 								})
+								
 								this.isFullscreen = true;
 							},
 							handleHideFullscreen() {
+								this.toggleAllowDocumentScroll();
 								const ANIMATION_DURATION = 300
 								this.resetCardInlineHeightAndWidth();
 								this.isFullscreen = false;
