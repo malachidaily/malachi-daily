@@ -732,11 +732,14 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 										<div
 											class="flex flex-wrap gap-2 items-baseline text-beautiful-gradient"
 										>
-											<h1 x-text="scriptureRef" class="text-xl font-medium">
+											<h1 x-text="scriptureRef" class="text-lg font-medium">
 												{scriptureRef}
 											</h1>
 											<span
-												class="text-xl font-medium cursor-pointer"
+												role="button"
+												tabindex="0"
+												@keyup.enter="$refs.settingsDrawerBtn.click();"
+												class="text-lg font-medium cursor-pointer"
 												x-on:click="$refs.settingsDrawerBtn.click();"
 												x-text="bibleVersionPreference"></span>
 											<div
