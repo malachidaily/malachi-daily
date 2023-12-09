@@ -8,47 +8,47 @@ export type bibleVersion = typeof selectedBibleVersions[number]
 export const bibleVersionData: { [key in bibleVersion]: { readableName: string, attribution: string, language: 'es' | 'en' } } = {
     "NIV": {
         language: 'en',
-        readableName: "NIV - New International Version",
+        readableName: "NIV - New International Version - English",
         attribution: "Scriptures taken from the Holy Bible, New International Version®, NIV®. Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.™ Used by permission of Zondervan. All rights reserved worldwide. www.zondervan.com The “NIV” and “New International Version” are trademarks registered in the United States Patent and Trademark Office by Biblica, Inc.™"
     },
     "ESV": {
         language: 'en',
-        readableName: "ESV - English Standard Version",
+        readableName: "ESV - English Standard Version - English",
         attribution: "Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved."
     },
     "NLT": {
         language: 'en',
-        readableName: "NLT - New Living Translation",
+        readableName: "NLT - New Living Translation - English",
         attribution: "Scripture quotations are taken from the Holy Bible, New Living Translation, copyright ©1996, 2004, 2015 by Tyndale House Foundation. Used by permission of Tyndale House Publishers, Carol Stream, Illinois 60188. All rights reserved."
     },
     "KJV": {
         language: 'en',
-        readableName: "KJV - King James Version",
+        readableName: "KJV - King James Version - English",
         attribution: "Rights in the Authorized (King James) Version in the United Kingdom are vested in the Crown. Published by permission of the Crown’s patentee, Cambridge University Press."
     },
     "MSG": {
         language: 'en',
-        readableName: "MSG - The Message",
+        readableName: "MSG - The Message - English",
         attribution: "All Scripture quotations are taken from The Message, copyright © 1993, 2002, 2018 by Eugene H. Peterson. Used by permission of NavPress. . All rights reserved. Represented by Tyndale House Publishers."
     },
     "NET": {
-        language: 'es',
-        readableName: 'NET - New English Translation',
+        language: 'en',
+        readableName: "NET - New English Translation - English",
         attribution: "The Scriptures quoted are from the NET Bible ® https://netbible.com copyright ©1996, 2019 used with permission from Biblical Studies Press, L.L.C. All rights reserved",
     },
     "RV1960": {
         language: 'es',
-        readableName: "RV1960 - Reina Valera 1960",
+        readableName: "RV1960 - Reina Valera 1960 - Spanish",
         attribution: "© Sociedades Bíblicas Unidas, 1960. Todos los derechos reservados. Sociedades Bíblicas Unidas (SBU): https://unitedbiblesocieties.org/es/casa/"
     },
     "NVI": {
         language: 'es',
-        readableName: "NVI - Nueva Versión Internacional",
+        readableName: "NVI - Nueva Versión Internacional - Spanish",
         attribution: "Nueva Versión Internacional® © 2015 por Biblica, Inc.® Todos los derechos reservados. Biblica, Inc.: https://www.biblica.com/"
     },
     "NTV": {
         language: 'es',
-        readableName: "NTV - Nueva Traducción Viviente",
+        readableName: "NTV - Nueva Traducción Viviente - Spanish",
         attribution: "Nueva Traducción Viviente® © 2010 Tyndale House Foundation.® Todos los derechos reservados. Tyndale House Foundation: https://www.tyndale.com/"
     }
 }
@@ -122,6 +122,11 @@ type SpanishBookName = "Génesis" |
     "Judas" |
     "Apocalipsis" |
     "Salmo"
+
+export type BookNameByLanguage = {
+    "en": BookName,
+    "es": SpanishBookName
+}
 
 export type Book = {
     bookid: number;
