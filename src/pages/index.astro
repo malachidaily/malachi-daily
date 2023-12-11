@@ -1370,6 +1370,12 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 				get isScheduledVerse() {
 					return this.passageNum;
 				},
+				resetScriptureHTMLCache() {
+					// Delete existing properties in scriptureHTMLCache
+					Object.keys(this.scriptureHTMLCache).forEach((key: string) => {
+						delete this.scriptureHTMLCache[Number(key)];
+					});
+				},
 				get malachiDailyBlogUrl() {
 					const url = new URL(MALACHI_BLOG_URL);
 					url.searchParams.set("q", this.scriptureRef);
@@ -1496,6 +1502,12 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							localStorage.removeItem('offWeekScriptureRef');
 							localStorage.removeItem('offWeekScriptureVersesObj');
 						}
+					})
+
+					// This is like garbage collection for the expensive operation to get underscores
+					// for a verse.
+					alpineState.$watch('scriptureRef', () => {
+						this.resetScriptureHTMLCache();
 					})
 				},
 				iconArticle: '<svg class="text-muted inline-flex" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zm4 2h10M7 12h10M7 16h10"/></svg>',
@@ -1637,7 +1649,12 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 				get scriptureWithUnderscores() {
 					return document.getElementById("verse-current")?.innerText || "";
 				},
+				scriptureHTMLCache: {} as {[key in number]: string},
 				get scriptureText() {
+					if (this.scriptureHTMLCache[this.fidelity]) {
+						return this.scriptureHTMLCache[this.fidelity];
+					}
+					
 					// Replace some words from the original with underscores for each character
 					// but do so where we replace more and more words as fidelity grows
 					// when fideltiy is at 0, we just return the original
@@ -1815,7 +1832,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 						`.trim();
 					}
 
-					return words
+					const wordsHTML = words
 						.map((word: string, index: number) => {
 							const fidelityAsNumber: number = Number(this.fidelity);
 
@@ -1858,6 +1875,10 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							return word;
 						})
 						.join(" ");
+
+					this.scriptureHTMLCache[this.fidelity] = wordsHTML;
+
+					return wordsHTML
 				},
 			}));
 		});
