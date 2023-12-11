@@ -1509,6 +1509,12 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					alpineState.$watch('scriptureRef', () => {
 						this.resetScriptureHTMLCache();
 					})
+					alpineState.$watch('showFirstLetter', () => {
+						this.resetScriptureHTMLCache();
+					})
+					alpineState.$watch('shouldRandomizeOrderOfHiddenWords', () => {
+						this.resetScriptureHTMLCache();
+					})
 				},
 				iconArticle: '<svg class="text-muted inline-flex" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zm4 2h10M7 12h10M7 16h10"/></svg>',
 				iconYVBible: '<svg class="text-muted inline-flex" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.344 21.836c-1.31-.177-2.567-.574-3.587-1.593-1.019-1.02-1.416-2.276-1.593-3.587C2 15.432 2 13.905 2 12.132v-.264c0-1.773 0-3.3.164-4.524.177-1.31.574-2.567 1.593-3.587 1.02-1.019 2.276-1.416 3.587-1.593C8.568 2 10.095 2 11.868 2h.264c1.773 0 3.3 0 4.524.164 1.31.177 2.567.574 3.587 1.593 1.019 1.02 1.416 2.276 1.593 3.587C22 8.568 22 10.095 22 11.868v.264c0 1.773 0 3.3-.164 4.524-.177 1.31-.574 2.567-1.593 3.587-1.02 1.019-2.276 1.416-3.587 1.593-1.224.164-2.751.164-4.524.164h-.264c-1.773 0-3.3 0-4.524-.164ZM5.172 5.172C4 6.343 4 8.229 4 12c0 3.771 0 5.657 1.172 6.828C6.343 20 8.229 20 12 20c3.771 0 5.657 0 6.828-1.172C20 17.657 20 15.771 20 12c0-3.771 0-5.657-1.172-6.828C17.657 4 15.771 4 12 4 8.229 4 6.343 4 5.172 5.172Z" fill="currentColor"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M7.978 18h6.404c1.317 0 2.169.057 2.956-.861.676-.782.62-2.097.662-3.139-.762 1.323-2.161 1.278-3.242 1.278H7.095c-1.89.004-1.163 2.721.883 2.721Z" fill="currentColor"></path></svg>',
