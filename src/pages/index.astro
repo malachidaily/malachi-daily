@@ -1053,7 +1053,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 				</div>
 
 				<!-- More Actions Bible Verse -->
-				<ul class="menu text-primary pr-2 menu-lg surface-primary w-full rounded-box" x-transition x-show="Boolean(hasPreviewVerse)" x-cloak>
+				<ul class="menu text-primary pr-2 menu-lg surface-primary w-full rounded-box" x-transition x-show="Boolean(hasPreviewVerse || !isOffWeek)" x-cloak>
 					<li class="w-full !bg-[inherit] text-primary !text-[inherit]" role="button">
 						<a 
 							class="flex flex-nowrap gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
