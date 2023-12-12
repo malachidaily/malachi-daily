@@ -1835,7 +1835,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 									x-on:resize.window="recalculateWidth()"
 									x-on:blur="calculateResults()"
 									x-on:input="validateWord()"
-									x-on:focus="$el.innerText = ''"
+									x-on:focus="$el.innerText = ''; wordIsCorrect = false;"
 								>${underscores}</span>
 							`.trim();
 						};
