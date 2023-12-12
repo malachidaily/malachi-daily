@@ -1786,7 +1786,13 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 											}
 										},
 										wordIsCorrect: false,
-										validateWord() {
+										validateWord(event) {
+											// Allow user to press spacebar without it affecting anything.
+											if (event.data === ' ') {
+												// Remove the last character from $el.innerText
+												$el.innerText = $el.innerText.slice(0, -1);
+											}
+
 											if ($el.innerText.length >= this.correctWord.length) {
 												this.hideWordIsCorrect();
 												this.hideWordIsIncorrect();
@@ -1834,7 +1840,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 									"
 									x-on:resize.window="recalculateWidth()"
 									x-on:blur="calculateResults()"
-									x-on:input="validateWord()"
+									x-on:input="validateWord(event)"
 									x-on:focus="$el.innerText = ''; wordIsCorrect = false;"
 								>${underscores}</span>
 							`.trim();
