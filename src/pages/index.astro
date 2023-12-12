@@ -1512,6 +1512,9 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					this.$watch('scriptureRef', () => {
 						this.resetScriptureHTMLCache();
 					})
+					this.$watch('bibleVersionPreference', () => {
+						this.resetScriptureHTMLCache();
+					})
 					this.$watch('showFirstLetter', () => {
 						this.resetScriptureHTMLCache();
 					})
@@ -1728,10 +1731,31 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 											// Get where data-solved exists
 											const words = Array.from(document.querySelectorAll('[data-solved]'));
 											if (words.length + 1 === this.numOfWordsToGuess) {
-												window.confetti({
-													particleCount: 150,
-													spread: 100
-												});
+												const duration = 3 * 1000;
+												const end = Date.now() + duration;
+
+												(function frame() {
+													// launch a few confetti from the left edge
+													confetti({
+														particleCount: 7,
+														angle: 60,
+														spread: 55,
+														origin: { x: 0 }
+													});
+
+													// and launch a few from the right edge
+													confetti({
+														particleCount: 7,
+														angle: 120,
+														spread: 55,
+														origin: { x: 1 }
+													});
+
+													// keep going until we are out of time
+													if (Date.now() < end) {
+														requestAnimationFrame(frame);
+													}
+												}());
 											}
 										},
 										get hiddenWordElsAsArray() {
