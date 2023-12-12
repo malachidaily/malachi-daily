@@ -1493,15 +1493,14 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					}, 500);
 
 					// Display the off week scripture when it's an off week.
-					const alpineState: AlpineComponent<any> = window.Alpine.$data(document.documentElement);
-					alpineState.$watch('isOffWeek', () => {
+					this.$watch('isOffWeek', () => {
 						// If it's an off week, set the review scripture ref to what's been set.
-						if (this.isOffWeek && offWeekScriptureRef && offWeekScriptureVersesObj) {
+						if (this.isOffWeek && offWeekScriptureRef && offWeekScriptureVersesObj && this.daysUntilNextVerse !== 7) {
 							this.scriptureRef = offWeekScriptureRef;
 							this.versesObj = offWeekScriptureVersesObj;
 							this.hasPreviewVerse = true;
 							this.fidelity = 0;
-						} else if (offWeekScriptureRef && offWeekScriptureVersesObj) {
+						} else if ((!this.isOffWeek && offWeekScriptureRef && offWeekScriptureVersesObj) || (this.daysUntilNextVerse === 7)) {
 							// Remove the off week data when it's an on week.
 							localStorage.removeItem('offWeekScriptureRef');
 							localStorage.removeItem('offWeekScriptureVersesObj');
@@ -1510,13 +1509,13 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 
 					// This is like garbage collection for the expensive operation to get underscores
 					// for a verse.
-					alpineState.$watch('scriptureRef', () => {
+					this.$watch('scriptureRef', () => {
 						this.resetScriptureHTMLCache();
 					})
-					alpineState.$watch('showFirstLetter', () => {
+					this.$watch('showFirstLetter', () => {
 						this.resetScriptureHTMLCache();
 					})
-					alpineState.$watch('shouldRandomizeOrderOfHiddenWords', () => {
+					this.$watch('shouldRandomizeOrderOfHiddenWords', () => {
 						this.resetScriptureHTMLCache();
 					})
 				},
