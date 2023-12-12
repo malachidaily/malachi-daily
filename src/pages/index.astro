@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 
 import Layout from "../layouts/Layout.astro";
+import SelectPreviousVerse from '../components/astro/SelectPreviousVerse/index.astro';
 import OffWeek from "../layouts/sections/OffWeek.astro";
 import logoImgUrl from "../../public/logo.png";
 import { backupVerse } from "../utils/constants";
@@ -1086,6 +1087,9 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 						</a>
 					</li>
 				</ul>
+
+				<!-- Select Previous Verse -->
+				<SelectPreviousVerse />
 
 				<!-- Notification Alert -->
 				<div
