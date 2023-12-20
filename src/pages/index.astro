@@ -18,6 +18,7 @@ import {
 	type bibleVersion,
 	selectedBibleVersions,
 	bibleVersionData,
+	bibleVersionsByLanguage,
 } from "../api/bible/static/books";
 import { getAllVerses, verseTableHeaders } from "../api/verses";
 
@@ -414,15 +415,21 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 											x-on:change="localStorage.setItem('bibleVersionPreference', JSON.stringify($el.value));"
 										>
 											{
-												selectedBibleVersions.map((bibleVersion) => (
-													<option
-														value={bibleVersion}
-														x-bind:selected={`'${bibleVersion}' === bibleVersionPreference`}
-													>
-														{bibleVersionData?.[bibleVersion]?.readableName ||
-															bibleVersion}
-													</option>
-												))
+												Object.keys(bibleVersionsByLanguage).map((languageKey: string) => {
+													return (
+														<optgroup label={bibleVersionsByLanguage[languageKey].readableName}>
+															{bibleVersionsByLanguage[languageKey].versions.map((bibleVersionKey) => (
+																<option
+																	value={bibleVersionKey}
+																	x-bind:selected={`'${bibleVersionKey}' === bibleVersionPreference`}
+																>
+																	{bibleVersionData?.[bibleVersionKey]?.readableName ||
+																		bibleVersionKey}
+																</option>
+															))}
+														</optgroup>
+													)
+												})
 											}
 										</select>
 									</div>

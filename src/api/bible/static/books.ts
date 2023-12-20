@@ -3,6 +3,22 @@
 const englishBibleVersions = ["NIV", "ESV", "NLT", "KJV", "MSG", "NET"];
 const spanishBibleVersions = ["RV1960", "NVI", "NTV"];
 
+type BibleVersionsByLanguage = {
+    [key: string]: {
+        versions: readonly string[],
+        readableName: string
+    };
+};
+export const bibleVersionsByLanguage: BibleVersionsByLanguage = {
+    'en': {
+        versions: englishBibleVersions,
+        readableName: 'English Bible Versions'
+    },
+    'es': {
+        versions: spanishBibleVersions,
+        readableName: 'Spanish Bible Versions'
+    }
+}
 export const selectedBibleVersions: readonly string[] = [...englishBibleVersions, ...spanishBibleVersions] as const
 export type bibleVersion = typeof selectedBibleVersions[number]
 export const bibleVersionData: { [key in bibleVersion]: { readableName: string, attribution: string, language: 'es' | 'en' } } = {
