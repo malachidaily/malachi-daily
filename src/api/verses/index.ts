@@ -14,7 +14,8 @@ export const verseTableHeaders = {
   pastStartDate: 'Past Start Date',
   passageNumber: 'Passage Num',
   previewVerse: 'Preview Verse',
-  readableVerseRef: 'Verse Ref'
+  readableVerseRef: 'Verse Ref',
+  bibleProjectLink: 'BibleProject Guide'
 }
 
 export async function getAllVerses({

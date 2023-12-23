@@ -146,6 +146,7 @@ const bookId = books[bookName].bookid;
 const chapter = Number(verseToUse.Chapter);
 const verseNum = Number(verseToUse[verseTableHeaders.verseNumberStart]);
 const verseNumEnd = Number(verseToUse[verseTableHeaders.verseNumberEnd]);
+const bibleProjectLink = verseToUse[verseTableHeaders.bibleProjectLink] || '';
 
 // Allow user to get multiple verses at once
 const verseNums: number[] = [];
@@ -271,6 +272,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 			chapter = ${chapter};
 			isOffWeek = ${isOffWeek};
 			daysUntilNextVerse = '${nextVerseComesInDays}';
+			bibleProjectLink = '${bibleProjectLink}';
 
 			$watch('daysUntilNextVerse', () => {
 				// While it looks like it's searching for 6 days, it's actually 7.
@@ -1065,35 +1067,52 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 				</div>
 
 				<!-- OffWeek Section -->
-				<div x-cloak x-transition x-show="isOffWeek" class="w-full max-sm:mt-8">
+				<div x-cloak x-transition x-show="isOffWeek && !hasPreviewVerse" class="w-full max-sm:mt-8">
 					<OffWeek nextVerseComesInDays={nextVerseComesInDays} />
 				</div>
 
-				<!-- More Actions Bible Verse -->
-				<ul class="menu text-primary pr-2 menu-lg surface-primary w-full rounded-box" x-transition x-show="Boolean(hasPreviewVerse || !isOffWeek)" x-cloak>
-					<li class="w-full !bg-[inherit] text-primary !text-[inherit]" role="button">
-						<a 
-							class="flex flex-nowrap gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
-							x-show="isScheduledVerse"
-							x-bind:href="malachiDailyBlogUrl"
-							target="_blank"
-						>
-							<span class="flex items-center gap-2" x-html="iconArticle + 'Learn the context of ' + scriptureRef"></span>
-							<span x-html="iconRightArrowSVG"></span>
-						</a>
-					</li>
-					<div class="ml-2 bg-gray-100 dark:bg-gray-600 h-[2px] w-full" role="separator" />
-					<li class="w-full !bg-[inherit] text-primary !text-[inherit]" role="button">
-						<a 
-							class="flex gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
-							x-bind:href="bibleDotComUrl"
-							target="_blank"
-						>
-							<span class="flex items-center gap-2" x-html="iconYVBible + 'Read ' + (scriptureRef ? scriptureRef.split(':')[0] : '') + ' on Bible.com'"></span>
-							<span x-html="iconRightArrowSVG"></span>
-						</a>
-					</li>
-				</ul>
+				<div class="flex flex-col gap-2">
+					<h3 class="text-base uppercase font-medium text-muted">Dig Deeper</h3>
+
+					<!-- More Actions Bible Verse -->
+					<ul class="menu text-primary pr-2 menu-lg surface-primary w-full rounded-box" x-transition x-show="Boolean(hasPreviewVerse || !isOffWeek)" x-cloak>
+						<!-- Blog -->
+						<li class="w-full !bg-[inherit] text-primary !text-[inherit]" role="button">
+							<a 
+								class="flex flex-nowrap gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
+								x-show="isScheduledVerse"
+								x-bind:href="malachiDailyBlogUrl"
+								target="_blank"
+							>
+								<span class="flex items-center gap-2" x-html="iconArticle + 'Learn the context of ' + scriptureRef"></span>
+								<span x-html="iconRightArrowSVG"></span>
+							</a>
+						</li>
+						<div class="ml-2 bg-gray-100 dark:bg-gray-600 h-[2px] w-full" role="separator" />
+						<!-- Bible.com -->
+						<li class="w-full !bg-[inherit] text-primary !text-[inherit]" role="button">
+							<a 
+								class="flex gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
+								x-bind:href="bibleDotComUrl"
+								target="_blank"
+							>
+								<span class="flex items-center gap-2" x-html="iconYVBible + 'Read ' + (scriptureRef ? scriptureRef.split(':')[0] : '') + ' on Bible.com'"></span>
+								<span x-html="iconRightArrowSVG"></span>
+							</a>
+						</li>
+						<div class="ml-2 bg-gray-100 dark:bg-gray-600 h-[2px] w-full" role="separator" x-show="bibleProjectLink" x-transition x-cloak />
+						<li class="w-full !bg-[inherit] text-primary !text-[inherit]" role="button" x-show="bibleProjectLink" x-transition x-cloak>
+							<a 
+								class="flex gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
+								x-bind:href="bibleProjectLink"
+								target="_blank"
+							>
+								<span class="flex items-center gap-2" x-html={`iconBibleProject + "Read BibleProject's Guide on " + (scriptureRef ? scriptureRef.split(':')[0] : '')`}></span>
+								<span x-html="iconRightArrowSVG"></span>
+							</a>
+						</li>
+					</ul>
+				</div>
 
 				<!-- Select Previous Verse -->
 				<SelectPreviousVerse />
@@ -1349,6 +1368,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 		document.addEventListener("alpine:init", () => {
 			const Alpine = window["Alpine"] || {};
 			Alpine.data("malachi", () => ({
+				bibleProjectLink: '',
 				isOffWeek: false,
 				toggleDarkMode: toggleDarkMode,
 				isDarkMode,
@@ -1531,6 +1551,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 				},
 				iconArticle: '<svg class="text-muted inline-flex" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zm4 2h10M7 12h10M7 16h10"/></svg>',
 				iconYVBible: '<svg class="text-muted inline-flex" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.344 21.836c-1.31-.177-2.567-.574-3.587-1.593-1.019-1.02-1.416-2.276-1.593-3.587C2 15.432 2 13.905 2 12.132v-.264c0-1.773 0-3.3.164-4.524.177-1.31.574-2.567 1.593-3.587 1.02-1.019 2.276-1.416 3.587-1.593C8.568 2 10.095 2 11.868 2h.264c1.773 0 3.3 0 4.524.164 1.31.177 2.567.574 3.587 1.593 1.019 1.02 1.416 2.276 1.593 3.587C22 8.568 22 10.095 22 11.868v.264c0 1.773 0 3.3-.164 4.524-.177 1.31-.574 2.567-1.593 3.587-1.02 1.019-2.276 1.416-3.587 1.593-1.224.164-2.751.164-4.524.164h-.264c-1.773 0-3.3 0-4.524-.164ZM5.172 5.172C4 6.343 4 8.229 4 12c0 3.771 0 5.657 1.172 6.828C6.343 20 8.229 20 12 20c3.771 0 5.657 0 6.828-1.172C20 17.657 20 15.771 20 12c0-3.771 0-5.657-1.172-6.828C17.657 4 15.771 4 12 4 8.229 4 6.343 4 5.172 5.172Z" fill="currentColor"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M7.978 18h6.404c1.317 0 2.169.057 2.956-.861.676-.782.62-2.097.662-3.139-.762 1.323-2.161 1.278-3.242 1.278H7.095c-1.89.004-1.163 2.721.883 2.721Z" fill="currentColor"></path></svg>',
+				iconBibleProject: '<svg width="24" height="24" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.3265 47.3995L6.31425 49.2954C6.11543 49.3345 6.01601 49.2528 6.01601 49.0504L6.00004 6.12543C5.99959 6.10683 6.00338 6.08839 6.01113 6.07148C6.01888 6.05457 6.03037 6.03964 6.04474 6.02784C6.05911 6.01603 6.07598 6.00766 6.09408 6.00334C6.11217 5.99903 6.131 5.99889 6.14916 6.00294C13.9495 7.47283 22.0871 9.00307 30.5621 10.5937C31.5491 10.7783 32.5077 10.7818 33.438 10.6043C41.9839 8.97822 50.0967 7.4533 57.7763 6.02957C57.9254 6.00116 58 6.06152 58 6.21064L57.9947 49.2049C57.995 49.2229 57.9912 49.2408 57.9838 49.2572C57.9764 49.2737 57.9654 49.2883 57.9516 49.3C57.9379 49.3117 57.9217 49.3202 57.9043 49.3249C57.8869 49.3297 57.8687 49.3305 57.8509 49.3274L32.2929 44.5076C32.2151 44.4927 32.1348 44.496 32.0582 44.5173C31.9815 44.5385 31.9106 44.5771 31.8509 44.6301L16.9869 57.9656C16.9647 57.9868 16.9367 58.0009 16.9064 58.0061C16.8762 58.0113 16.8451 58.0073 16.817 57.9948C16.789 57.9822 16.7654 57.9616 16.7492 57.9355C16.733 57.9094 16.7249 57.8791 16.726 57.8485L16.7313 47.735C16.7313 47.4616 16.5964 47.3498 16.3265 47.3995Z" fill="#00B3E5"/></svg>',
 				iconRightArrowSVG: '<svg class="text-muted" width="24px" height="24px" stroke-width="2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
 				showDebug: (() => {
 					// Get url param debug = true
