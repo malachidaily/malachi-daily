@@ -1071,20 +1071,25 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 					<OffWeek nextVerseComesInDays={nextVerseComesInDays} />
 				</div>
 
-				<div class="flex flex-col gap-2">
+				<!-- More Actions Bible Verse -->
+				<section class="flex flex-col gap-2" x-transition x-show="Boolean(hasPreviewVerse || !isOffWeek)" x-cloak>
 					<h3 class="text-base uppercase font-medium text-muted">Dig Deeper</h3>
-
-					<!-- More Actions Bible Verse -->
-					<ul class="menu text-primary pr-2 menu-lg surface-primary w-full rounded-box" x-transition x-show="Boolean(hasPreviewVerse || !isOffWeek)" x-cloak>
+					<ul class="menu text-primary pr-2 menu-lg surface-primary w-full rounded-box">
 						<!-- Blog -->
 						<li class="w-full !bg-[inherit] text-primary !text-[inherit]" role="button">
 							<a 
-								class="flex flex-nowrap gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
+								class="flex items-center flex-nowrap gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
 								x-show="isScheduledVerse"
 								x-bind:href="malachiDailyBlogUrl"
 								target="_blank"
 							>
-								<span class="flex items-center gap-2" x-html="iconArticle + 'Learn the context of ' + scriptureRef"></span>
+								<div class="flex gap-4 items-center">
+									<div x-html="iconArticle"></div>
+									<div>
+										<p class="font-medium" x-text="'Learn the context of ' + scriptureRef"></p>
+										<p class="text-primary  text-muted text-sm" x-show="isOffWeek" x-cloak x-transition>New blog post every day, excluding Off Weeks</p>
+									</div>
+								</div>
 								<span x-html="iconRightArrowSVG"></span>
 							</a>
 						</li>
@@ -1096,7 +1101,12 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								x-bind:href="bibleDotComUrl"
 								target="_blank"
 							>
-								<span class="flex items-center gap-2" x-html="iconYVBible + 'Read ' + (scriptureRef ? scriptureRef.split(':')[0] : '') + ' on Bible.com'"></span>
+								<div class="flex gap-4 items-center">
+									<div x-html="iconYVBible"></div>
+									<div>
+										<p class="text-primary font-medium" x-text="'Read ' + (scriptureRef ? scriptureRef.split(':')[0] : '') + ' on Bible.com'"></p>
+									</div>
+								</div>
 								<span x-html="iconRightArrowSVG"></span>
 							</a>
 						</li>
@@ -1107,15 +1117,22 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								x-bind:href="bibleProjectLink"
 								target="_blank"
 							>
-								<span class="flex items-center gap-2" x-html={`iconBibleProject + "Read BibleProject's Guide on " + (scriptureRef ? scriptureRef.split(':')[0] : '')`}></span>
+								<div class="flex gap-4 items-center">
+									<div x-html="iconBibleProject"></div>
+									<div>
+										<p class="text-primary font-medium" x-text={`"Read BibleProject's Guide on " + (scriptureRef ? scriptureRef.split(':')[0] : '')`}></p>
+									</div>
+								</div>
 								<span x-html="iconRightArrowSVG"></span>
 							</a>
 						</li>
 					</ul>
-				</div>
+				</section>
 
 				<!-- Select Previous Verse -->
-				<SelectPreviousVerse />
+				<div x-cloak x-show="true" x-transition>
+					<SelectPreviousVerse />
+				</div>
 
 				<!-- Notification Alert -->
 				<div
