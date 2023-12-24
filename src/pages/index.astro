@@ -1065,38 +1065,56 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 				</div>
 
 				<!-- OffWeek Section -->
-				<div x-cloak x-transition x-show="isOffWeek" class="w-full max-sm:mt-8">
+				<div x-cloak x-transition x-show="isOffWeek && !hasPreviewVerse" class="w-full max-sm:mt-8">
 					<OffWeek nextVerseComesInDays={nextVerseComesInDays} />
 				</div>
 
 				<!-- More Actions Bible Verse -->
-				<ul class="menu text-primary pr-2 menu-lg surface-primary w-full rounded-box" x-transition x-show="Boolean(hasPreviewVerse || !isOffWeek)" x-cloak>
-					<li class="w-full !bg-[inherit] text-primary !text-[inherit]" role="button">
-						<a 
-							class="flex flex-nowrap gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
-							x-show="isScheduledVerse"
-							x-bind:href="malachiDailyBlogUrl"
-							target="_blank"
-						>
-							<span class="flex items-center gap-2" x-html="iconArticle + 'Learn the context of ' + scriptureRef"></span>
-							<span x-html="iconRightArrowSVG"></span>
-						</a>
-					</li>
-					<div class="ml-2 bg-gray-100 dark:bg-gray-600 h-[2px] w-full" role="separator" />
-					<li class="w-full !bg-[inherit] text-primary !text-[inherit]" role="button">
-						<a 
-							class="flex gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
-							x-bind:href="bibleDotComUrl"
-							target="_blank"
-						>
-							<span class="flex items-center gap-2" x-html="iconYVBible + 'Read ' + (scriptureRef ? scriptureRef.split(':')[0] : '') + ' on Bible.com'"></span>
-							<span x-html="iconRightArrowSVG"></span>
-						</a>
-					</li>
-				</ul>
+				<section class="flex flex-col gap-2" x-transition x-show="Boolean(hasPreviewVerse || !isOffWeek)" x-cloak>
+					<h3 class="text-base uppercase font-medium text-muted">Dig Deeper</h3>
+					<ul class="menu text-primary pr-2 menu-lg surface-primary w-full rounded-box">
+						<!-- Blog -->
+						<li class="w-full !bg-[inherit] text-primary !text-[inherit]" role="button">
+							<a 
+								class="flex items-center flex-nowrap gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
+								x-show="isScheduledVerse"
+								x-bind:href="malachiDailyBlogUrl"
+								target="_blank"
+							>
+								<div class="flex gap-4 items-center">
+									<div x-html="iconArticle"></div>
+									<div>
+										<p class="text-primary font-medium" x-text="'Learn the context of ' + scriptureRef"></p>
+										<p class="text-muted text-sm">New blog post every day, excluding Off Weeks</p>
+									</div>
+								</div>
+								<span x-html="iconRightArrowSVG"></span>
+							</a>
+						</li>
+						<div class="ml-2 bg-gray-100 dark:bg-gray-600 h-[2px] w-full" role="separator" />
+						<!-- Bible.com -->
+						<li class="w-full !bg-[inherit] text-primary !text-[inherit]" role="button">
+							<a 
+								class="flex gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
+								x-bind:href="bibleDotComUrl"
+								target="_blank"
+							>
+								<div class="flex gap-4 items-center">
+									<div x-html="iconYVBible"></div>
+									<div>
+										<p class="text-primary font-medium" x-text="'Read ' + (scriptureRef ? scriptureRef.split(':')[0] : '') + ' on Bible.com'"></p>
+									</div>
+								</div>
+								<span x-html="iconRightArrowSVG"></span>
+							</a>
+						</li>
+					</ul>
+				</section>
 
 				<!-- Select Previous Verse -->
-				<SelectPreviousVerse />
+				<div x-cloak x-show="true" x-transition>
+					<SelectPreviousVerse />
+				</div>
 
 				<!-- Notification Alert -->
 				<div
