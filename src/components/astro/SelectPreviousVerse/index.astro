@@ -48,7 +48,6 @@ const nowAndPastVersesFromApi = await getAllVerses({
                             data-end-verse={
                                 verse[verseTableHeaders.verseNumberEnd]
                             }
-                            data-bible-project-link={verse[verseTableHeaders.bibleProjectLink]}
                             data-book-name={bookName}
                         >
                             {verse[verseTableHeaders.passageNumber]}.{" "}
@@ -130,7 +129,6 @@ const nowAndPastVersesFromApi = await getAllVerses({
                 startVerse,
                 endVerse,
                 bookName = "",
-                bibleProjectLink = "",
             } = selectInputEl.selectedOptions[0].dataset;
 
             const verses = await getSelectedVerse({
@@ -142,7 +140,6 @@ const nowAndPastVersesFromApi = await getAllVerses({
 
             const scriptureRef = `${bookName} ${chapter}:${startVerse}${endVerse ? `-${endVerse}` : ""}`;
 
-            setAlpineState('bibleProjectLink', bibleProjectLink);
             // Add the verses to the versesObj in AlpineJS.
             setAlpineState("versesObj", verses);
             localStorage.setItem('offWeekScriptureVersesObj', JSON.stringify(verses));
