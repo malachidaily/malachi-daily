@@ -1,0 +1,68 @@
+{
+  "name": "Malachi Daily | Simple Scripture Memorization, Together",
+  "short_name": "Malachi Daily",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Open Malachi Daily",
+      "url": "/",
+      "description": "Let's memorize today's verse"
+    }
+  ],
+  "screenshots" : [
+    {
+      "src": "app-screenshot-1.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Homescreen a Bible verse with words hidden"
+    },
+    {
+      "src": "app-screenshot-2.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Full screen focus view of a Bible verse with some words filled out and some hidden"
+    },
+    {
+      "src": "app-screenshot-3.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Homescreen a Bible verse with words hidden, but in dark mode"
+    },
+    {
+      "src": "app-screenshot-4.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Every other week is a week to rest and review, as shown in the screenshot"
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "handle_links": "preferred",
+  "background_color": "#1f2937",
+  "display": "standalone",
+  "gcm_sender_id": "44879717629",
+  "start_url": "https://app.malachidaily.com",
+  "dir": "ltr",
+  "lang": "en",
+  "orientation": "portrait-primary",
+  "categories": ["education", "lifestyle"],
+  "id": "app-malachi-daily",
+  "description":
+    "The daily notification with an eternal purpose. Join thousands of Jesus followers memorizing Scripture together. Learn one Bible verse and its context per week.",
+}
