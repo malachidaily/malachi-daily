@@ -20,7 +20,7 @@
       "description": "Let's memorize today's verse"
     }
   ],
-  "screenshots" : [
+  "screenshots": [
     {
       "src": "app-screenshot-1.png",
       "sizes": "750x1334",
@@ -61,8 +61,10 @@
   "dir": "ltr",
   "lang": "en",
   "orientation": "portrait-primary",
-  "categories": ["education", "lifestyle"],
+  "categories": [
+    "education",
+    "lifestyle"
+  ],
   "id": "app-malachi-daily",
-  "description":
-    "The daily notification with an eternal purpose. Join thousands of Jesus followers memorizing Scripture together. Learn one Bible verse and its context per week."
+  "description": "The daily notification with an eternal purpose. Join thousands of Jesus followers memorizing Scripture together. Learn one Bible verse and its context per week."
 }
