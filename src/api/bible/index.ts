@@ -41,9 +41,15 @@ function transformBibleVersesFromMultipleTranslations(data: Array<Array<Verse>>)
             const hasMultipleVerses = Boolean(verseIndex > 0)
             
             let verseText = data[versionIndex][verseIndex].text
+            
+            // Oftentimes a verse may have a break because of the title of the section
+            // appears first and then the verse content is next. 
+            // I decided to just keep both because it's very hard to determine
+            // if a break tag is within the verse or just separating a title
+            // from a verse.
             if (verseText.includes('<br/>')) {
                 // Remove br and everything before
-                verseText = verseText.split('<br/>')[1]
+                verseText.replace('<br/>', '\n')
             }
 
             // Remove anything that looks like HTML syntax in string
@@ -95,7 +101,7 @@ export async function getBibleVersesFromMultipleTranslations({
 
     // Transform verse to readable data
     const returnObj = transformBibleVersesFromMultipleTranslations(data)
-
+    
     return returnObj
 }
 
