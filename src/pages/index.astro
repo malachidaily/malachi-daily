@@ -342,7 +342,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 						<!-- Settings and Notifications -->
 						<div class="flex gap-4 items-center">
 							<!-- Share Icon -->
-							<button title="Share Malachi Daily">
+							<button x-show="isPWAInstalled" x-cloak x-transition title="Share Malachi Daily">
 								<svg
 									class="text-muted flex-shrink-0"
 									width="24"
