@@ -1,6 +1,6 @@
 // Book data provided by https://bolls.life/api
 
-const englishBibleVersions = ["NIV", "ESV", "NLT", "KJV", "MSG", "NET"];
+const englishBibleVersions = ["NIV", "ESV", "NLT", "KJV", "MSG", "NET", "NKJV"];
 const spanishBibleVersions = ["RV1960", "NVI", "NTV"];
 
 type BibleVersionsByLanguage = {
@@ -22,6 +22,11 @@ export const bibleVersionsByLanguage: BibleVersionsByLanguage = {
 export const selectedBibleVersions: readonly string[] = [...englishBibleVersions, ...spanishBibleVersions] as const
 export type bibleVersion = typeof selectedBibleVersions[number]
 export const bibleVersionData: { [key in bibleVersion]: { readableName: string, attribution: string, language: 'es' | 'en' } } = {
+    "NKJV": {
+        language: 'en',
+        readableName: "NKJV - New King James Version",
+        attribution: "Scripture taken from the New King James Version®. Copyright © 1982 by Thomas Nelson. Used by permission. All rights reserved."
+    },
     "NIV": {
         language: 'en',
         readableName: "NIV - New International Version",
@@ -50,7 +55,7 @@ export const bibleVersionData: { [key in bibleVersion]: { readableName: string, 
     "NET": {
         language: 'en',
         readableName: "NET - New English Translation",
-        attribution: "The Scriptures quoted are from the NET Bible ® https://netbible.com copyright ©1996, 2019 used with permission from Biblical Studies Press, L.L.C. All rights reserved",
+        attribution: "Scripture quoted by permission. Quotations designated (NET) are from the NET Bible® copyright ©1996, 2019 by Biblical Studies Press, L.L.C. http://netbible.com. All rights reserved.",
     },
     "RV1960": {
         language: 'es',
