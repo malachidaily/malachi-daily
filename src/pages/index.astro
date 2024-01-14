@@ -264,7 +264,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
       paddingTop: 'env(safe-area-inset-top) !important',
       paddingBottom: `env(safe-area-inset-bottom) !important`,
     }}
-    class="overflow-hidden h-screen grid grid-rows-[1fr_auto] canvas-secondary max-sm:rounded-2xl overflow-x-hidden"
+    class="overflow-hidden h-[100svh] grid grid-rows-[1fr_auto] canvas-secondary max-sm:rounded-2xl overflow-x-hidden"
     x-init={`
 			versesObj = ${JSON.stringify(verses)};
 			bibleVersionData = ${JSON.stringify(bibleVersionData)};
