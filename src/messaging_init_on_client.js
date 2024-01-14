@@ -19,6 +19,7 @@ export async function getUserFirebaseNotificationToken() {
             Notification?.permission === "granted") ||
             false,
     );
+    
     let currentToken = '';
 
     if (isSubscribedToNotifications) {

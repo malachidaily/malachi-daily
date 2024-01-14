@@ -1115,7 +1115,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
         <div
           x-cloak
           x-transition
-          x-show="isOffWeek && !hasPreviewVerse"
+          x-show="isOffWeek"
           class="w-full max-sm:mt-8"
         >
           <OffWeek nextVerseComesInDays={nextVerseComesInDays} />
