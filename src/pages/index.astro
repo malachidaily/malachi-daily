@@ -912,10 +912,22 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
                 class="w-full mt-4"
                 x-bind:class="{ '!h-fit': showProgressBar }"
                 x-data=`{
+                  init() {
+                    // If the timer is going and the fidelity is changed,
+                    // then focus on the input so the user can easily
+                    // keep on typing.
+                    $watch('fidelity', () => {
+                      if (this.showProgressBar && this.fidelity !== 0) {
+                        setTimeout(() => {
+                          this.focusOnFirstHiddenWordInput();
+                        }, 1000);
+                      }
+                    })
+                  },
 									showProgressBar: false,
 									timeRemaining: 0,
 									focusOnFirstHiddenWordInput() {
-										document.getElementById('firstHiddenWordInput')?.focus?.();
+                    document.getElementById('firstHiddenWordInput')?.focus?.();
 									},
 									timerInterval: null,
 									clearTimer() {
@@ -923,6 +935,10 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 										clearInterval(this.timerInterval);
 									},
 									setOneMinuteTimer() {
+                    if (this.fidelity === 0) {
+                      this.fidelity = 10;
+                    }
+
 										this.focusOnFirstHiddenWordInput();
 										this.showProgressBar = true;
 										let currentCount = 0;
@@ -1966,7 +1982,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 									x-bind:data-solved="wordIsCorrect ? true : false"
 									data-index="${index}"
 									data-underscores="${underscores}"
-									class="focus-visible:outline-0 cursor-text self-baseline mask-underscores opacity-60 outline-0 rounded-sm inline-flex text-blue-700 dark:text-gray-300"
+									class="focus-visible:outline-1 cursor-text self-baseline mask-underscores opacity-60 outline-0 rounded-sm inline-flex text-blue-700 dark:text-gray-300"
 									x-init="
 										setTimeout(() => {
 											recalculateWidth();
