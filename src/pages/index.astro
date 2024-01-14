@@ -685,7 +685,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								$el.classList.add('w-full');
 								$el.classList.remove('!h-screen');
 								$el.classList.remove('!w-screen');
-								$el.classList.remove('!h-[100svh]');
+								$el.classList.remove('!h-svh');
 								$el.classList.remove('!w-[100svw]');
 							},
 							clearInlineHeightAndWidth() {
@@ -729,8 +729,8 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								
 								$el.classList.add('!h-screen');
 								$el.classList.add('!w-screen');
-								$el.classList.add('!h-[100svh]');
-								$el.classList.add('!w-[100svw]');
+								$el.classList.add('!h-svh');
+								$el.classList.add('!w-svh');
 
 								$el.style.height = '100svh';
 								$el.style.width = '100svw';
