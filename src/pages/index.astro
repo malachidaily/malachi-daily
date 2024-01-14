@@ -307,7 +307,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
       >
         <!-- LOGO Header -->
         <section
-          class="sticky mx-[-24px] w-screen px-6 canvas-secondary z-20 py-4 top-0 w-full flex flex-col gap-2 items-start justify-start"
+          class="sticky max-sm:mx-[-24px] max-sm:w-screen max-sm:px-6 canvas-secondary z-20 py-4 top-0 w-full flex flex-col gap-2 items-start justify-start"
         >
           <a
             x-cloak
@@ -1865,13 +1865,13 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 											// Get where data-solved exists
 											const words = Array.from(document.querySelectorAll('[data-solved]'));
 											if (words.length + 1 === this.numOfWordsToGuess) {
-												const duration = 3 * 1000;
+												const duration = 2 * 1000;
 												const end = Date.now() + duration;
 
 												(function frame() {
 													// launch a few confetti from the left edge
 													confetti({
-														particleCount: 7,
+														particleCount: 5,
 														angle: 60,
 														spread: 55,
 														origin: { x: 0 }
@@ -1879,7 +1879,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 
 													// and launch a few from the right edge
 													confetti({
-														particleCount: 7,
+														particleCount: 5,
 														angle: 120,
 														spread: 55,
 														origin: { x: 1 }

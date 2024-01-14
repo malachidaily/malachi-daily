@@ -31,9 +31,12 @@
     </li>
     <li class="leading-3 flex items-center">
       <button
-        x-on:click="window.alert('Try reading the verse.\\n\\nEvery day a few words of the verse is hidden to help you practice it.\\n\\nThe slider helps you hide more words or show more words in the verse.\\n\\n--\\n\\nThis web app is a companion to the Malachi Daily newsletter, where we help you memorize 1 Bible verse every other week and learn its context.\\n\\nIf you are not receiving those emails or want to learn more, you can sign up at malachidaily.com')"
-        class="link whitespace-nowrap text-xs"
+        x-on:click="window.alert('Try reading the verse.\\n\\nEvery day a few words of the verse is hidden to help you practice it. It's interactive! You can tap a hidden work and fill it in using your keyboard.\\n\\nThe slider helps you hide more words or show more words in the verse.\\n\\n--\\n\\nThis web app is a companion to the Malachi Daily newsletter, where we help you memorize 1 Bible verse every other week and learn its context.\\n\\nIf you are not receiving those emails or want to learn more, you can sign up at malachidaily.com')"
+        class="flex gap-1 items-center link whitespace-nowrap text-xs"
       >
+        <svg width={16} height={16} viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+          <path fill="currentColor" fill-rule="evenodd" d="M7.5 1a6.5 6.5 0 1 0 0 13a6.5 6.5 0 0 0 0-13m0 12a5.5 5.5 0 1 1 0-11a5.5 5.5 0 0 1 0 11m1.55-8.42a1.84 1.84 0 0 0-.61-.42A2.25 2.25 0 0 0 7.53 4a2.16 2.16 0 0 0-.88.17c-.239.1-.45.254-.62.45a1.89 1.89 0 0 0-.38.62a3 3 0 0 0-.15.72h1.23a.84.84 0 0 1 .506-.741a.72.72 0 0 1 .304-.049a.86.86 0 0 1 .27 0a.64.64 0 0 1 .22.14a.6.6 0 0 1 .16.22a.73.73 0 0 1 .06.3c0 .173-.037.343-.11.5a2.4 2.4 0 0 1-.27.46l-.35.42c-.12.13-.24.27-.35.41a2.33 2.33 0 0 0-.27.45a1.18 1.18 0 0 0-.1.5v.66H8v-.49a.94.94 0 0 1 .11-.42a3.09 3.09 0 0 1 .28-.41l.36-.44a4.29 4.29 0 0 0 .36-.48a2.59 2.59 0 0 0 .28-.55a1.91 1.91 0 0 0 .11-.64a2.18 2.18 0 0 0-.1-.67a1.52 1.52 0 0 0-.35-.55M6.8 9.83h1.17V11H6.8z" clip-rule="evenodd"/>
+        </svg>
         How to Use
       </button>
     </li>
@@ -43,7 +46,7 @@
         href="https://malachidaily.com"
         target="_blank"
       >
-        Malachi Daily
+        Our Website
       </a>
     </li>
     <li
