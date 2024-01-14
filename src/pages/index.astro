@@ -1134,20 +1134,20 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
               role="button"
             >
               <a
-                class="flex items-center flex-nowrap gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
+                class="grid grid-cols-[1fr_auto] items-center gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
                 x-show="isScheduledVerse"
                 x-bind:href="malachiDailyBlogUrl"
                 target="_blank"
               >
-                <div class="flex gap-4 items-center">
+                <div class="flex w-full gap-4 items-center">
                   <div x-html="iconArticle"></div>
-                  <div>
+                  <div class="w-full shrink">
                     <p
-                      class="text-primary font-medium"
+                      class="shrink line-clamp-2 text-wrap w-full text-primary font-medium"
                       x-text="'Learn the context of ' + scriptureRef"
                     >
                     </p>
-                    <p class="text-muted text-sm">
+                    <p class="text-wrap shrink w-full line-clamp-2 text-muted text-sm">
                       New blog post every day, excluding Off Weeks
                     </p>
                   </div>
@@ -1166,15 +1166,15 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
               role="button"
             >
               <a
-                class="flex gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
+                class="grid grid-cols-[1fr_auto] gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
                 x-bind:href="bibleDotComUrl"
                 target="_blank"
               >
-                <div class="flex gap-4 items-center">
+                <div class="w-full flex gap-4 items-center">
                   <div x-html="iconYVBible"></div>
-                  <div>
+                  <div class="w-full shrink">
                     <p
-                      class="text-primary font-medium"
+                      class="text-wrap shrink w-full line-clamp-2 text-primary font-medium"
                       x-text="'Read ' + (scriptureRef ? scriptureRef.split(':')[0] : '') + ' on Bible.com'"
                     >
                     </p>
