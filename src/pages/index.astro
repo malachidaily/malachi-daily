@@ -307,7 +307,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
       >
         <!-- LOGO Header -->
         <section
-          class="sticky canvas-secondary z-20 py-4 top-0 w-full flex flex-col gap-2 items-start justify-start"
+          class="sticky mx-[-24px] w-screen px-6 canvas-secondary z-20 py-4 top-0 w-full flex flex-col gap-2 items-start justify-start"
         >
           <a
             x-cloak
@@ -983,8 +983,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
           </div>
 
           <!-- Scrubbing Input -->
-          <section class="w-full mt-12
-						max-sm:mx-6 max-sm:w-auto max-sm:mt-8">
+          <section class="w-full mt-12 max-sm:mx-6 max-sm:w-auto max-sm:mt-8">
             <div
               class="w-[calc(100%+16px)] ms-[-8px] flex justify-between text-xs font-mono text-muted"
               x-data="{ dayOfWeek: new Date().getDay() }"
