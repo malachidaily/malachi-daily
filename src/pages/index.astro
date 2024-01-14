@@ -2,23 +2,23 @@
 import { Image } from "astro:assets";
 
 import Layout from "../layouts/Layout.astro";
-import SelectPreviousVerse from '../components/astro/SelectPreviousVerse/index.astro';
+import SelectPreviousVerse from "../components/astro/SelectPreviousVerse/index.astro";
 import OffWeek from "../layouts/sections/OffWeek.astro";
 import logoImgUrl from "../../public/logo.png";
 import { backupVerse } from "../utils/constants";
 import NativeFeelingDrawer from "../components/react/NativeFeelingDrawer";
 import SectionLinks from "../components/astro/SectionLinks/index.astro";
 import {
-	type BibleVersesFromMultipleTranslations,
-	getBibleVersesFromMultipleTranslations,
+  type BibleVersesFromMultipleTranslations,
+  getBibleVersesFromMultipleTranslations,
 } from "../api/bible";
 import {
-	books,
-	type BookName,
-	type bibleVersion,
-	selectedBibleVersions,
-	bibleVersionData,
-	bibleVersionsByLanguage,
+  books,
+  type BookName,
+  type bibleVersion,
+  selectedBibleVersions,
+  bibleVersionData,
+  bibleVersionsByLanguage,
 } from "../api/bible/static/books";
 import { getAllVerses, verseTableHeaders } from "../api/verses";
 
@@ -29,7 +29,7 @@ const searchParamStartVerse = urlSearchParams.get("start-verse");
 const searchParamEndVerse = urlSearchParams.get("end-verse");
 let verseToUse;
 const getVerseFromUrlParams = Boolean(
-	searchParamBook && searchParamChapter && searchParamStartVerse,
+  searchParamBook && searchParamChapter && searchParamStartVerse,
 );
 
 let errorText = "";
@@ -37,106 +37,106 @@ let infoText = "";
 let whenIsNextVerse = "";
 
 if (getVerseFromUrlParams) {
-	// Return the verse from the params...
-	verseToUse = {
-		[verseTableHeaders.book]: {
-			value: searchParamBook,
-		},
-		[verseTableHeaders.chapter]: searchParamChapter,
-		[verseTableHeaders.verseNumberStart]: searchParamStartVerse,
-		[verseTableHeaders.verseNumberEnd]: searchParamEndVerse,
-	};
+  // Return the verse from the params...
+  verseToUse = {
+    [verseTableHeaders.book]: {
+      value: searchParamBook,
+    },
+    [verseTableHeaders.chapter]: searchParamChapter,
+    [verseTableHeaders.verseNumberStart]: searchParamStartVerse,
+    [verseTableHeaders.verseNumberEnd]: searchParamEndVerse,
+  };
 } else {
-	// Nope, let's get the verse from the API!
-	try {
-		// This will get the most recent verse from the API that's live.
-		const nowAndPastVersesFromApi = await getAllVerses({
-			filters: JSON.stringify({
-				filter_type: "AND",
-				filters: [
-					{
-						type: "boolean",
-						field: verseTableHeaders.pastStartDate,
-						value: "1",
-					},
-				],
-				groups: [],
-			}),
-			// The minus up front tells the API to order by the descending order.
-			orderBy: "-" + verseTableHeaders.startDate,
-			size: 1,
-		});
+  // Nope, let's get the verse from the API!
+  try {
+    // This will get the most recent verse from the API that's live.
+    const nowAndPastVersesFromApi = await getAllVerses({
+      filters: JSON.stringify({
+        filter_type: "AND",
+        filters: [
+          {
+            type: "boolean",
+            field: verseTableHeaders.pastStartDate,
+            value: "1",
+          },
+        ],
+        groups: [],
+      }),
+      // The minus up front tells the API to order by the descending order.
+      orderBy: "-" + verseTableHeaders.startDate,
+      size: 1,
+    });
 
-		// This will get and cache the latest verses fom the API.
-		const futureVersesFromApi = await getAllVerses({
-			filters: JSON.stringify({
-				filter_type: "AND",
-				filters: [
-					{
-						type: "boolean",
-						field: verseTableHeaders.pastStartDate,
-						value: "0",
-					},
-				],
-				groups: [],
-			}),
-			orderBy: verseTableHeaders.startDate,
-			size: 2,
-		});
+    // This will get and cache the latest verses fom the API.
+    const futureVersesFromApi = await getAllVerses({
+      filters: JSON.stringify({
+        filter_type: "AND",
+        filters: [
+          {
+            type: "boolean",
+            field: verseTableHeaders.pastStartDate,
+            value: "0",
+          },
+        ],
+        groups: [],
+      }),
+      orderBy: verseTableHeaders.startDate,
+      size: 2,
+    });
 
-		function getMostCurrentVerse() {
-			const firstVerseFromApi = nowAndPastVersesFromApi.results[0];
+    function getMostCurrentVerse() {
+      const firstVerseFromApi = nowAndPastVersesFromApi.results[0];
 
-			const firstFutureVerseFromApi = futureVersesFromApi.results[0];
-			const secondFutureVerseFromApi = futureVersesFromApi.results?.[1] || null;
+      const firstFutureVerseFromApi = futureVersesFromApi.results[0];
+      const secondFutureVerseFromApi = futureVersesFromApi.results?.[1] || null;
 
-			const firstFutureVerseStartTime =
-				new Date(
-					firstFutureVerseFromApi[verseTableHeaders.startDate],
-				).getTime() / 1000;
-			const secondFutureVerseStartTime = secondFutureVerseFromApi
-				? new Date(
-						secondFutureVerseFromApi[verseTableHeaders.startDate],
-				  ).getTime() / 1000
-				: null;
+      const firstFutureVerseStartTime =
+        new Date(
+          firstFutureVerseFromApi[verseTableHeaders.startDate],
+        ).getTime() / 1000;
+      const secondFutureVerseStartTime = secondFutureVerseFromApi
+        ? new Date(
+            secondFutureVerseFromApi[verseTableHeaders.startDate],
+          ).getTime() / 1000
+        : null;
 
-			let isFutureVerseActuallyNow = firstFutureVerseStartTime >= Date.now();
+      let isFutureVerseActuallyNow = firstFutureVerseStartTime >= Date.now();
 
-			// This could happen due to cacheing, because I have a 1 day cache on most API calls.
-			if (
-				isFutureVerseActuallyNow &&
-				(secondFutureVerseStartTime
-					? secondFutureVerseStartTime <= Date.now()
-					: false)
-			) {
-				whenIsNextVerse = secondFutureVerseFromApi[verseTableHeaders.startDate];
-				return secondFutureVerseFromApi;
-			} else if (isFutureVerseActuallyNow) {
-				whenIsNextVerse = firstFutureVerseFromApi[verseTableHeaders.startDate];
-				return firstFutureVerseFromApi;
-			} else {
-				whenIsNextVerse = firstFutureVerseFromApi[verseTableHeaders.startDate];
-				return firstVerseFromApi;
-			}
-		}
+      // This could happen due to cacheing, because I have a 1 day cache on most API calls.
+      if (
+        isFutureVerseActuallyNow &&
+        (secondFutureVerseStartTime
+          ? secondFutureVerseStartTime <= Date.now()
+          : false)
+      ) {
+        whenIsNextVerse = secondFutureVerseFromApi[verseTableHeaders.startDate];
+        return secondFutureVerseFromApi;
+      } else if (isFutureVerseActuallyNow) {
+        whenIsNextVerse = firstFutureVerseFromApi[verseTableHeaders.startDate];
+        return firstFutureVerseFromApi;
+      } else {
+        whenIsNextVerse = firstFutureVerseFromApi[verseTableHeaders.startDate];
+        return firstVerseFromApi;
+      }
+    }
 
-		verseToUse = getMostCurrentVerse();
-	} catch (error) {
-		errorText = "An error occured. Returning backup verse: Matthew 4:4";
-		verseToUse = backupVerse;
-	}
+    verseToUse = getMostCurrentVerse();
+  } catch (error) {
+    errorText = "An error occured. Returning backup verse: Matthew 4:4";
+    verseToUse = backupVerse;
+  }
 }
 
 function getDiffBetweenDays() {
-	if (!whenIsNextVerse) {
-		return 0;
-	}
+  if (!whenIsNextVerse) {
+    return 0;
+  }
 
-	const date1 = new Date();
-	const date2 = new Date(whenIsNextVerse);
-	const diffTime: number = Math.abs(date2.getTime() - date1.getTime());
-	const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-	return diffDays;
+  const date1 = new Date();
+  const date2 = new Date(whenIsNextVerse);
+  const diffTime: number = Math.abs(date2.getTime() - date1.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
 }
 
 const nextVerseComesInDays = getDiffBetweenDays() || 0;
@@ -151,41 +151,41 @@ const verseNumEnd = Number(verseToUse[verseTableHeaders.verseNumberEnd]);
 const verseNums: number[] = [];
 verseNums.push(verseNum);
 if (verseNumEnd && verseNum < verseNumEnd) {
-	for (let i = verseNum + 1; i <= verseNumEnd; i++) {
-		verseNums.push(i);
-	}
+  for (let i = verseNum + 1; i <= verseNumEnd; i++) {
+    verseNums.push(i);
+  }
 }
 
 // Anytime there's a new passage for Malachi Daily, this will increment by one.
 const passageNum = verseToUse[verseTableHeaders.passageNumber] || "0";
 
 let verseRef = `${bookName} ${chapter}:${verseNum}${
-	verseNumEnd ? `-${verseNumEnd}` : ""
+  verseNumEnd ? `-${verseNumEnd}` : ""
 }`;
 
 let verses: BibleVersesFromMultipleTranslations = {};
 
 if (getVerseFromUrlParams) {
-	infoText = `Showing verse from URL Params: ${verseRef}`;
+  infoText = `Showing verse from URL Params: ${verseRef}`;
 }
 
 try {
-	verses = await getBibleVersesFromMultipleTranslations({
-		bookId: bookId,
-		chapter,
-		verses: verseNums,
-		translations: selectedBibleVersions,
-	});
+  verses = await getBibleVersesFromMultipleTranslations({
+    bookId: bookId,
+    chapter,
+    verses: verseNums,
+    translations: selectedBibleVersions,
+  });
 } catch (error) {
-	// Use backup verse, instead.
-	errorText = `${verseRef} cannot be found. Returning Matthew 4:4`;
-	verses = await getBibleVersesFromMultipleTranslations({
-		bookId: books["Matthew"].bookid,
-		chapter: 4,
-		verses: [4],
-		translations: selectedBibleVersions,
-	});
-	verseRef = "Matthew 4:4";
+  // Use backup verse, instead.
+  errorText = `${verseRef} cannot be found. Returning Matthew 4:4`;
+  verses = await getBibleVersesFromMultipleTranslations({
+    bookId: books["Matthew"].bookid,
+    chapter: 4,
+    verses: [4],
+    translations: selectedBibleVersions,
+  });
+  verseRef = "Matthew 4:4";
 }
 
 const scriptureText = verses[translation];
@@ -196,72 +196,72 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 ---
 
 <Layout title="Malachi Daily: Memorize Bible Verses & Learn Their Context">
-	<style is:global>
-		.surface-primary {
-			@apply bg-white dark:bg-gray-700;
-		}
+  <style is:global>
+    .surface-primary {
+      @apply bg-white dark:bg-gray-700;
+    }
 
-		.checkbox {
-			@apply dark:border-gray-500;
-		}
+    .checkbox {
+      @apply dark:border-gray-500;
+    }
 
-		.canvas-secondary {
-			@apply bg-gray-100 dark:bg-gray-800;
-		}
+    .canvas-secondary {
+      @apply bg-gray-100 dark:bg-gray-800;
+    }
 
-		.canvas-tertiary {
-			@apply bg-gray-200 dark:bg-gray-700;
-		}
+    .canvas-tertiary {
+      @apply bg-gray-200 dark:bg-gray-700;
+    }
 
-		.text-muted {
-			@apply text-gray-500 dark:text-gray-400;
-		}
+    .text-muted {
+      @apply text-gray-500 dark:text-gray-400;
+    }
 
-		.text-primary {
-			@apply text-gray-800 dark:text-gray-100;
-		}
+    .text-primary {
+      @apply text-gray-800 dark:text-gray-100;
+    }
 
-		.thin-line {
-			@apply border-gray-200 dark:border-gray-700;
-		}
+    .thin-line {
+      @apply border-gray-200 dark:border-gray-700;
+    }
 
-		html:not(.dark) .text-beautiful-gradient {
-			@apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700;
-		}
+    html:not(.dark) .text-beautiful-gradient {
+      @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700;
+    }
 
-		html.dark .text-beautiful-gradient {
-			@apply text-gray-300;
-		}
+    html.dark .text-beautiful-gradient {
+      @apply text-gray-300;
+    }
 
-		html.dark .range {
-			--range-shdw: 217 19% 27%;
-		}
+    html.dark .range {
+      --range-shdw: 217 19% 27%;
+    }
 
-		.safe-area-bottom-padding {
-			padding-block-end: env(safe-area-inset-bottom, 16px);
-		}
+    .safe-area-bottom-padding {
+      padding-block-end: env(safe-area-inset-bottom, 16px);
+    }
 
-		.safe-area-bottom-padding-extra {
-			padding-block-end: calc(env(safe-area-inset-bottom, 16px) + 1rem);
-		}
+    .safe-area-bottom-padding-extra {
+      padding-block-end: calc(env(safe-area-inset-bottom, 16px) + 1rem);
+    }
 
-		.btn-filled-contrast {
-			@apply btn rounded-full hover:!brightness-110 bg-gray-700 hover:bg-gray-700 dark:bg-gray-200 hover:dark:bg-gray-200 text-white dark:text-gray-800 border-transparent hover:border-transparent active:border-transparent w-fit whitespace-nowrap normal-case dark:active:outline-gray-200 dark:focus:outline-gray-200;
-		}
+    .btn-filled-contrast {
+      @apply btn rounded-full hover:!brightness-110 bg-gray-700 hover:bg-gray-700 dark:bg-gray-200 hover:dark:bg-gray-200 text-white dark:text-gray-800 border-transparent hover:border-transparent active:border-transparent w-fit whitespace-nowrap normal-case dark:active:outline-gray-200 dark:focus:outline-gray-200;
+    }
 
-		.btn-outline {
-			@apply text-primary border border-gray-200 dark:border-gray-500 rounded-full hover:bg-gray-100 hover:text-gray-800 hover:border-gray-300 active:bg-gray-200 dark:hover:bg-gray-600 dark:hover:text-white dark:active:bg-gray-700;
-		}
+    .btn-outline {
+      @apply text-primary border border-gray-200 dark:border-gray-500 rounded-full hover:bg-gray-100 hover:text-gray-800 hover:border-gray-300 active:bg-gray-200 dark:hover:bg-gray-600 dark:hover:text-white dark:active:bg-gray-700;
+    }
 
-		.mask-underscores:after {
-			/* I want the underscores to be visible. It's stored in a data attribute */
-			content: attr(data-underscores);
-			@apply outline-0 pointer-events-none absolute animate-pulse opacity-40;
-		}
-	</style>
-	<div
-		class="canvas-secondary max-sm:rounded-2xl overflow-x-hidden"
-		x-init={`
+    .mask-underscores:after {
+      /* I want the underscores to be visible. It's stored in a data attribute */
+      content: attr(data-underscores);
+      @apply outline-0 pointer-events-none absolute animate-pulse opacity-40;
+    }
+  </style>
+  <div
+    class="overflow-hidden grid grid-rows-[1fr_auto] canvas-secondary max-sm:rounded-2xl overflow-x-hidden"
+    x-init={`
 			versesObj = ${JSON.stringify(verses)};
 			bibleVersionData = ${JSON.stringify(bibleVersionData)};
 			notificationAlert = '${errorText}';
@@ -282,74 +282,81 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 				}
 			});
 		`.trim()}
-		x-clear
-		vaul-drawer-wrapper=""
-	>
-		<main
-			class="w-screen h-auto min-h-[calc(100vh-48px)] px-6 flex flex-col items-center"
-			x-bind:class="{ 'min-h-screen': isFullscreen }"
-		>
-			<div
-				class="p-6 rounded-xl canvas-tertiary max-w-[600px] w-full"
-				x-show="showDebug"
-				x-transition
-				x-cloak
-			>
-				<p class="text-muted">Your Firebase Cloud Messaging Token:</p>
-				<p
-					x-text="$data.firebaseCMToken || 'No token available. Try requesting notification acccess.'"
-					class="select-all font-mono text-primary font-medium text-start break-all"
-				>
-				</p>
-			</div>
-			<div
-				class="max-w-[600px] w-full flex flex-col py-12 max-sm:py-6 gap-12 max-sm:gap-6"
-			>
-				<!-- LOGO -->
-				<div class="w-full flex flex-col gap-2 items-start justify-start">
-					<a
-						x-cloak
-						x-show="!isScheduledVerse && !isOffWeek"
-						class="mb-4 whitespace-nowrap badge canvas-tertiary text-primary py-3 dark:border-gray-700"
-						href="/"
-					>
-						Go back to Main Verse
-					</a>
-					<div class="w-full flex gap-2 justify-between">
-						<div
-							x-data={`{ clickCount: 0}`}
-							x-on:click={`
+    x-clear
+    vaul-drawer-wrapper=""
+  >
+    <main
+      class="overflow-y-scroll overflow-x-hidden w-screen h-auto max-h-[calc(100vh-48px)] px-6 flex flex-col items-center"
+      x-bind:class="{ 'min-h-screen': isFullscreen }"
+    >
+      <div
+        class="p-6 rounded-xl canvas-tertiary max-w-[600px] w-full"
+        x-show="showDebug"
+        x-transition
+        x-cloak
+      >
+        <p class="text-muted">Your Firebase Cloud Messaging Token:</p>
+        <p
+          x-text="$data.firebaseCMToken || 'No token available. Try requesting notification acccess.'"
+          class="select-all font-mono text-primary font-medium text-start break-all"
+        >
+        </p>
+      </div>
+      <div
+        class="max-w-[600px] w-full flex flex-col py-12 max-sm:py-6 gap-12 max-sm:gap-6"
+      >
+        <!-- LOGO Header -->
+        <section
+          class="sticky canvas-secondary z-20 py-4 top-0 w-full flex flex-col gap-2 items-start justify-start"
+        >
+          <a
+            x-cloak
+            x-show="!isScheduledVerse && !isOffWeek"
+            class="mb-4 whitespace-nowrap badge canvas-tertiary text-primary py-3 dark:border-gray-700"
+            href="/"
+          >
+            Go back to Main Verse
+          </a>
+          <div class="w-full flex gap-2 justify-between">
+            <div
+              x-data={`{ clickCount: 0}`}
+              x-on:click={`
 								clickCount += 1;
 								if (clickCount >= 10) {
 									showDebug = true;
 								}
 							`.trim()}
-							x-clear
-							class="flex gap-2 items-center justify-start"
-						>
-							<Image
-								src={logoImgUrl}
-								alt="Malachi Daily Logo | shows hands praying"
-								class={`aspect-[${logoImgUrl.height}/${logoImgUrl.width}] h-[32px] w-fit`}
-							/>
-							<h2
-								class="max-sm:text-xl text-3xl text-primary font-bold line-clamp-2 text-ellipsis overflow-hidden"
-								x-text="showDebug ? 'Malachi Daily (Debug)' : 'Malachi Daily'"
-							>
-								Malachi Daily
-							</h2>
-						</div>
-						<!-- Settings and Notifications -->
-						<div class="flex gap-4 items-center">
-							<!-- Share Icon -->
-							<button x-show="isPWAInstalled" x-cloak x-transition title="Share Malachi Daily">
-								<svg
-									class="text-muted flex-shrink-0"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									xmlns="http://www.w3.org/2000/svg"
-									x-on:click={`
+              x-clear
+              class="flex gap-2 items-center justify-start"
+            >
+              <Image
+                src={logoImgUrl}
+                alt="Malachi Daily Logo | shows hands praying"
+                class={`aspect-[${logoImgUrl.height}/${logoImgUrl.width}] h-[32px] w-fit`}
+              />
+              <h2
+                class="max-sm:text-xl text-3xl text-primary font-bold line-clamp-2 text-ellipsis overflow-hidden"
+                x-text="showDebug ? 'Malachi Daily (Debug)' : 'Malachi Daily'"
+              >
+                Malachi Daily
+              </h2>
+            </div>
+            <!-- Settings and Notifications -->
+            <div class="flex gap-4 items-center">
+              <!-- Share Icon -->
+              <button
+                x-show="isPWAInstalled"
+                x-cloak
+                x-transition
+                title="Share Malachi Daily"
+              >
+                <svg
+                  class="text-muted flex-shrink-0"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  x-on:click={`
 										const title = document.title;
 										const url = document.querySelector('link[rel=canonical]') ? document.querySelector('link[rel=canonical]').href : document.location.href;
 										
@@ -364,173 +371,182 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 											notificationInfo = 'URL copied to clipboard';
 										};
 									`.trim()}
-								>
-									<path
-										fill="none"
-										stroke="currentColor"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M12 5v8.5M15 7l-3-3l-3 3m-4 5v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"
-									></path>
-								</svg>
-							</button>
-							<!-- Notifications Icon -->
-							<button
-								x-show="!isSubscribedToNotifications"
-								x-cloak
-								title="Subscribe to Notifications"
-							>
-								<svg
-									x-on:click="handleAskForNotificationPermissions"
-									x-data="{ showAnimation: true }"
-									x-init="setTimeout(() => showAnimation = false, 2500)"
-									x-transition
-									x-bind:class="{ 'animate-bounce': showAnimation && !isSubscribedToNotifications }"
-									role="button"
-									class="text-muted flex-shrink-0"
-									width="24"
-									height="24"
-									viewBox="0 0 256 256"
-									xmlns="http://www.w3.org/2000/svg"
-								>
-									<path
-										fill="currentColor"
-										d="M225.29 165.93C216.61 151 212 129.57 212 104a84 84 0 0 0-168 0c0 25.58-4.59 47-13.27 61.93a20.08 20.08 0 0 0-.07 20.07A19.77 19.77 0 0 0 48 196h36.18a44 44 0 0 0 87.64 0H208a19.77 19.77 0 0 0 17.31-10a20.08 20.08 0 0 0-.02-20.07ZM128 212a20 20 0 0 1-19.6-16h39.2a20 20 0 0 1-19.6 16Zm-73.34-40C63.51 154 68 131.14 68 104a60 60 0 0 1 120 0c0 27.13 4.48 50 13.33 68Z"
-									></path>
-								</svg>
-							</button>
-							<NativeFeelingDrawer client:load>
-								<div class="flex flex-col gap-2">
-									<div class="form-control w-full max-w-xs mb-2">
-										<label class="label">
-											<span class="label-text text-primary"
-												>Select your preferred Bible translation</span
-											>
-										</label>
-										<select
-											class="select select-bordered dark:bg-gray-700 focus:outline dark:focus:outline-gray-500 focus:outline-gray-700 text-primary"
-											x-ref="bibleVersionSelectEl"
-											x-model="bibleVersionPreference"
-											x-on:change="localStorage.setItem('bibleVersionPreference', JSON.stringify($el.value));"
-										>
-											{
-												Object.keys(bibleVersionsByLanguage).map((languageKey: string) => {
-													return (
-														<optgroup label={bibleVersionsByLanguage[languageKey].readableName}>
-															{bibleVersionsByLanguage[languageKey].versions.map((bibleVersionKey) => (
-																<option
-																	value={bibleVersionKey}
-																	x-bind:selected={`'${bibleVersionKey}' === bibleVersionPreference`}
-																>
-																	{bibleVersionData?.[bibleVersionKey]?.readableName ||
-																		bibleVersionKey}
-																</option>
-															))}
-														</optgroup>
-													)
-												})
-											}
-										</select>
-									</div>
-									<div class="form-control w-fit">
-										<label class="label cursor-pointer flex gap-2 items-center">
-											<input
-												x-model="isDarkMode"
-												type="checkbox"
-												checked="checked"
-												class="checkbox"
-												x-on:click=`
+                >
+                  <path
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 5v8.5M15 7l-3-3l-3 3m-4 5v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"
+                  ></path>
+                </svg>
+              </button>
+              <!-- Notifications Icon -->
+              <button
+                x-show="!isSubscribedToNotifications"
+                x-cloak
+                title="Subscribe to Notifications"
+              >
+                <svg
+                  x-on:click="handleAskForNotificationPermissions"
+                  x-data="{ showAnimation: true }"
+                  x-init="setTimeout(() => showAnimation = false, 2500)"
+                  x-transition
+                  x-bind:class="{ 'animate-bounce': showAnimation && !isSubscribedToNotifications }"
+                  role="button"
+                  class="text-muted flex-shrink-0"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 256 256"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M225.29 165.93C216.61 151 212 129.57 212 104a84 84 0 0 0-168 0c0 25.58-4.59 47-13.27 61.93a20.08 20.08 0 0 0-.07 20.07A19.77 19.77 0 0 0 48 196h36.18a44 44 0 0 0 87.64 0H208a19.77 19.77 0 0 0 17.31-10a20.08 20.08 0 0 0-.02-20.07ZM128 212a20 20 0 0 1-19.6-16h39.2a20 20 0 0 1-19.6 16Zm-73.34-40C63.51 154 68 131.14 68 104a60 60 0 0 1 120 0c0 27.13 4.48 50 13.33 68Z"
+                  ></path>
+                </svg>
+              </button>
+              <NativeFeelingDrawer client:load>
+                <div class="flex flex-col gap-2">
+                  <div class="form-control w-full max-w-xs mb-2">
+                    <label class="label">
+                      <span class="label-text text-primary"
+                        >Select your preferred Bible translation</span
+                      >
+                    </label>
+                    <select
+                      class="select select-bordered dark:bg-gray-700 focus:outline dark:focus:outline-gray-500 focus:outline-gray-700 text-primary"
+                      x-ref="bibleVersionSelectEl"
+                      x-model="bibleVersionPreference"
+                      x-on:change="localStorage.setItem('bibleVersionPreference', JSON.stringify($el.value));"
+                    >
+                      {
+                        Object.keys(bibleVersionsByLanguage).map(
+                          (languageKey: string) => {
+                            return (
+                              <optgroup
+                                label={
+                                  bibleVersionsByLanguage[languageKey]
+                                    .readableName
+                                }
+                              >
+                                {bibleVersionsByLanguage[
+                                  languageKey
+                                ].versions.map((bibleVersionKey) => (
+                                  <option
+                                    value={bibleVersionKey}
+                                    x-bind:selected={`'${bibleVersionKey}' === bibleVersionPreference`}
+                                  >
+                                    {bibleVersionData?.[bibleVersionKey]
+                                      ?.readableName || bibleVersionKey}
+                                  </option>
+                                ))}
+                              </optgroup>
+                            );
+                          },
+                        )
+                      }
+                    </select>
+                  </div>
+                  <div class="form-control w-fit">
+                    <label class="label cursor-pointer flex gap-2 items-center">
+                      <input
+                        x-model="isDarkMode"
+                        type="checkbox"
+                        checked="checked"
+                        class="checkbox"
+                        x-on:click=`
 													localStorage.setItem('isDarkMode', JSON.stringify($el.checked));
 													toggleDarkMode();
 												`
-											/>
-											<span class="label-text text-primary"
-												>Enable Dark Mode</span
-											>
-										</label>
-									</div>
-									<div class="form-control w-fit">
-										<label
-											class="label cursor-pointer flex gap-2 items-center"
-											for="show-first-letter"
-										>
-											<input
-												x-model="showFirstLetter"
-												type="checkbox"
-												checked="checked"
-												class="checkbox"
-												name="show-first-letter"
-												id="show-first-letter"
-												x-on:click="localStorage.setItem('showFirstLetter', JSON.stringify($el.checked));"
-											/>
-											<span class="label-text text-primary"
-												>Show the first letter in each hidden word</span
-											>
-										</label>
-									</div>
-									<div class="form-control w-fit">
-										<label
-											class="label cursor-pointer flex gap-2 items-center"
-											for="checkbox-randomize-hidden-words"
-										>
-											<input
-												x-model="shouldRandomizeOrderOfHiddenWords"
-												type="checkbox"
-												checked="checked"
-												class="checkbox"
-												name="checkbox-randomize-hidden-words"
-												id="checkbox-randomize-hidden-words"
-												x-on:click="localStorage.setItem('shouldRandomizeOrderOfHiddenWords', JSON.stringify($el.checked));"
-											/>
-											<span class="label-text text-primary"
-												>Randomize the order of hidden words</span
-											>
-										</label>
-									</div>
-									<div class="form-control w-fit">
-										<label
-											class="label cursor-pointer flex gap-2 items-center"
-											for="checkbox-show-serif-font"
-										>
-											<input
-												x-model="showSerifFont"
-												type="checkbox"
-												checked="checked"
-												class="checkbox"
-												name="checkbox-show-serif-font"
-												id="checkbox-show-serif-font"
-												x-on:click="localStorage.setItem('showSerifFont', JSON.stringify($el.checked));"
-											/>
-											<span class="label-text text-primary"
-												>Use a more decorative font (serif)</span
-											>
-										</label>
-									</div>
-									<div class="flex gap-3 w-fit mt-2">
-										<button
-											class="btn-sm btn btn-outline text-primary thin-line rounded-full normal-case"
-											x-on:click="if (window.confirm('Reload the app?')) { location.reload() }"
-											>Reload App</button
-										>
-									</div>
-								</div>
-								<footer
-									class="w-full rounded-xl !bg-opacity-10 bg-gray-500 dark:bg-gray-100 mt-2"
-								>
-									<SectionLinks />
-								</footer>
-							</NativeFeelingDrawer>
-						</div>
-					</div>
-					<div
-						class="h-6"
-						x-data={`{ 
+                      />
+                      <span class="label-text text-primary"
+                        >Enable Dark Mode</span
+                      >
+                    </label>
+                  </div>
+                  <div class="form-control w-fit">
+                    <label
+                      class="label cursor-pointer flex gap-2 items-center"
+                      for="show-first-letter"
+                    >
+                      <input
+                        x-model="showFirstLetter"
+                        type="checkbox"
+                        checked="checked"
+                        class="checkbox"
+                        name="show-first-letter"
+                        id="show-first-letter"
+                        x-on:click="localStorage.setItem('showFirstLetter', JSON.stringify($el.checked));"
+                      />
+                      <span class="label-text text-primary"
+                        >Show the first letter in each hidden word</span
+                      >
+                    </label>
+                  </div>
+                  <div class="form-control w-fit">
+                    <label
+                      class="label cursor-pointer flex gap-2 items-center"
+                      for="checkbox-randomize-hidden-words"
+                    >
+                      <input
+                        x-model="shouldRandomizeOrderOfHiddenWords"
+                        type="checkbox"
+                        checked="checked"
+                        class="checkbox"
+                        name="checkbox-randomize-hidden-words"
+                        id="checkbox-randomize-hidden-words"
+                        x-on:click="localStorage.setItem('shouldRandomizeOrderOfHiddenWords', JSON.stringify($el.checked));"
+                      />
+                      <span class="label-text text-primary"
+                        >Randomize the order of hidden words</span
+                      >
+                    </label>
+                  </div>
+                  <div class="form-control w-fit">
+                    <label
+                      class="label cursor-pointer flex gap-2 items-center"
+                      for="checkbox-show-serif-font"
+                    >
+                      <input
+                        x-model="showSerifFont"
+                        type="checkbox"
+                        checked="checked"
+                        class="checkbox"
+                        name="checkbox-show-serif-font"
+                        id="checkbox-show-serif-font"
+                        x-on:click="localStorage.setItem('showSerifFont', JSON.stringify($el.checked));"
+                      />
+                      <span class="label-text text-primary"
+                        >Use a more decorative font (serif)</span
+                      >
+                    </label>
+                  </div>
+                  <div class="flex gap-3 w-fit mt-2">
+                    <button
+                      class="btn-sm btn btn-outline text-primary thin-line rounded-full normal-case"
+                      x-on:click="if (window.confirm('Reload the app?')) { location.reload() }"
+                      >Reload App</button
+                    >
+                  </div>
+                </div>
+                <footer
+                  class="w-full rounded-xl !bg-opacity-10 bg-gray-500 dark:bg-gray-100 mt-2"
+                >
+                  <SectionLinks />
+                </footer>
+              </NativeFeelingDrawer>
+            </div>
+          </div>
+          <div
+            class="h-6"
+            x-data={`{ 
 							showInfoSubtext: false, 
 							showPassageInfo: true, 
 							isNotCurrentVerseOfWeek: ${getVerseFromUrlParams},
 						}`.trim()}
-						x-init={`
+            x-init={`
 							const millisecondsTilTransition = 3000;
 							setTimeout(() => {
 								showPassageInfo = false;
@@ -540,85 +556,85 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								showInfoSubtext = true;
 							}, millisecondsTilTransition + 500);
 						`.trim()}
-					>
-						<p
-							x-cloak
-							x-on:click={`
+          >
+            <p
+              x-cloak
+              x-on:click={`
 								showInfoSubtext = false;
 								setTimeout(() => {
 									showPassageInfo = true;
 								}, 500);
 							`.trim()}
-							x-transition
-							x-show="showInfoSubtext && !isNotCurrentVerseOfWeek && !hasPreviewVerse"
-							class="cursor-pointer text-muted text-start"
-						>
-							Scripture memory, together.
-						</p>
-						<div
-							x-cloak
-							x-transition
-							x-show="showPassageInfo && !isNotCurrentVerseOfWeek && !isOffWeek || (isOffWeek && hasPreviewVerse)"
-							class="gap-1 flex text-muted flex-wrap items-center"
-							x-on:click={`
+              x-transition
+              x-show="showInfoSubtext && !isNotCurrentVerseOfWeek && !hasPreviewVerse"
+              class="cursor-pointer text-muted text-start"
+            >
+              Scripture memory, together.
+            </p>
+            <div
+              x-cloak
+              x-transition
+              x-show="showPassageInfo && !isNotCurrentVerseOfWeek && !isOffWeek || (isOffWeek && hasPreviewVerse)"
+              class="gap-1 flex text-muted flex-wrap items-center"
+              x-on:click={`
 								showPassageInfo = false;
 								setTimeout(() => {
 									showInfoSubtext = true;
 								}, 500);
 							`.trim()}
-						>
-							<p
-								class="cursor-pointer whitespace-nowrap inline"
-								x-show="passageNum > 0 && !isOffWeek"
-								x-text="'Passage #' + passageNum"
-							>
-								Passage #--
-							</p>
-							<p
-								class="text-sm pointer-events-none px-3 py-1 whitespace-nowrap inline rounded-box bg-blue-100 dark:text-sky-300 dark:bg-sky-900 text-blue-600"
-								x-show="isOffWeek"
-								x-cloak
-								x-transition
-							>
-								Off Week Review
-							</p>
-							<p x-show="passageNum > 0" x-cloak x-transition>{' • '}</p>
-							<p
-								class="pointer-events-none whitespace-nowrap inline"
-								x-text="daysUntilNextVerse + ' days until next verse'"
-							>
-								Next verse coming on
-							</p>
-						</div>
-						<p
-							class="text-muted text-start"
-							x-show="isNotCurrentVerseOfWeek"
-							x-transition
-							x-cloak
-						>
-							You are previewing a verse
-						</p>
-					</div>
-				</div>
+            >
+              <p
+                class="cursor-pointer whitespace-nowrap inline"
+                x-show="passageNum > 0 && !isOffWeek"
+                x-text="'Passage #' + passageNum"
+              >
+                Passage #--
+              </p>
+              <p
+                class="text-sm pointer-events-none px-3 py-1 whitespace-nowrap inline rounded-box bg-blue-100 dark:text-sky-300 dark:bg-sky-900 text-blue-600"
+                x-show="isOffWeek"
+                x-cloak
+                x-transition
+              >
+                Off Week Review
+              </p>
+              <p x-show="passageNum > 0" x-cloak x-transition>{" • "}</p>
+              <p
+                class="pointer-events-none whitespace-nowrap inline"
+                x-text="daysUntilNextVerse + ' days until next verse'"
+              >
+                Next verse coming on
+              </p>
+            </div>
+            <p
+              class="text-muted text-start"
+              x-show="isNotCurrentVerseOfWeek"
+              x-transition
+              x-cloak
+            >
+              You are previewing a verse
+            </p>
+          </div>
+        </section>
 
-				<!-- SCRIPTURE TO MEMORIZE -->
-				<section
-					id="scripture"
-					x-init={`
+        <!-- SCRIPTURE TO MEMORIZE -->
+        <section
+          id="scripture"
+          x-init={`
 						scriptureRef = '${scriptureRef}';
 						fidelity = fidelityOfTheDay;
 					`}
-					x-cloak
-					x-show="Boolean(!isOffWeek || hasPreviewVerse)"
-					x-transition
-					class="rounded-md text-start max-sm:mx-[-24px]"
-				>
-					<div
-						class="surface-primary p-6 flex justify-center items-center rounded-xl shadow-xl max-sm:shadow-sm max-sm:rounded-3xl transition-[height] duration-500"
-						x-ref="scriptureCard"
-						x-clear
-						x-on:resize.window="clearInlineHeightAndWidth(); getAndSetCardWidth($el)"
-						x-init={`
+          x-cloak
+          x-show="Boolean(!isOffWeek || hasPreviewVerse)"
+          x-transition
+          class="rounded-md text-start max-sm:mx-[-24px]"
+        >
+          <div
+            class="surface-primary p-6 flex justify-center items-center rounded-xl shadow-xl max-sm:shadow-sm max-sm:rounded-3xl transition-[height] duration-500"
+            x-ref="scriptureCard"
+            x-clear
+            x-on:resize.window="clearInlineHeightAndWidth(); getAndSetCardWidth($el)"
+            x-init={`
 							// https://alpinejs.dev/directives/init#next-tick
 							$nextTick(() => {
 								// Hack to allow the event loop to allow the UI to render
@@ -651,7 +667,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								getAndSetCardWidth($el);
 							});
 						`.trim()}
-						x-data={`{ 
+            x-data={`{ 
 							ANIMATION_DURATION: 500,
 							intrinsicHeight: 0,
 							intrinsicWidth: 0,
@@ -740,129 +756,139 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 								}, 300);
 							}
 						}`}
-						x-bind:class="{ 'absolute top-0 left-0 bottom-0 right-0 z-30': isFullscreen }"
-					>
-						<div class="max-w-[calc(600px-24px*2)] w-full flex flex-col gap-4">
-							<div class="w-full flex justify-between gap-6 flex-grow-1">
-								<div class="flex items-center">
-									<div class="flex gap-0 flex-col">
-										<div
-											class="flex flex-wrap gap-2 items-baseline text-beautiful-gradient"
-										>
-											<h1 x-text="scriptureRef" class="text-lg font-medium">
-												{scriptureRef}
-											</h1>
-											<span
-												role="button"
-												tabindex="0"
-												@keyup.enter="$refs.settingsDrawerBtn.click();"
-												class="text-lg font-medium cursor-pointer"
-												x-on:click="handleTakeUserToChangeBibleVersion();"
-												x-text="bibleVersionPreference"></span>
-											<div
-												class="tooltip tooltip-bottom h-[24px] w-[24px] flex items-center justify-center text-purple-700 dark:text-gray-300"
-												x-show="Boolean(bibleVersionData && bibleVersionPreference)"
-												x-bind:data-tip="bibleVersionData?.[bibleVersionPreference]?.attribution + ' (Scripture sourced from https://bolls.life/api/)'"
-											>
-												<svg
-													width="16"
-													height="16"
-													viewBox="0 0 256 256"
-													xmlns="http://www.w3.org/2000/svg"
-												>
-													<path
-														fill="currentColor"
-														d="M108 84a16 16 0 1 1 16 16a16 16 0 0 1-16-16Zm128 44A108 108 0 1 1 128 20a108.12 108.12 0 0 1 108 108Zm-24 0a84 84 0 1 0-84 84a84.09 84.09 0 0 0 84-84Zm-72 36.68V132a20 20 0 0 0-20-20a12 12 0 0 0-4 23.32V168a20 20 0 0 0 20 20a12 12 0 0 0 4-23.32Z"
-													></path>
-												</svg>
-											</div>
-										</div>
-									</div>
-								</div>
+            x-bind:class="{ 'absolute top-0 left-0 bottom-0 right-0 z-30': isFullscreen }"
+          >
+            <div class="max-w-[calc(600px-24px*2)] w-full flex flex-col gap-4">
+              <div class="w-full flex justify-between gap-6 flex-grow-1">
+                <div class="flex items-center">
+                  <div class="flex gap-0 flex-col">
+                    <div
+                      class="flex flex-wrap gap-2 items-baseline text-beautiful-gradient"
+                    >
+                      <h1 x-text="scriptureRef" class="text-lg font-medium">
+                        {scriptureRef}
+                      </h1>
+                      <span
+                        role="button"
+                        tabindex="0"
+                        @keyup.enter="$refs.settingsDrawerBtn.click();"
+                        class="text-lg font-medium cursor-pointer"
+                        x-on:click="handleTakeUserToChangeBibleVersion();"
+                        x-text="bibleVersionPreference"></span>
+                      <div
+                        class="tooltip tooltip-bottom h-[24px] w-[24px] flex items-center justify-center text-purple-700 dark:text-gray-300"
+                        x-show="Boolean(bibleVersionData && bibleVersionPreference)"
+                        x-bind:data-tip="bibleVersionData?.[bibleVersionPreference]?.attribution + ' (Scripture sourced from https://bolls.life/api/)'"
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 256 256"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fill="currentColor"
+                            d="M108 84a16 16 0 1 1 16 16a16 16 0 0 1-16-16Zm128 44A108 108 0 1 1 128 20a108.12 108.12 0 0 1 108 108Zm-24 0a84 84 0 1 0-84 84a84.09 84.09 0 0 0 84-84Zm-72 36.68V132a20 20 0 0 0-20-20a12 12 0 0 0-4 23.32V168a20 20 0 0 0 20 20a12 12 0 0 0 4-23.32Z"
+                          ></path>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-								<!-- Scripture Action Buttons -->
-								<div class="text-muted flex gap-4 items-center">
-									<!-- Reset Text Button -->
-									<button
-										title="Reset the text fields"
-										x-on:click="resetScriptureGuessInputs"
-										x-transition
-									>
-										<svg
-											class="cursor-pointer"
-											width="24"
-											height="24"
-											viewBox="0 0 20 20"
-											xmlns="http://www.w3.org/2000/svg"
-										>
-											<g fill="currentColor">
-													<path d="M5.05 14.95a1 1 0 1 1 1.414-1.414A5 5 0 0 0 15 10a1 1 0 1 1 2 0a7 7 0 0 1-11.95 4.95Z"/>
-													<path d="M13.559 12.832a1 1 0 1 1-1.11-1.664l3-2a1 1 0 1 1 1.11 1.664l-3 2Z"/>
-													<path d="M18.832 12.445a1 1 0 0 1-1.664 1.11l-2-3a1 1 0 1 1 1.664-1.11l2 3Zm-3.975-7.594a1 1 0 1 1-1.414 1.414a5 5 0 0 0-8.536 3.536a1 1 0 1 1-2 0a7 7 0 0 1 11.95-4.95Z"/>
-													<path d="M6.349 6.969a1 1 0 0 1 1.11 1.664l-3.001 2a1 1 0 1 1-1.11-1.664l3-2Z"/>
-													<path d="M1.075 7.356a1 1 0 1 1 1.664-1.11l2 3a1 1 0 1 1-1.664 1.11l-2-3Z"/>
-											</g>
-										</svg>
-									</button>
-									<!-- Show Fullscreen Button -->
-									<button
-										x-show="!isFullscreen"
-										title="Open fullscreen verse view"
-										x-transition
-									>
-										<svg
-											x-on:click="handleShowFullscreen"
-											class="cursor-pointer"
-											width="24"
-											height="24"
-											viewBox="0 0 24 24"
-											xmlns="http://www.w3.org/2000/svg"
-										>
-											<g fill="none" fill-rule="evenodd">
-												<path
-													d="M24 0v24H0V0h24ZM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018Zm.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022Zm-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01l-.184-.092Z"
-												></path>
-												<path
-													fill="currentColor"
-													d="M18.5 5.5H16a1.5 1.5 0 0 1 0-3h3A2.5 2.5 0 0 1 21.5 5v3a1.5 1.5 0 0 1-3 0V5.5ZM8 5.5H5.5V8a1.5 1.5 0 1 1-3 0V5A2.5 2.5 0 0 1 5 2.5h3a1.5 1.5 0 1 1 0 3Zm0 13H5.5V16a1.5 1.5 0 0 0-3 0v3A2.5 2.5 0 0 0 5 21.5h3a1.5 1.5 0 0 0 0-3Zm8 0h2.5V16a1.5 1.5 0 0 1 3 0v3a2.5 2.5 0 0 1-2.5 2.5h-3a1.5 1.5 0 0 1 0-3Z"
-												></path>
-											</g>
-										</svg>
-									</button>
-									<!-- Hide Fullscreen Button -->
-									<button
-										x-show="isFullscreen"
-										title="Dismiss fullscreen verse view"
-										x-cloak
-										x-transition
-									>
-										<svg
-											x-on:click="handleHideFullscreen"
-											class="cursor-pointer"
-											width="28"
-											height="28"
-											viewBox="0 0 24 24"
-											xmlns="http://www.w3.org/2000/svg"
-										>
-											<path
-												fill="none"
-												stroke="currentColor"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2.5"
-												d="m7 7l10 10M7 17L17 7"></path>
-										</svg>
-									</button>
-								</div>
-							</div>
+                <!-- Scripture Action Buttons -->
+                <div class="text-muted flex gap-4 items-center">
+                  <!-- Reset Text Button -->
+                  <button
+                    title="Reset the text fields"
+                    x-on:click="resetScriptureGuessInputs"
+                    x-transition
+                  >
+                    <svg
+                      class="cursor-pointer"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <g fill="currentColor">
+                        <path
+                          d="M5.05 14.95a1 1 0 1 1 1.414-1.414A5 5 0 0 0 15 10a1 1 0 1 1 2 0a7 7 0 0 1-11.95 4.95Z"
+                        ></path>
+                        <path
+                          d="M13.559 12.832a1 1 0 1 1-1.11-1.664l3-2a1 1 0 1 1 1.11 1.664l-3 2Z"
+                        ></path>
+                        <path
+                          d="M18.832 12.445a1 1 0 0 1-1.664 1.11l-2-3a1 1 0 1 1 1.664-1.11l2 3Zm-3.975-7.594a1 1 0 1 1-1.414 1.414a5 5 0 0 0-8.536 3.536a1 1 0 1 1-2 0a7 7 0 0 1 11.95-4.95Z"
+                        ></path>
+                        <path
+                          d="M6.349 6.969a1 1 0 0 1 1.11 1.664l-3.001 2a1 1 0 1 1-1.11-1.664l3-2Z"
+                        ></path>
+                        <path
+                          d="M1.075 7.356a1 1 0 1 1 1.664-1.11l2 3a1 1 0 1 1-1.664 1.11l-2-3Z"
+                        ></path>
+                      </g>
+                    </svg>
+                  </button>
+                  <!-- Show Fullscreen Button -->
+                  <button
+                    x-show="!isFullscreen"
+                    title="Open fullscreen verse view"
+                    x-transition
+                  >
+                    <svg
+                      x-on:click="handleShowFullscreen"
+                      class="cursor-pointer"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <g fill="none" fill-rule="evenodd">
+                        <path
+                          d="M24 0v24H0V0h24ZM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018Zm.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022Zm-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01l-.184-.092Z"
+                        ></path>
+                        <path
+                          fill="currentColor"
+                          d="M18.5 5.5H16a1.5 1.5 0 0 1 0-3h3A2.5 2.5 0 0 1 21.5 5v3a1.5 1.5 0 0 1-3 0V5.5ZM8 5.5H5.5V8a1.5 1.5 0 1 1-3 0V5A2.5 2.5 0 0 1 5 2.5h3a1.5 1.5 0 1 1 0 3Zm0 13H5.5V16a1.5 1.5 0 0 0-3 0v3A2.5 2.5 0 0 0 5 21.5h3a1.5 1.5 0 0 0 0-3Zm8 0h2.5V16a1.5 1.5 0 0 1 3 0v3a2.5 2.5 0 0 1-2.5 2.5h-3a1.5 1.5 0 0 1 0-3Z"
+                        ></path>
+                      </g>
+                    </svg>
+                  </button>
+                  <!-- Hide Fullscreen Button -->
+                  <button
+                    x-show="isFullscreen"
+                    title="Dismiss fullscreen verse view"
+                    x-cloak
+                    x-transition
+                  >
+                    <svg
+                      x-on:click="handleHideFullscreen"
+                      class="cursor-pointer"
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2.5"
+                        d="m7 7l10 10M7 17L17 7"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
 
-							<!-- Scripture Verses -->
-							<div
-								class="relative transition font-scripture"
-								x-bind:class="{ 'font-scripture-serif': showSerifFont }"
-							>
-								<h2
-									x-on:visibilitychange.document=`
+              <!-- Scripture Verses -->
+              <div
+                class="relative transition font-scripture"
+                x-bind:class="{ 'font-scripture-serif': showSerifFont }"
+              >
+                <h2
+                  x-on:visibilitychange.document=`
 										if (document.visibilityState === 'hidden') {
 											$el.classList.remove('transition-opacity', 'duration-1000');
 											$el.classList.add('opacity-0');
@@ -871,21 +897,21 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 											setTimeout(() => $el.classList.remove('opacity-0'), 1000);
 										}
 									`
-									x-ref="scriptureTextEl"
-									x-init="$el.classList.remove('opacity-0')"
-									id="verse-current"
-									x-html="scriptureText"
-									class="opacity-0 transition-opacity duration-1000 font-bold text-beautiful-gradient leading-tight"
-								>
-									{scriptureText}
-								</h2>
-							</div>
+                  x-ref="scriptureTextEl"
+                  x-init="$el.classList.remove('opacity-0')"
+                  id="verse-current"
+                  x-html="scriptureText"
+                  class="opacity-0 transition-opacity duration-1000 font-bold text-beautiful-gradient leading-tight"
+                >
+                  {scriptureText}
+                </h2>
+              </div>
 
-							<!-- Progress Bar -->
-							<div
-								class="w-full mt-4"
-								x-bind:class="{ '!h-fit': showProgressBar }"
-								x-data=`{
+              <!-- Progress Bar -->
+              <div
+                class="w-full mt-4"
+                x-bind:class="{ '!h-fit': showProgressBar }"
+                x-data=`{
 									showProgressBar: false,
 									timeRemaining: 0,
 									focusOnFirstHiddenWordInput() {
@@ -918,207 +944,241 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 										}, 1000)
 									},
 								}`
-							>
-								<progress
-									x-transition
-									x-cloak
-									x-show="showProgressBar"
-									x-ref="progressBarEl"
-									class="z-30 fixed top-0 left-0 right-0 h-2 progress w-full dark:bg-white dark:bg-opacity-10 dark:text-white !text-gray-800 rounded-none"
-									value="0"
-									max="100"
-									x-bind:style="isDarkMode ? '--bc: 0 0% 100%;' : ''"
-								></progress>
+              >
+                <progress
+                  x-transition
+                  x-cloak
+                  x-show="showProgressBar"
+                  x-ref="progressBarEl"
+                  class="z-30 fixed top-0 left-0 right-0 h-2 progress w-full dark:bg-white dark:bg-opacity-10 dark:text-white !text-gray-800 rounded-none"
+                  value="0"
+                  max="100"
+                  x-bind:style="isDarkMode ? '--bc: 0 0% 100%;' : ''"
+                ></progress>
 
-								<div class="items-center flex gap-3 flex-wrap">
-									<!-- Practice Button -->
-									<button
-										x-bind:disabled="showProgressBar"
-										x-bind:class="{ 'btn-disabled !text-opacity-60 dark:text-white': showProgressBar }"
-										x-on:click="setOneMinuteTimer()"
-										x-text="showProgressBar ? '~' + timeRemaining + 's left' : 'Practice 1 min'"
-										class="btn-filled-contrast !btn-sm"
-									>
-										Practice 1 min
-									</button>
+                <div class="items-center flex gap-3 flex-wrap">
+                  <!-- Practice Button -->
+                  <button
+                    x-bind:disabled="showProgressBar"
+                    x-bind:class="{ 'btn-disabled !text-opacity-60 dark:text-white': showProgressBar }"
+                    x-on:click="setOneMinuteTimer()"
+                    x-text="showProgressBar ? '~' + timeRemaining + 's left' : 'Practice 1 min'"
+                    class="btn-filled-contrast !btn-sm"
+                  >
+                    Practice 1 min
+                  </button>
 
-									<button
-										x-on:click="clearTimer()"
-										x-show="showProgressBar"
-										x-transition
-										x-cloak
-										class="btn-outline !btn-sm"
-									>
-										Cancel
-									</button>
-								</div>
-							</div>
-						</div>
-					</div>
+                  <button
+                    x-on:click="clearTimer()"
+                    x-show="showProgressBar"
+                    x-transition
+                    x-cloak
+                    class="btn-outline !btn-sm"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
-					<!-- Scrubbing Input -->
-					<section class="w-full mt-12
+          <!-- Scrubbing Input -->
+          <section class="w-full mt-12
 						max-sm:mx-6 max-sm:w-auto max-sm:mt-8">
-						<div
-							class="w-[calc(100%+16px)] ms-[-8px] flex justify-between text-xs font-mono text-muted"
-							x-data="{ dayOfWeek: new Date().getDay() }"
-						>
-							<span
-								class="cursor-pointer p-1 px-2 rounded-md"
-								x-on:click="fidelity = 10 * 0"
-								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 0 || dayOfWeek === 7 }"
-								>Sun</span
-							>
-							<span
-								class="cursor-pointer p-1 px-2 rounded-md"
-								x-on:click="fidelity = 10 * 1"
-								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 1 }"
-								>Mon</span
-							>
-							<span
-								class="cursor-pointer p-1 px-2 rounded-md"
-								x-on:click="fidelity = 10 * 2"
-								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 2 }"
-								>Tue</span
-							>
-							<span
-								class="cursor-pointer p-1 px-2 rounded-md"
-								x-on:click="fidelity = 10 * 3"
-								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 3 }"
-								>Wed</span
-							>
-							<span
-								class="cursor-pointer p-1 px-2 rounded-md"
-								x-on:click="fidelity = 10 * 4"
-								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 4 }"
-								>Thu</span
-							>
-							<span
-								class="cursor-pointer p-1 px-2 rounded-md"
-								x-on:click="fidelity = 10 * 5"
-								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 5 }"
-								>Fri</span
-							>
-							<span
-								class="cursor-pointer p-1 px-2 rounded-md"
-								x-on:click="fidelity = 10 * 6"
-								x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 6 }"
-								>Sat</span
-							>
-						</div>
-						<div class="mb-2 mt-1 w-full flex justify-between text-xs px-2 text-muted opacity-50">
-							<span>|</span>
-							<span>|</span>
-							<span>|</span>
-							<span>|</span>
-							<span>|</span>
-							<span>|</span>
-							<span>|</span>
-						</div>
-						<input
-							x-model="fidelity"
-							type="range"
-							aria-label="Change to hide or show more words in the Bible verse"
-							min="0"
-							max="60"
-							value="0"
-							class="range range-md"
-							step="10"
-						/>
-						<div class="w-full flex justify-between text-xs px-2 text-muted opacity-50">
-							<span>|</span>
-							<span>|</span>
-							<span>|</span>
-							<span>|</span>
-							<span>|</span>
-							<span>|</span>
-							<span>|</span>
-						</div>
-						<div
-							class="w-[calc(100%+16px)] ms-[-8px] flex justify-between text-xs mt-1 font-mono text-muted"
-							x-data="{ dayOfWeek: new Date().getDay() }"
-						>
-							<span
-								class="cursor-pointer p-1 px-2 rounded-md"
-								x-on:click="fidelity = 10 * 0"
-								>Easy</span
-							>
-							<span
-								class="cursor-pointer p-1 px-2 rounded-md"
-								x-on:click="fidelity = 10 * 6"
-								>Hard</span
-							>
-						</div>
-					</section>
-				</section>
+            <div
+              class="w-[calc(100%+16px)] ms-[-8px] flex justify-between text-xs font-mono text-muted"
+              x-data="{ dayOfWeek: new Date().getDay() }"
+            >
+              <span
+                class="cursor-pointer p-1 px-2 rounded-md"
+                x-on:click="fidelity = 10 * 0"
+                x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 0 || dayOfWeek === 7 }"
+                >Sun</span
+              >
+              <span
+                class="cursor-pointer p-1 px-2 rounded-md"
+                x-on:click="fidelity = 10 * 1"
+                x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 1 }"
+                >Mon</span
+              >
+              <span
+                class="cursor-pointer p-1 px-2 rounded-md"
+                x-on:click="fidelity = 10 * 2"
+                x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 2 }"
+                >Tue</span
+              >
+              <span
+                class="cursor-pointer p-1 px-2 rounded-md"
+                x-on:click="fidelity = 10 * 3"
+                x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 3 }"
+                >Wed</span
+              >
+              <span
+                class="cursor-pointer p-1 px-2 rounded-md"
+                x-on:click="fidelity = 10 * 4"
+                x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 4 }"
+                >Thu</span
+              >
+              <span
+                class="cursor-pointer p-1 px-2 rounded-md"
+                x-on:click="fidelity = 10 * 5"
+                x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 5 }"
+                >Fri</span
+              >
+              <span
+                class="cursor-pointer p-1 px-2 rounded-md"
+                x-on:click="fidelity = 10 * 6"
+                x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 6 }"
+                >Sat</span
+              >
+            </div>
+            <div
+              class="mb-2 mt-1 w-full flex justify-between text-xs px-2 text-muted opacity-50"
+            >
+              <span>|</span>
+              <span>|</span>
+              <span>|</span>
+              <span>|</span>
+              <span>|</span>
+              <span>|</span>
+              <span>|</span>
+            </div>
+            <input
+              x-model="fidelity"
+              type="range"
+              aria-label="Change to hide or show more words in the Bible verse"
+              min="0"
+              max="60"
+              value="0"
+              class="range range-md"
+              step="10"
+            />
+            <div
+              class="w-full flex justify-between text-xs px-2 text-muted opacity-50"
+            >
+              <span>|</span>
+              <span>|</span>
+              <span>|</span>
+              <span>|</span>
+              <span>|</span>
+              <span>|</span>
+              <span>|</span>
+            </div>
+            <div
+              class="w-[calc(100%+16px)] ms-[-8px] flex justify-between text-xs mt-1 font-mono text-muted"
+              x-data="{ dayOfWeek: new Date().getDay() }"
+            >
+              <span
+                class="cursor-pointer p-1 px-2 rounded-md"
+                x-on:click="fidelity = 10 * 0">Easy</span
+              >
+              <span
+                class="cursor-pointer p-1 px-2 rounded-md"
+                x-on:click="fidelity = 10 * 6">Hard</span
+              >
+            </div>
+          </section>
+        </section>
 
-				<div
-					class="p-6 rounded-xl canvas-tertiary w-full"
-					x-show="showDebug"
-					x-transition
-					x-cloak
-				>
-					<pre
-						x-text="JSON.stringify($data, null, 2)"
-						class="font-mono whitespace-pre text-muted text-start break-all overflow-x-scroll">
-					</pre>
-				</div>
+        <div
+          class="p-6 rounded-xl canvas-tertiary w-full"
+          x-show="showDebug"
+          x-transition
+          x-cloak
+        >
+          <pre
+            x-text="JSON.stringify($data, null, 2)"
+            class="font-mono whitespace-pre text-muted text-start break-all overflow-x-scroll">
+          </pre>
+        </div>
 
-				<!-- OffWeek Section -->
-				<div x-cloak x-transition x-show="isOffWeek && !hasPreviewVerse" class="w-full max-sm:mt-8">
-					<OffWeek nextVerseComesInDays={nextVerseComesInDays} />
-				</div>
+        <!-- OffWeek Section -->
+        <div
+          x-cloak
+          x-transition
+          x-show="isOffWeek && !hasPreviewVerse"
+          class="w-full max-sm:mt-8"
+        >
+          <OffWeek nextVerseComesInDays={nextVerseComesInDays} />
+        </div>
 
-				<!-- More Actions Bible Verse -->
-				<section class="flex flex-col gap-2" x-transition x-show="Boolean(hasPreviewVerse || !isOffWeek)" x-cloak>
-					<h3 class="text-base uppercase font-medium text-muted">Dig Deeper</h3>
-					<ul class="menu text-primary pr-2 menu-lg surface-primary w-full rounded-box">
-						<!-- Blog -->
-						<li class="w-full !bg-[inherit] text-primary !text-[inherit]" role="button">
-							<a 
-								class="flex items-center flex-nowrap gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
-								x-show="isScheduledVerse"
-								x-bind:href="malachiDailyBlogUrl"
-								target="_blank"
-							>
-								<div class="flex gap-4 items-center">
-									<div x-html="iconArticle"></div>
-									<div>
-										<p class="text-primary font-medium" x-text="'Learn the context of ' + scriptureRef"></p>
-										<p class="text-muted text-sm">New blog post every day, excluding Off Weeks</p>
-									</div>
-								</div>
-								<span x-html="iconRightArrowSVG"></span>
-							</a>
-						</li>
-						<div class="ml-2 bg-gray-100 dark:bg-gray-600 h-[2px] w-full" role="separator" />
-						<!-- Bible.com -->
-						<li class="w-full !bg-[inherit] text-primary !text-[inherit]" role="button">
-							<a 
-								class="flex gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
-								x-bind:href="bibleDotComUrl"
-								target="_blank"
-							>
-								<div class="flex gap-4 items-center">
-									<div x-html="iconYVBible"></div>
-									<div>
-										<p class="text-primary font-medium" x-text="'Read ' + (scriptureRef ? scriptureRef.split(':')[0] : '') + ' on Bible.com'"></p>
-									</div>
-								</div>
-								<span x-html="iconRightArrowSVG"></span>
-							</a>
-						</li>
-					</ul>
-				</section>
+        <!-- More Actions Bible Verse -->
+        <section
+          class="flex flex-col gap-2"
+          x-transition
+          x-show="Boolean(hasPreviewVerse || !isOffWeek)"
+          x-cloak
+        >
+          <h3 class="text-base uppercase font-medium text-muted">Dig Deeper</h3>
+          <ul
+            class="menu text-primary pr-2 menu-lg surface-primary w-full rounded-box"
+          >
+            <!-- Blog -->
+            <li
+              class="w-full !bg-[inherit] text-primary !text-[inherit]"
+              role="button"
+            >
+              <a
+                class="flex items-center flex-nowrap gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
+                x-show="isScheduledVerse"
+                x-bind:href="malachiDailyBlogUrl"
+                target="_blank"
+              >
+                <div class="flex gap-4 items-center">
+                  <div x-html="iconArticle"></div>
+                  <div>
+                    <p
+                      class="text-primary font-medium"
+                      x-text="'Learn the context of ' + scriptureRef"
+                    >
+                    </p>
+                    <p class="text-muted text-sm">
+                      New blog post every day, excluding Off Weeks
+                    </p>
+                  </div>
+                </div>
+                <span x-html="iconRightArrowSVG"></span>
+              </a>
+            </li>
+            <div
+              class="ml-2 bg-gray-100 dark:bg-gray-600 h-[2px] w-full"
+              role="separator"
+            >
+            </div>
+            <!-- Bible.com -->
+            <li
+              class="w-full !bg-[inherit] text-primary !text-[inherit]"
+              role="button"
+            >
+              <a
+                class="flex gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
+                x-bind:href="bibleDotComUrl"
+                target="_blank"
+              >
+                <div class="flex gap-4 items-center">
+                  <div x-html="iconYVBible"></div>
+                  <div>
+                    <p
+                      class="text-primary font-medium"
+                      x-text="'Read ' + (scriptureRef ? scriptureRef.split(':')[0] : '') + ' on Bible.com'"
+                    >
+                    </p>
+                  </div>
+                </div>
+                <span x-html="iconRightArrowSVG"></span>
+              </a>
+            </li>
+          </ul>
+        </section>
 
-				<!-- Select Previous Verse -->
-				<div x-cloak x-show="true" x-transition>
-					<SelectPreviousVerse />
-				</div>
+        <!-- Select Previous Verse -->
+        <div class="w-full" x-cloak x-show="true" x-transition>
+          <SelectPreviousVerse />
+        </div>
 
-				<!-- Notification Alert -->
-				<div
-					x-data={`{ 
+        <!-- Notification Alert -->
+        <div
+          x-data={`{ 
 						showAlert: false,
 						shouldShowAlert() {
 							if (notificationAlert.length) {
@@ -1139,31 +1199,31 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							$watch('notificationAlert', this.shouldShowAlert);
 						},
 					}`}
-					x-on:click="hideAlert"
-					x-cloak
-					x-transition
-					x-show="showAlert"
-					class="text-primary alert alert-warning dark:bg-red-900 dark:border-red-900 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-2xl w-fit max-sm:w-auto max-sm:max-w-full"
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						fill="none"
-						viewBox="0 0 24 24"
-						class="stroke-current shrink-0 w-6 h-6"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-						></path>
-					</svg>
-					<span x-text="notificationAlert"></span>
-				</div>
+          x-on:click="hideAlert"
+          x-cloak
+          x-transition
+          x-show="showAlert"
+          class="text-primary alert alert-warning dark:bg-red-900 dark:border-red-900 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-2xl w-fit max-sm:w-auto max-sm:max-w-full"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            class="stroke-current shrink-0 w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <span x-text="notificationAlert"></span>
+        </div>
 
-				<!-- Notification Info -->
-				<div
-					x-data={`{ 
+        <!-- Notification Info -->
+        <div
+          x-data={`{ 
 						showAlert: false,
 						shouldShowAlert() {
 							if (notificationInfo.length) {
@@ -1184,555 +1244,600 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 							$watch('notificationInfo', this.shouldShowAlert);
 						},
 					}`}
-					x-on:click="hideAlert"
-					x-cloak
-					x-transition
-					x-show="showAlert"
-					class="text-primary alert alert-info surface-primary border-white dark:border-gray-600 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-2xl w-fit max-sm:w-auto max-sm:max-w-full"
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						fill="none"
-						viewBox="0 0 24 24"
-						class="stroke-current shrink-0 w-6 h-6"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-						></path>
-					</svg>
-					<span x-text="notificationInfo"></span>
-				</div>
+          x-on:click="hideAlert"
+          x-cloak
+          x-transition
+          x-show="showAlert"
+          class="text-primary alert alert-info surface-primary border-white dark:border-gray-600 flex-wrap-none fixed z-40 bottom-4 right-4 max-sm:left-4 shadow-2xl w-fit max-sm:w-auto max-sm:max-w-full"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            class="stroke-current shrink-0 w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <span x-text="notificationInfo"></span>
+        </div>
 
-				<!-- Subscribe -->
-				<div
-					class="relative w-full max-sm:mx-[-24px] max-sm:w-screen rounded-xl canvas-tertiary"
-					x-ref="subscribeSection"
-					x-cloak
-					x-show="showSubscribeSection"
-				>
-					<iframe
-						src="https://embeds.beehiiv.com/2f6c51bb-5e19-4053-95f7-d0f01ecd6546"
-						data-test-id="beehiiv-embed"
-						class="opacity-0 duration-200 transition-opacity w-full rounded-xl canvas-tertiary skeleton"
-						height="320"
-						title="Subscribe to the Malachi Daily email newsletter"
-						frameborder="0"
-						scrolling="no"
-						style="margin: 0;"
-						loading="lazy"
-						x-bind:onload="setTimeout(() => { $el.classList.remove('opacity-0') }, 1000)"
-					></iframe>
-					<!-- Stop Showing Subscribe -->
-					<svg
-						role="button"
-						x-on:click="handleHideSubscribeSection"
-						class="cursor-pointer text-white top-6 right-6 absolute"
-						width="28"
-						height="28"
-						viewBox="0 0 24 24"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path
-							fill="none"
-							stroke="currentColor"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2.5"
-							d="m7 7l10 10M7 17L17 7"></path>
-					</svg>
-				</div>
-			</div>
-		</main>
-		<!-- Footer -->
-		<footer
-			class="w-full safe-area-bottom-padding !bg-opacity-10 bg-gray-800 dark:bg-gray-100"
-		>
-			<SectionLinks />
-		</footer>
-	</div>
+        <!-- Subscribe -->
+        <div
+          class="relative w-full max-sm:mx-[-24px] max-sm:w-screen rounded-xl canvas-tertiary"
+          x-ref="subscribeSection"
+          x-cloak
+          x-show="showSubscribeSection"
+        >
+          <iframe
+            src="https://embeds.beehiiv.com/2f6c51bb-5e19-4053-95f7-d0f01ecd6546"
+            data-test-id="beehiiv-embed"
+            class="opacity-0 duration-200 transition-opacity w-full rounded-xl canvas-tertiary skeleton"
+            height="320"
+            title="Subscribe to the Malachi Daily email newsletter"
+            frameborder="0"
+            scrolling="no"
+            style="margin: 0;"
+            loading="lazy"
+            x-bind:onload="setTimeout(() => { $el.classList.remove('opacity-0') }, 1000)"
+          ></iframe>
+          <!-- Stop Showing Subscribe -->
+          <svg
+            role="button"
+            x-on:click="handleHideSubscribeSection"
+            class="cursor-pointer text-white top-6 right-6 absolute"
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              d="m7 7l10 10M7 17L17 7"></path>
+          </svg>
+        </div>
+      </div>
+    </main>
+    <!-- Footer -->
+    <footer
+      class="w-full safe-area-bottom-padding !bg-opacity-10 bg-gray-800 dark:bg-gray-100"
+    >
+      <SectionLinks />
+    </footer>
+  </div>
 
-	<script>
-		import {
-			requestNotificationPermission,
-			messaging,
-			getUserFirebaseNotificationToken,
-		} from "../messaging_init_on_client.js";
-		import {
-			constructBibleDotComChapterURL,
-			type BookName,
-		} from "../api/bible/static/books.ts";
-		import { removeAlpineAttributes, setAlpineState } from "../utils";
-		import { MALACHI_BLOG_URL } from "../utils/constants";
+  <script>
+    import {
+      requestNotificationPermission,
+      messaging,
+      getUserFirebaseNotificationToken,
+    } from "../messaging_init_on_client.js";
+    import {
+      constructBibleDotComChapterURL,
+      type BookName,
+    } from "../api/bible/static/books.ts";
+    import { removeAlpineAttributes, setAlpineState } from "../utils";
+    import { MALACHI_BLOG_URL } from "../utils/constants";
 
-		declare global {
-			var setAlpineState: Function;
-		}
+    declare global {
+      var setAlpineState: Function;
+    }
 
-		async function enableNoSleepMode() {
-			// The wake lock sentinel.
-			let wakeLock = null;
+    async function enableNoSleepMode() {
+      // The wake lock sentinel.
+      let wakeLock = null;
 
-			try {
-				wakeLock = await navigator.wakeLock.request("screen");
-				wakeLock.addEventListener("release", () => {
-					console.log("Wake Lock was disabled");
-				});
-				console.log("Wake Lock is enabled");
-			} catch (err: Error | any) {
-				console.error(`${err?.name}, ${err?.message}`);
-			}
-		}
+      try {
+        wakeLock = await navigator.wakeLock.request("screen");
+        wakeLock.addEventListener("release", () => {
+          console.log("Wake Lock was disabled");
+        });
+        console.log("Wake Lock is enabled");
+      } catch (err: Error | any) {
+        console.error(`${err?.name}, ${err?.message}`);
+      }
+    }
 
-		enableNoSleepMode();
+    enableNoSleepMode();
 
-		console.log(
-			"🙏".repeat(15) +
-				"\n\nWelcome to the console! Jesus loves you.\n\n" +
-				"🙏".repeat(15),
-		);
+    console.log(
+      "🙏".repeat(15) +
+        "\n\nWelcome to the console! Jesus loves you.\n\n" +
+        "🙏".repeat(15),
+    );
 
-		function toggleDarkMode() {
-			document.documentElement.classList.toggle("dark");
-		}
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle("dark");
+    }
 
-		function getFromLocalStorage(key: string, defaultValue: any) {
-			const value = localStorage.getItem(key);
-			if ((!value && (typeof value === 'number' && value !== 0)) || value === 'undefined' || value === null) {
-				return defaultValue;
-			} else if (typeof value === 'number') {
-				return value;
-			} else {
-				let returnValue;
-				try {
-					returnValue = JSON.parse(value || '');
-				} catch {
-					returnValue = value;
-				}
-				return returnValue;
-			}
-		}
+    function getFromLocalStorage(key: string, defaultValue: any) {
+      const value = localStorage.getItem(key);
+      if (
+        (!value && typeof value === "number" && value !== 0) ||
+        value === "undefined" ||
+        value === null
+      ) {
+        return defaultValue;
+      } else if (typeof value === "number") {
+        return value;
+      } else {
+        let returnValue;
+        try {
+          returnValue = JSON.parse(value || "");
+        } catch {
+          returnValue = value;
+        }
+        return returnValue;
+      }
+    }
 
-		// Local storage values
-		const showFirstLetter = getFromLocalStorage('showFirstLetter', false);
-		const showSerifFont = getFromLocalStorage('showSerifFont', false);
-		const showSubscribeSection = getFromLocalStorage('showSubscribeSection', true);
-		const shouldRandomizeOrderOfHiddenWords = getFromLocalStorage('shouldRandomizeOrderOfHiddenWords', false);
-		const isDarkMode = getFromLocalStorage('isDarkMode', Boolean(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches));
-		const bibleVersionPreference = getFromLocalStorage('bibleVersionPreference', 'NIV');
-		const offWeekScriptureRef = getFromLocalStorage('offWeekScriptureRef', '');
-		const offWeekScriptureVersesObj = getFromLocalStorage('offWeekScriptureVersesObj', undefined);
+    // Local storage values
+    const showFirstLetter = getFromLocalStorage("showFirstLetter", false);
+    const showSerifFont = getFromLocalStorage("showSerifFont", false);
+    const showSubscribeSection = getFromLocalStorage(
+      "showSubscribeSection",
+      true,
+    );
+    const shouldRandomizeOrderOfHiddenWords = getFromLocalStorage(
+      "shouldRandomizeOrderOfHiddenWords",
+      false,
+    );
+    const isDarkMode = getFromLocalStorage(
+      "isDarkMode",
+      Boolean(
+        window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches,
+      ),
+    );
+    const bibleVersionPreference = getFromLocalStorage(
+      "bibleVersionPreference",
+      "NIV",
+    );
+    const offWeekScriptureRef = getFromLocalStorage("offWeekScriptureRef", "");
+    const offWeekScriptureVersesObj = getFromLocalStorage(
+      "offWeekScriptureVersesObj",
+      undefined,
+    );
 
-		if (isDarkMode) {
-			toggleDarkMode();
-		}
+    if (isDarkMode) {
+      toggleDarkMode();
+    }
 
-		const isUserAgentOniOS = (): boolean => {
-			const iOS = window.navigator.userAgent
-				.toLowerCase()
-				.match(/(iphone|ipad|ipod)/);
-			// return boolean
-			return iOS ? true : false;
-		};
+    const isUserAgentOniOS = (): boolean => {
+      const iOS = window.navigator.userAgent
+        .toLowerCase()
+        .match(/(iphone|ipad|ipod)/);
+      // return boolean
+      return iOS ? true : false;
+    };
 
-		const getiOSVersion = () => {
-			let iOSVersionNumber: number = 0;
-			const iOS = window.navigator.userAgent
-				.toLowerCase()
-				.match(/(iphone|ipad|ipod)/);
-			const iOSVersionMatch = /CPU iPhone OS (\d+_\d+)/.exec(
-				window.navigator.userAgent,
-			);
-			iOSVersionNumber = parseFloat(
-				iOSVersionMatch?.[1]?.replace("_", ".") || "0.0",
-			);
+    const getiOSVersion = () => {
+      let iOSVersionNumber: number = 0;
+      const iOS = window.navigator.userAgent
+        .toLowerCase()
+        .match(/(iphone|ipad|ipod)/);
+      const iOSVersionMatch = /CPU iPhone OS (\d+_\d+)/.exec(
+        window.navigator.userAgent,
+      );
+      iOSVersionNumber = parseFloat(
+        iOSVersionMatch?.[1]?.replace("_", ".") || "0.0",
+      );
 
-			if (!iOS) {
-				// iOS is not detected. Must be using something else.
-				return iOSVersionNumber;
-			}
+      if (!iOS) {
+        // iOS is not detected. Must be using something else.
+        return iOSVersionNumber;
+      }
 
-			return iOSVersionNumber;
-		};
+      return iOSVersionNumber;
+    };
 
-		// Get the Alpine data connected to the DOM.
-		document.documentElement.setAttribute("x-data", "malachi");
+    // Get the Alpine data connected to the DOM.
+    document.documentElement.setAttribute("x-data", "malachi");
 
-		// Make it where I can easily update the alpine state when testing.
-		window.setAlpineState = setAlpineState;
+    // Make it where I can easily update the alpine state when testing.
+    window.setAlpineState = setAlpineState;
 
-		document.addEventListener("alpine:init", () => {
-			const Alpine = window["Alpine"] || {};
-			Alpine.data("malachi", () => ({
-				isOffWeek: false,
-				toggleDarkMode: toggleDarkMode,
-				isDarkMode,
-				isPWAInstalled: window.matchMedia("(display-mode: standalone)").matches,
-				passageNum: 0,
-				bookName: "",
-				chapter: 0,
-				hasPreviewVerse: false,
-				resetScriptureGuessInputs() {
-					document.querySelectorAll('[data-underscores]').forEach((el: any) => {
-						el.innerText = "";
-						el.removeAttribute('data-solved');
-						el.classList.remove('focus:outline');
-						el.classList.remove('outline-2');
-						el.classList.remove('outline-green-400');
-						el.classList.remove('outline-red-400');
-					});
-				},
-				get bibleDotComUrl() {
-					const bibleDotComChapterUrl = constructBibleDotComChapterURL({
-						book: this.bookName as BookName,
-						chapter: this.chapter,
-						versionShortCode: this.bibleVersionPreference,
-					});
+    document.addEventListener("alpine:init", () => {
+      const Alpine = window["Alpine"] || {};
+      Alpine.data("malachi", () => ({
+        isOffWeek: false,
+        toggleDarkMode: toggleDarkMode,
+        isDarkMode,
+        isPWAInstalled: window.matchMedia("(display-mode: standalone)").matches,
+        passageNum: 0,
+        bookName: "",
+        chapter: 0,
+        hasPreviewVerse: false,
+        resetScriptureGuessInputs() {
+          document.querySelectorAll("[data-underscores]").forEach((el: any) => {
+            el.innerText = "";
+            el.removeAttribute("data-solved");
+            el.classList.remove("focus:outline");
+            el.classList.remove("outline-2");
+            el.classList.remove("outline-green-400");
+            el.classList.remove("outline-red-400");
+          });
+        },
+        get bibleDotComUrl() {
+          const bibleDotComChapterUrl = constructBibleDotComChapterURL({
+            book: this.bookName as BookName,
+            chapter: this.chapter,
+            versionShortCode: this.bibleVersionPreference,
+          });
 
-					return bibleDotComChapterUrl;
-				},
-				// This tells me the verse is not a one-off from a URL param,
-				// which means it has devotional content created from Malachi Daily.
-				get isScheduledVerse() {
-					return this.passageNum;
-				},
-				resetScriptureHTMLCache() {
-					// Delete existing properties in scriptureHTMLCache
-					Object.keys(this.scriptureHTMLCache).forEach((key: string) => {
-						delete this.scriptureHTMLCache[Number(key)];
-					});
-				},
-				get malachiDailyBlogUrl() {
-					const url = new URL(MALACHI_BLOG_URL);
-					url.searchParams.set("q", this.scriptureRef);
-					url.searchParams.set("referring_domain", "app.malachidaily.com");
-					url.searchParams.set("utm_source", "malachi-daily-web-app");
-					url.searchParams.set("utm_medium", "referral");
+          return bibleDotComChapterUrl;
+        },
+        // This tells me the verse is not a one-off from a URL param,
+        // which means it has devotional content created from Malachi Daily.
+        get isScheduledVerse() {
+          return this.passageNum;
+        },
+        resetScriptureHTMLCache() {
+          // Delete existing properties in scriptureHTMLCache
+          Object.keys(this.scriptureHTMLCache).forEach((key: string) => {
+            delete this.scriptureHTMLCache[Number(key)];
+          });
+        },
+        get malachiDailyBlogUrl() {
+          const url = new URL(MALACHI_BLOG_URL);
+          url.searchParams.set("q", this.scriptureRef);
+          url.searchParams.set("referring_domain", "app.malachidaily.com");
+          url.searchParams.set("utm_source", "malachi-daily-web-app");
+          url.searchParams.set("utm_medium", "referral");
 
-					return url;
-				},
-				daysUntilNextVerse: 0,
-				showPWAInstallDrawer() {
-					const installDialogEl = document.getElementById('install-dialog') as HTMLElement & { show: () => void };
-					installDialogEl?.show();
-				},
-				// https://webmasters.stackexchange.com/a/142231
-				get isUsingArcBrowser() {
-					return Boolean(window
-						.getComputedStyle(document.documentElement)
-						.getPropertyValue('--arc-palette-background'))
-				},
-				init() {
-					if (!this.isOffWeek && offWeekScriptureRef && offWeekScriptureVersesObj) {
-						// Remove the off week data when it's an ON week.
-						localStorage.removeItem('offWeekScriptureRef');
-						localStorage.removeItem('offWeekScriptureVersesObj');
-					}
+          return url;
+        },
+        daysUntilNextVerse: 0,
+        showPWAInstallDrawer() {
+          const installDialogEl = document.getElementById(
+            "install-dialog",
+          ) as HTMLElement & { show: () => void };
+          installDialogEl?.show();
+        },
+        // https://webmasters.stackexchange.com/a/142231
+        get isUsingArcBrowser() {
+          return Boolean(
+            window
+              .getComputedStyle(document.documentElement)
+              .getPropertyValue("--arc-palette-background"),
+          );
+        },
+        init() {
+          if (
+            !this.isOffWeek &&
+            offWeekScriptureRef &&
+            offWeekScriptureVersesObj
+          ) {
+            // Remove the off week data when it's an ON week.
+            localStorage.removeItem("offWeekScriptureRef");
+            localStorage.removeItem("offWeekScriptureVersesObj");
+          }
 
-					document.getElementById("install-dialog")?.addEventListener("ready", () => {
-						// Arc browser does not support PWA installs.
-						if (!this.isPWAInstalled && !this.isUsingArcBrowser) {
-							this.showPWAInstallDrawer()
-						}
-					})		
+          document
+            .getElementById("install-dialog")
+            ?.addEventListener("ready", () => {
+              // Arc browser does not support PWA installs.
+              if (!this.isPWAInstalled && !this.isUsingArcBrowser) {
+                this.showPWAInstallDrawer();
+              }
+            });
 
-					// Set the native operating system badge.
-					const setAppBadgeNative = (value: number) => {
-						const supportsAppBadge = "setAppBadge" in navigator;
-						if (
-							supportsAppBadge &&
-							matchMedia("(display-mode: standalone)").matches
-						) {
-							navigator.setAppBadge(value);
-						}
-					};
+          // Set the native operating system badge.
+          const setAppBadgeNative = (value: number) => {
+            const supportsAppBadge = "setAppBadge" in navigator;
+            if (
+              supportsAppBadge &&
+              matchMedia("(display-mode: standalone)").matches
+            ) {
+              navigator.setAppBadge(value);
+            }
+          };
 
-					messaging.onMessage((payload) => {
-						console.log("message received", payload);
-						// Update the UI to include the received message.
-						this.notificationInfo =
-							`${payload?.notification?.title}: ${payload?.notification?.body}` ||
-							"";
+          messaging.onMessage((payload) => {
+            console.log("message received", payload);
+            // Update the UI to include the received message.
+            this.notificationInfo =
+              `${payload?.notification?.title}: ${payload?.notification?.body}` ||
+              "";
 
-						// Send web push notification to the device
-						if (this.notificationInfo) {
-							// Show the notification
-							const notification = new Notification(
-								payload?.notification?.title,
-								{
-									body: payload?.notification?.body,
-									icon: "apple-touch-icon.png",
-								},
-							);
+            // Send web push notification to the device
+            if (this.notificationInfo) {
+              // Show the notification
+              const notification = new Notification(
+                payload?.notification?.title,
+                {
+                  body: payload?.notification?.body,
+                  icon: "apple-touch-icon.png",
+                },
+              );
 
-							setAppBadgeNative(1);
+              setAppBadgeNative(1);
 
-							notification.onclick = () => {
-								window.focus();
-								notification.close();
-							};
-						}
-					});
+              notification.onclick = () => {
+                window.focus();
+                notification.close();
+              };
+            }
+          });
 
-					getUserFirebaseNotificationToken().then(
-						(token) => (this.firebaseCMToken = token),
-					);
+          getUserFirebaseNotificationToken().then(
+            (token) => (this.firebaseCMToken = token),
+          );
 
-					removeAlpineAttributes();
+          removeAlpineAttributes();
 
-					// TODO - here I want to fade in the verse again every time.
-					// This runs when the user opens the app/page.
-					window.addEventListener("focus", () => {
-						setAppBadgeNative(0);
+          // TODO - here I want to fade in the verse again every time.
+          // This runs when the user opens the app/page.
+          window.addEventListener("focus", () => {
+            setAppBadgeNative(0);
 
-						let lastRefresh = localStorage.getItem("lastRefresh");
+            let lastRefresh = localStorage.getItem("lastRefresh");
 
-						if (!lastRefresh) {
-							const lastRefresh = JSON.stringify(Date.now());
-							localStorage.setItem("lastRefresh", lastRefresh);
-							return;
-						}
+            if (!lastRefresh) {
+              const lastRefresh = JSON.stringify(Date.now());
+              localStorage.setItem("lastRefresh", lastRefresh);
+              return;
+            }
 
-						const isLastRefreshFromToday = lastRefresh
-							? new Date(Number(lastRefresh)).toDateString() ===
-							  new Date().toDateString()
-							: false;
-						const isLastRefreshAnHourOrMoreAgo = Boolean(
-							lastRefresh && Date.now() - Number(lastRefresh) > 3600000,
-						);
+            const isLastRefreshFromToday = lastRefresh
+              ? new Date(Number(lastRefresh)).toDateString() ===
+                new Date().toDateString()
+              : false;
+            const isLastRefreshAnHourOrMoreAgo = Boolean(
+              lastRefresh && Date.now() - Number(lastRefresh) > 3600000,
+            );
 
-						if (!isLastRefreshFromToday || isLastRefreshAnHourOrMoreAgo) {
-							localStorage.removeItem("lastRefresh");
-							window.location.reload();
-						}
-					});
+            if (!isLastRefreshFromToday || isLastRefreshAnHourOrMoreAgo) {
+              localStorage.removeItem("lastRefresh");
+              window.location.reload();
+            }
+          });
 
-					setTimeout(() => {
-						const allowedKeys = ["isOffWeek", "daysUntilNextVerse"];
-						// Get URL params and try to setAlpineState
-						const urlParams = new URLSearchParams(window.location.search);
-						for (const [key, value] of urlParams.entries()) {
-							if (!allowedKeys.includes(key)) {
-								continue;
-							}
+          setTimeout(() => {
+            const allowedKeys = ["isOffWeek", "daysUntilNextVerse"];
+            // Get URL params and try to setAlpineState
+            const urlParams = new URLSearchParams(window.location.search);
+            for (const [key, value] of urlParams.entries()) {
+              if (!allowedKeys.includes(key)) {
+                continue;
+              }
 
-							setAlpineState(key, JSON.parse(value));
-						}
-					}, 500);
+              setAlpineState(key, JSON.parse(value));
+            }
+          }, 500);
 
-					// Display the off week scripture when it's an off week.
-					this.$watch('isOffWeek', () => {
-						// If it's an off week, set the review scripture ref to what's been set.
-						if (this.isOffWeek && offWeekScriptureRef && offWeekScriptureVersesObj && this.daysUntilNextVerse !== 7) {
-							this.scriptureRef = offWeekScriptureRef;
-							this.versesObj = offWeekScriptureVersesObj;
-							this.hasPreviewVerse = true;
-							this.fidelity = 0;
-						} else if ((!this.isOffWeek && offWeekScriptureRef && offWeekScriptureVersesObj) || (this.daysUntilNextVerse === 7)) {
-							// Remove the off week data when it's an on week.
-							localStorage.removeItem('offWeekScriptureRef');
-							localStorage.removeItem('offWeekScriptureVersesObj');
-						}
-					})
+          // Display the off week scripture when it's an off week.
+          this.$watch("isOffWeek", () => {
+            // If it's an off week, set the review scripture ref to what's been set.
+            if (
+              this.isOffWeek &&
+              offWeekScriptureRef &&
+              offWeekScriptureVersesObj &&
+              this.daysUntilNextVerse !== 7
+            ) {
+              this.scriptureRef = offWeekScriptureRef;
+              this.versesObj = offWeekScriptureVersesObj;
+              this.hasPreviewVerse = true;
+              this.fidelity = 0;
+            } else if (
+              (!this.isOffWeek &&
+                offWeekScriptureRef &&
+                offWeekScriptureVersesObj) ||
+              this.daysUntilNextVerse === 7
+            ) {
+              // Remove the off week data when it's an on week.
+              localStorage.removeItem("offWeekScriptureRef");
+              localStorage.removeItem("offWeekScriptureVersesObj");
+            }
+          });
 
-					// This is like garbage collection for the expensive operation to get underscores
-					// for a verse.
-					this.$watch('scriptureRef', () => {
-						this.resetScriptureHTMLCache();
-					})
-					this.$watch('bibleVersionPreference', () => {
-						this.resetScriptureHTMLCache();
-					})
-					this.$watch('showFirstLetter', () => {
-						this.resetScriptureHTMLCache();
-					})
-					this.$watch('shouldRandomizeOrderOfHiddenWords', () => {
-						this.resetScriptureHTMLCache();
-					})
-				},
-				iconArticle: '<svg class="text-muted inline-flex" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zm4 2h10M7 12h10M7 16h10"/></svg>',
-				iconYVBible: '<svg class="text-muted inline-flex" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.344 21.836c-1.31-.177-2.567-.574-3.587-1.593-1.019-1.02-1.416-2.276-1.593-3.587C2 15.432 2 13.905 2 12.132v-.264c0-1.773 0-3.3.164-4.524.177-1.31.574-2.567 1.593-3.587 1.02-1.019 2.276-1.416 3.587-1.593C8.568 2 10.095 2 11.868 2h.264c1.773 0 3.3 0 4.524.164 1.31.177 2.567.574 3.587 1.593 1.019 1.02 1.416 2.276 1.593 3.587C22 8.568 22 10.095 22 11.868v.264c0 1.773 0 3.3-.164 4.524-.177 1.31-.574 2.567-1.593 3.587-1.02 1.019-2.276 1.416-3.587 1.593-1.224.164-2.751.164-4.524.164h-.264c-1.773 0-3.3 0-4.524-.164ZM5.172 5.172C4 6.343 4 8.229 4 12c0 3.771 0 5.657 1.172 6.828C6.343 20 8.229 20 12 20c3.771 0 5.657 0 6.828-1.172C20 17.657 20 15.771 20 12c0-3.771 0-5.657-1.172-6.828C17.657 4 15.771 4 12 4 8.229 4 6.343 4 5.172 5.172Z" fill="currentColor"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M7.978 18h6.404c1.317 0 2.169.057 2.956-.861.676-.782.62-2.097.662-3.139-.762 1.323-2.161 1.278-3.242 1.278H7.095c-1.89.004-1.163 2.721.883 2.721Z" fill="currentColor"></path></svg>',
-				iconRightArrowSVG: '<svg class="text-muted" width="24px" height="24px" stroke-width="2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
-				showDebug: (() => {
-					// Get url param debug = true
-					const url = new URL(window.location.href);
-					const urlParams = url.searchParams;
-					const debug = urlParams.get("debug");
-					if (debug === "true") {
-						return true;
-					}
-					return false;
-				})(),
-				bibleVersionData: undefined,
-				bibleVersionPreference,
-				versesObj: undefined,
-				notificationAlert: "",
-				notificationInfo: "",
-				get scriptureTextOriginal() {
-					return this.versesObj?.[this.bibleVersionPreference] || "";
-				},
-				scriptureRef: "",
-				showSerifFont,
-				iOSVersion: getiOSVersion(),
-				get isEligibleForNotificationPermission() {
-					const IOS_VERSION_WITH_NOTIFICATIONS = 16.4;
-					const iOSVersion = getiOSVersion();
+          // This is like garbage collection for the expensive operation to get underscores
+          // for a verse.
+          this.$watch("scriptureRef", () => {
+            this.resetScriptureHTMLCache();
+          });
+          this.$watch("bibleVersionPreference", () => {
+            this.resetScriptureHTMLCache();
+          });
+          this.$watch("showFirstLetter", () => {
+            this.resetScriptureHTMLCache();
+          });
+          this.$watch("shouldRandomizeOrderOfHiddenWords", () => {
+            this.resetScriptureHTMLCache();
+          });
+        },
+        iconArticle:
+          '<svg class="text-muted inline-flex" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zm4 2h10M7 12h10M7 16h10"/></svg>',
+        iconYVBible:
+          '<svg class="text-muted inline-flex" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.344 21.836c-1.31-.177-2.567-.574-3.587-1.593-1.019-1.02-1.416-2.276-1.593-3.587C2 15.432 2 13.905 2 12.132v-.264c0-1.773 0-3.3.164-4.524.177-1.31.574-2.567 1.593-3.587 1.02-1.019 2.276-1.416 3.587-1.593C8.568 2 10.095 2 11.868 2h.264c1.773 0 3.3 0 4.524.164 1.31.177 2.567.574 3.587 1.593 1.019 1.02 1.416 2.276 1.593 3.587C22 8.568 22 10.095 22 11.868v.264c0 1.773 0 3.3-.164 4.524-.177 1.31-.574 2.567-1.593 3.587-1.02 1.019-2.276 1.416-3.587 1.593-1.224.164-2.751.164-4.524.164h-.264c-1.773 0-3.3 0-4.524-.164ZM5.172 5.172C4 6.343 4 8.229 4 12c0 3.771 0 5.657 1.172 6.828C6.343 20 8.229 20 12 20c3.771 0 5.657 0 6.828-1.172C20 17.657 20 15.771 20 12c0-3.771 0-5.657-1.172-6.828C17.657 4 15.771 4 12 4 8.229 4 6.343 4 5.172 5.172Z" fill="currentColor"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M7.978 18h6.404c1.317 0 2.169.057 2.956-.861.676-.782.62-2.097.662-3.139-.762 1.323-2.161 1.278-3.242 1.278H7.095c-1.89.004-1.163 2.721.883 2.721Z" fill="currentColor"></path></svg>',
+        iconRightArrowSVG:
+          '<svg class="text-muted" width="24px" height="24px" stroke-width="2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
+        showDebug: (() => {
+          // Get url param debug = true
+          const url = new URL(window.location.href);
+          const urlParams = url.searchParams;
+          const debug = urlParams.get("debug");
+          if (debug === "true") {
+            return true;
+          }
+          return false;
+        })(),
+        bibleVersionData: undefined,
+        bibleVersionPreference,
+        versesObj: undefined,
+        notificationAlert: "",
+        notificationInfo: "",
+        get scriptureTextOriginal() {
+          return this.versesObj?.[this.bibleVersionPreference] || "";
+        },
+        scriptureRef: "",
+        showSerifFont,
+        iOSVersion: getiOSVersion(),
+        get isEligibleForNotificationPermission() {
+          const IOS_VERSION_WITH_NOTIFICATIONS = 16.4;
+          const iOSVersion = getiOSVersion();
 
-					if (!iOSVersion) {
-						return true;
-					}
+          if (!iOSVersion) {
+            return true;
+          }
 
-					if (iOSVersion < IOS_VERSION_WITH_NOTIFICATIONS) {
-						return false;
-					}
+          if (iOSVersion < IOS_VERSION_WITH_NOTIFICATIONS) {
+            return false;
+          }
 
-					return true;
-				},
-				// TODO fix this and make it show fidelity per day of week
-				get fidelityOfTheDay() {
-					// Get day of the week as a number from 0 to 6
-					const dayOfWeek = new Date().getDay();
-					// Turn that into a number from 0 to 6
-					let dayOfWeekAsNumber = 0;
-					if (dayOfWeek === 7) {
-						dayOfWeekAsNumber = 0;
-					} else {
-						dayOfWeekAsNumber = dayOfWeek;
-					}
-					return dayOfWeekAsNumber * 10;
-				},
-				fidelity: 0,
-				showFirstLetter,
-				shouldRandomizeOrderOfHiddenWords,
-				showSubscribeSection,
-				handleHideSubscribeSection() {
-					const subscribeSection = this.$refs.subscribeSection;
-					subscribeSection.style.display = "none";
-					localStorage.setItem("showSubscribeSection", "false");
-				},
-				firebaseCMToken: "",
-				get isSubscribedToNotifications() {
-					return Boolean(
-						("Notification" in window &&
-							Notification?.permission === "granted") ||
-							false,
-					);
-				},
-				isFullscreen: false,
-				async handleAskForNotificationPermissions() {
-					if (this.isSubscribedToNotifications) {
-						this.notificationInfo =
-							"Notifications will appear a few times a week";
+          return true;
+        },
+        // TODO fix this and make it show fidelity per day of week
+        get fidelityOfTheDay() {
+          // Get day of the week as a number from 0 to 6
+          const dayOfWeek = new Date().getDay();
+          // Turn that into a number from 0 to 6
+          let dayOfWeekAsNumber = 0;
+          if (dayOfWeek === 7) {
+            dayOfWeekAsNumber = 0;
+          } else {
+            dayOfWeekAsNumber = dayOfWeek;
+          }
+          return dayOfWeekAsNumber * 10;
+        },
+        fidelity: 0,
+        showFirstLetter,
+        shouldRandomizeOrderOfHiddenWords,
+        showSubscribeSection,
+        handleHideSubscribeSection() {
+          const subscribeSection = this.$refs.subscribeSection;
+          subscribeSection.style.display = "none";
+          localStorage.setItem("showSubscribeSection", "false");
+        },
+        firebaseCMToken: "",
+        get isSubscribedToNotifications() {
+          return Boolean(
+            ("Notification" in window &&
+              Notification?.permission === "granted") ||
+              false,
+          );
+        },
+        isFullscreen: false,
+        async handleAskForNotificationPermissions() {
+          if (this.isSubscribedToNotifications) {
+            this.notificationInfo =
+              "Notifications will appear a few times a week";
 
-						if (!("Notification" in window)) {
-							return;
-						}
+            if (!("Notification" in window)) {
+              return;
+            }
 
-						// Instead, show a test notification from the web push api
-						const notification = new Notification(
-							"This is a Test Notification",
-							{
-								body: `
+            // Instead, show a test notification from the web push api
+            const notification = new Notification(
+              "This is a Test Notification",
+              {
+                body: `
 									${this.scriptureWithUnderscores}
 									— ${this.scriptureRef}
 								`.trim(),
-								icon: "/logo.png",
-							},
-						);
+                icon: "/logo.png",
+              },
+            );
 
-						return;
-					}
+            return;
+          }
 
-					if (this.isEligibleForNotificationPermission) {
-						// Check if the browser supports notifications
-						if (!("Notification" in window)) {
-							this.notificationInfo =
-								"Install this web app to allow notifications. Tap share and click 'Add to Home Screen'";
-							return;
-						}
+          if (this.isEligibleForNotificationPermission) {
+            // Check if the browser supports notifications
+            if (!("Notification" in window)) {
+              this.notificationInfo =
+                "Install this web app to allow notifications. Tap share and click 'Add to Home Screen'";
+              return;
+            }
 
-						// Check if notification permissions have already been granted
-						if (Notification.permission === "granted") {
-							return;
-						}
+            // Check if notification permissions have already been granted
+            if (Notification.permission === "granted") {
+              return;
+            }
 
-						// Request notification permissions
-						try {
-							const currentToken = await requestNotificationPermission();
-							this.firebaseCMToken = currentToken;
-							this.notificationInfo = "Notification permissions granted.";
-						} catch (error: Error | any) {
-							if (
-								error?.message.includes("Can't find variable: Notification")
-							) {
-								const isUserOniOS = isUserAgentOniOS();
-								if (isUserOniOS) {
-									this.notificationInfo =
-										"Install this web app to allow notifications. Tap share and click 'Add to Home Screen'";
-								} else {
-									this.notificationInfo =
-										"Notifications are not supported on this device.";
-								}
-							} else {
-								if (isUserAgentOniOS()) {
-									this.notificationInfo =
-										"Please update to the latest iOS version to get notifications.";
-								} else {
-									this.notificationAlert =
-										error?.message ||
-										"An error occurred. Please close the app and try again.";
-								}
-							}
-						}
-					}
-				},
-				get scriptureWithUnderscores() {
-					return document.getElementById("verse-current")?.innerText || "";
-				},
-				scriptureHTMLCache: {} as {[key in number]: string},
-				get scriptureText() {
-					if (this.scriptureHTMLCache[this.fidelity]) {
-						return this.scriptureHTMLCache[this.fidelity];
-					}
-					
-					// Replace some words from the original with underscores for each character
-					// but do so where we replace more and more words as fidelity grows
-					// when fideltiy is at 0, we just return the original
-					// when fidelity is at 60, we return every word with underscores for each character
-					const words = this.scriptureTextOriginal.split(" ");
-					let hasFirstHiddenInputSet = false;
+            // Request notification permissions
+            try {
+              const currentToken = await requestNotificationPermission();
+              this.firebaseCMToken = currentToken;
+              this.notificationInfo = "Notification permissions granted.";
+            } catch (error: Error | any) {
+              if (
+                error?.message.includes("Can't find variable: Notification")
+              ) {
+                const isUserOniOS = isUserAgentOniOS();
+                if (isUserOniOS) {
+                  this.notificationInfo =
+                    "Install this web app to allow notifications. Tap share and click 'Add to Home Screen'";
+                } else {
+                  this.notificationInfo =
+                    "Notifications are not supported on this device.";
+                }
+              } else {
+                if (isUserAgentOniOS()) {
+                  this.notificationInfo =
+                    "Please update to the latest iOS version to get notifications.";
+                } else {
+                  this.notificationAlert =
+                    error?.message ||
+                    "An error occurred. Please close the app and try again.";
+                }
+              }
+            }
+          }
+        },
+        get scriptureWithUnderscores() {
+          return document.getElementById("verse-current")?.innerText || "";
+        },
+        scriptureHTMLCache: {} as { [key in number]: string },
+        get scriptureText() {
+          if (this.scriptureHTMLCache[this.fidelity]) {
+            return this.scriptureHTMLCache[this.fidelity];
+          }
 
-					function convertWordToUnderscores(
-						word: string,
-						showFirstCharacter: boolean = false,
-						index: number,
-					): string {
-						const wordToBeReplaced = word.match(/([A-Za-z]+)/gi)?.[0] || "";
+          // Replace some words from the original with underscores for each character
+          // but do so where we replace more and more words as fidelity grows
+          // when fideltiy is at 0, we just return the original
+          // when fidelity is at 60, we return every word with underscores for each character
+          const words = this.scriptureTextOriginal.split(" ");
+          let hasFirstHiddenInputSet = false;
 
-						let underscores = "_".repeat(wordToBeReplaced.length);
-						if (showFirstCharacter && word.length > 1) {
-							underscores = "_".repeat(wordToBeReplaced.length - 1);
-						} else if (wordToBeReplaced.length === 1) {
-							underscores = "_";
-						}
+          function convertWordToUnderscores(
+            word: string,
+            showFirstCharacter: boolean = false,
+            index: number,
+          ): string {
+            const wordToBeReplaced = word.match(/([A-Za-z]+)/gi)?.[0] || "";
 
-						const makeUnderscoresVisible = () => {
-							if (!underscores.length) {
-								return '';
-							}
+            let underscores = "_".repeat(wordToBeReplaced.length);
+            if (showFirstCharacter && word.length > 1) {
+              underscores = "_".repeat(wordToBeReplaced.length - 1);
+            } else if (wordToBeReplaced.length === 1) {
+              underscores = "_";
+            }
 
-							return `
+            const makeUnderscoresVisible = () => {
+              if (!underscores.length) {
+                return "";
+              }
+
+              return `
 								<span
 									id="${!hasFirstHiddenInputSet ? "" : "firstHiddenWordInput"}"
 									contenteditable="plaintext-only"
 									x-data="{
 										index: ${index},
 										correctWord: '${wordToBeReplaced.substring(
-											showFirstCharacter && word.length > 1 ? 1 : 0,
-											wordToBeReplaced.length,
-										)}',
+                      showFirstCharacter && word.length > 1 ? 1 : 0,
+                      wordToBeReplaced.length,
+                    )}',
 										showWordIsCorrect() {
 											$el.classList.add('focus:outline');
 											$el.classList.add('outline-green-400');
@@ -1874,82 +1979,90 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 									x-on:focus="$el.innerText = ''; wordIsCorrect = false;"
 								>${underscores}</span>
 							`.trim();
-						};
+            };
 
-						hasFirstHiddenInputSet = true;
+            hasFirstHiddenInputSet = true;
 
-						const bookendsOfTheWord = word.replace(
-							wordToBeReplaced,
-							"{INSERT_UNDERSCORES}",
-						);
-						const firstCharacter = showFirstCharacter
-							? wordToBeReplaced[0] || ""
-							: "";
-						let replacedWord = bookendsOfTheWord.replace(
-							"{INSERT_UNDERSCORES}",
-							firstCharacter + makeUnderscoresVisible(),
-						);
+            const bookendsOfTheWord = word.replace(
+              wordToBeReplaced,
+              "{INSERT_UNDERSCORES}",
+            );
+            const firstCharacter = showFirstCharacter
+              ? wordToBeReplaced[0] || ""
+              : "";
+            let replacedWord = bookendsOfTheWord.replace(
+              "{INSERT_UNDERSCORES}",
+              firstCharacter + makeUnderscoresVisible(),
+            );
 
-						if (word.length === 1) {
-							replacedWord = makeUnderscoresVisible();
-						}
+            if (word.length === 1) {
+              replacedWord = makeUnderscoresVisible();
+            }
 
-						return `
+            return `
 							<div class="text-[inherit] cursor-default align-bottom inline-flex whitespace-nowrap rounded-md focus:outline-2 focus:outline-blue-400">
 								${replacedWord}
 							</div>
 						`.trim();
-					}
+          }
 
-					const wordsHTML = words
-						.map((word: string, index: number) => {
-							const fidelityAsNumber: number = Number(this.fidelity);
+          const wordsHTML = words
+            .map((word: string, index: number) => {
+              const fidelityAsNumber: number = Number(this.fidelity);
 
-							if (fidelityAsNumber === 0) {
-								return word;
-							}
+              if (fidelityAsNumber === 0) {
+                return word;
+              }
 
-							if (fidelityAsNumber === 60 && word.length) {
-								return convertWordToUnderscores(word, this.showFirstLetter, index);
-							}
+              if (fidelityAsNumber === 60 && word.length) {
+                return convertWordToUnderscores(
+                  word,
+                  this.showFirstLetter,
+                  index,
+                );
+              }
 
-							const percentOfWordsHidden: number = fidelityAsNumber / 60;
-							const numOfWordsToReplace: number = Math.round(
-								percentOfWordsHidden * words.length,
-							);
+              const percentOfWordsHidden: number = fidelityAsNumber / 60;
+              const numOfWordsToReplace: number = Math.round(
+                percentOfWordsHidden * words.length,
+              );
 
-							const indicesToReplace: number[] = [];
+              const indicesToReplace: number[] = [];
 
-							if (this.shouldRandomizeOrderOfHiddenWords) {
-								// This function evenly disperses the hidden words
-								for (let i = 0; i < words.length; i += 1) {
-									const index: number = Math.floor(
-										(i * words.length) / numOfWordsToReplace,
-									);
-									indicesToReplace.push(index);
-								}
-							} else {
-								// Otherwise, hide the words from start to finish
-								for (let i = 0; i < words.length; i += 1) {
-									if (i < numOfWordsToReplace) {
-										indicesToReplace.push(i);
-									}
-								}
-							}
+              if (this.shouldRandomizeOrderOfHiddenWords) {
+                // This function evenly disperses the hidden words
+                for (let i = 0; i < words.length; i += 1) {
+                  const index: number = Math.floor(
+                    (i * words.length) / numOfWordsToReplace,
+                  );
+                  indicesToReplace.push(index);
+                }
+              } else {
+                // Otherwise, hide the words from start to finish
+                for (let i = 0; i < words.length; i += 1) {
+                  if (i < numOfWordsToReplace) {
+                    indicesToReplace.push(i);
+                  }
+                }
+              }
 
-							if (indicesToReplace.includes(index) && word.length) {
-								return convertWordToUnderscores(word, this.showFirstLetter, index);
-							}
+              if (indicesToReplace.includes(index) && word.length) {
+                return convertWordToUnderscores(
+                  word,
+                  this.showFirstLetter,
+                  index,
+                );
+              }
 
-							return word;
-						})
-						.join(" ");
+              return word;
+            })
+            .join(" ");
 
-					this.scriptureHTMLCache[this.fidelity] = wordsHTML;
+          this.scriptureHTMLCache[this.fidelity] = wordsHTML;
 
-					return wordsHTML
-				},
-			}));
-		});
-	</script>
+          return wordsHTML;
+        },
+      }));
+    });
+  </script>
 </Layout>

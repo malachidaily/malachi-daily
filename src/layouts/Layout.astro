@@ -2,126 +2,154 @@
 import "@fontsource/inconsolata/900.css"; // Specify weight
 
 interface Props {
-	title?: string;
-	description?: string;
-	ogImageUrl?: string;
+  title?: string;
+  description?: string;
+  ogImageUrl?: string;
 }
 
-const canonicalUrl = 'https://app.malachidaily.com' + Astro.url.pathname;
-const urlForTwitterDomainMetaTag = 'app.malachidaily.com';
+const canonicalUrl = "https://app.malachidaily.com" + Astro.url.pathname;
+const urlForTwitterDomainMetaTag = "app.malachidaily.com";
 
 const {
-	title = 'Malachi Daily: Memorize Bible Verses & Learn Their Context', 
-	description = 'Join thousands of Jesus followers memorizing Scripture together. Learn one Bible verse and its context bi-weekly.',
-	ogImageUrl = '/og-image.png',
+  title = "Malachi Daily: Memorize Bible Verses & Learn Their Context",
+  description = "Join thousands of Jesus followers memorizing Scripture together. Learn one Bible verse and its context bi-weekly.",
+  ogImageUrl = "/og-image.png",
 } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en" class="bg-gray-800 rounded-2xl">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="generator" content={Astro.generator} />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
-		<link rel="canonical" href={canonicalUrl} />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="generator" content={Astro.generator} />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <link rel="canonical" href={canonicalUrl} />
 
-		<title>{title}</title>
-		
-		<!-- Facebook Meta Tags - generated via https://www.opengraph.xyz -->
-		<meta property="og:url" content={Astro.url.origin} />
-		<meta property="og:type" content="website" />
-		<meta property="og:title" content={title} />
-		<meta property="og:description" content={description} />
-		<meta property="og:image" content={ogImageUrl} />
-	  
-		<!-- Twitter Meta Tags - generated via https://www.opengraph.xyz -->
-		<meta name="twitter:card" content="summary_large_image" />
-		<meta property="twitter:domain" content={urlForTwitterDomainMetaTag} />
-		<meta property="twitter:url" content={Astro.url.origin} />
-		<meta name="twitter:title" content={title} />
-		<meta name="twitter:description" content={description} />
-		<meta name="twitter:image" content={ogImageUrl} />
-	  
-		<!-- 
+    <title>{title}</title>
+
+    <!-- Facebook Meta Tags - generated via https://www.opengraph.xyz -->
+    <meta property="og:url" content={Astro.url.origin} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+
+    <!-- Twitter Meta Tags - generated via https://www.opengraph.xyz -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="twitter:domain" content={urlForTwitterDomainMetaTag} />
+    <meta property="twitter:url" content={Astro.url.origin} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <!-- 
 			This is how I can easily change the header in the PWA on light and dark mode. 
 			https://web.dev/learn/pwa/web-app-manifest 
 		-->
-		<!-- <meta name="theme-color" x-bind:content="isDarkMode ? '#1f2937' : '#f3f4f6'" /> -->
-		<!-- TEST - I want this to look dark on light and dark mode, because it sometimes gets in the way, make it fade into the bg... -->
-		<meta name="theme-color" content="#000000" />
-		<link rel="manifest" href="/manifest.json" />
+    <!-- <meta name="theme-color" x-bind:content="isDarkMode ? '#1f2937' : '#f3f4f6'" /> -->
+    <!-- TEST - I want this to look dark on light and dark mode, because it sometimes gets in the way, make it fade into the bg... -->
+    <meta name="theme-color" content="#000000" />
+    <link rel="manifest" href="/manifest.json" />
 
-		<!-- Favicon -->
-		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
-		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 
-		<!-- Google Scripts - Analytics & fonts -->
-		<link type="text/partytown" rel="preconnect" href="https://fonts.googleapis.com" />
-		<link type="text/partytown" rel="preconnect" href="https://fonts.gstatic.com" crossorigin />	
-		<script type="text/partytown" src="https://www.googletagmanager.com/gtag/js?id=G-XN36VGGVNK"></script>
-		<script type="text/partytown">
-			window.dataLayer = window.dataLayer || [];
-			function gtag() {
-			  dataLayer.push(arguments);
-			}
-			gtag("js", new Date());
-			gtag("config", "G-XN36VGGVNK");
-		  </script>
-		<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <!-- Google Scripts - Analytics & fonts -->
+    <link
+      type="text/partytown"
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      type="text/partytown"
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <script
+      type="text/partytown"
+      src="https://www.googletagmanager.com/gtag/js?id=G-XN36VGGVNK"></script>
+    <script type="text/partytown">
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-XN36VGGVNK");
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,700;1,700&display=swap"
+      rel="stylesheet"
+    />
 
-		<!-- Confetti!! -->
-		<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.0/dist/confetti.browser.min.js"></script>
+    <!-- Confetti!! -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.0/dist/confetti.browser.min.js"
+    ></script>
 
-		<!-- Register the service worker up-front -->
-		<script>
-			if ('serviceWorker' in navigator) {
-				navigator
-					.serviceWorker
-					.register('/service-worker.js')
-			}
-		</script>
+    <!-- Register the service worker up-front -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/service-worker.js");
+      }
+    </script>
 
-		<!-- Styles -->
-		<style is:global>
-			div.font-scripture {
-				font-family: "Inconsolata";
-				word-spacing: -4px;
-				letter-spacing: normal;
-				font-size: clamp(1.75rem, 2.65vw, 2.25rem) !important;
-			}
+    <!-- Styles -->
+    <style is:global>
+      div.font-scripture {
+        font-family: "Inconsolata";
+        word-spacing: -4px;
+        letter-spacing: normal;
+        font-size: clamp(1.75rem, 2.65vw, 2.25rem) !important;
+      }
 
-			body {
-				@apply max-sm:overflow-x-hidden;
-			}
+      body {
+        @apply max-sm:overflow-x-hidden;
+      }
 
-			div.font-scripture-serif {
-				font-family: 'IBM Plex Mono', monospace;
-				font-style: italic;
-				word-spacing: -8px;
-				letter-spacing: -2px;
-				font-size: clamp(1.75rem, 2.65vw, 2.25rem) !important;
-			}
+      div.font-scripture-serif {
+        font-family: "IBM Plex Mono", monospace;
+        font-style: italic;
+        word-spacing: -8px;
+        letter-spacing: -2px;
+        font-size: clamp(1.75rem, 2.65vw, 2.25rem) !important;
+      }
 
-			[x-cloak] {
-				@apply hidden;
-			}
+      [x-cloak] {
+        @apply hidden;
+      }
 
-			.dock-verse-day-scrubber {
-				@apply max-sm:mt-0 max-sm:w-auto max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:p-4 max-sm:z-20 max-sm:bg-gray-100 max-sm:shadow-sm max-sm:border-t-[1px] max-sm:border-gray-300 max-sm:mx-0;
-			}
-		</style>
-	</head>
-	<body class="overflow-x-hidden">
-		<script>
-			import "@storedotapp/pwa-install-dialog";
-		</script>
-		<pwa-install-dialog 
-			id="install-dialog"
-			app="app-malachidaily-com" 
-			x-bind:theme="isDarkMode ? 'dark' : 'light'"
-		></pwa-install-dialog>
-		<slot />
-	</body>
+      .dock-verse-day-scrubber {
+        @apply max-sm:mt-0 max-sm:w-auto max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:p-4 max-sm:z-20 max-sm:bg-gray-100 max-sm:shadow-sm max-sm:border-t-[1px] max-sm:border-gray-300 max-sm:mx-0;
+      }
+
+      /*
+				Disable text selection on touch, so that it feels
+				more like a native app. I know this is controversial,
+				but where text is likely to be selected, we re-enable it.
+			*/
+      * {
+        /* The min-w-0 comes from https://www.youtube.com/watch?v=cH8VbLM1958 */
+        @apply select-none min-w-0 min-h-0 flex-shrink-0;
+      }
+    </style>
+  </head>
+  <body
+    class="overflow-x-hidden overflow-y-hidden max-h-screen max-h-[100svh] h-full"
+  >
+    <script>
+      import "@storedotapp/pwa-install-dialog";
+    </script>
+    <pwa-install-dialog
+      id="install-dialog"
+      app="app-malachidaily-com"
+      x-bind:theme="isDarkMode ? 'dark' : 'light'"></pwa-install-dialog>
+    <slot />
+  </body>
 </html>
