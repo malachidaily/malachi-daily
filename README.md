@@ -13,6 +13,7 @@ This is a Progressive Web App (PWA) to help comunity gather together and memoriz
 - [Google Analytics](https://analytics.google.com/) - This is for analytics.
 - [Google Tag Manager](https://www.google.com/tagmanager/) - This is for analytics.
 - [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/) - This is for notifications.
+- [Bolls Life Bible API](https://bolls.life/) - This is where we get our verses from.
 
 ## Get Started
 
@@ -30,3 +31,8 @@ npm run dev
 ## Deploy to Netlify
 
 This happens automatically when a GitHub PR is merged and/or when the `main` branch is pushed. It will deply to https://app.malachidaily.com. All changes should then be visible on any device with the app installed. 
+
+## Future Ideas
+
+- Implement [`BibleScraper`](https://github.com/IonicaBizau/bible-scraper) instead of Bolls List Bible API, or as a backup, because it'll give us access to the entire Bible.com library of Bible Versions and verses.
+- Use PWABuilder to turn this into an app to be shipped to the Android Google Play Store and the iOS Apple App Store.
