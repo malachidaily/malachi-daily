@@ -261,7 +261,8 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
   </style>
   <div
     style={{
-      paddingTop: 'env(safe-area-inset-top)',
+      paddingTop: 'env(safe-area-inset-top) !important',
+      paddingBottom: `env(safe-area-inset-bottom) !important`,
     }}
     class="overflow-hidden h-screen grid grid-rows-[1fr_auto] canvas-secondary max-sm:rounded-2xl overflow-x-hidden"
     x-init={`
