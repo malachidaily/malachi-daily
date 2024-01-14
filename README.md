@@ -14,6 +14,7 @@ This is a Progressive Web App (PWA) to help comunity gather together and memoriz
 - [Google Tag Manager](https://www.google.com/tagmanager/) - This is for analytics.
 - [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/) - This is for notifications.
 - [Bolls Life Bible API](https://bolls.life/) - This is where we get our verses from.
+- [Baserow.io](https://baserow.io/) - This is where we store our data for upcoming verses.
 
 ## Get Started
 
