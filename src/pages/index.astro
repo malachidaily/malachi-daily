@@ -1255,7 +1255,6 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 	</div>
 
 	<script>
-		import { type AlpineComponent } from "alpinejs";
 		import {
 			requestNotificationPermission,
 			messaging,
@@ -1426,6 +1425,12 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 						.getPropertyValue('--arc-palette-background'))
 				},
 				init() {
+					if (!this.isOffWeek && offWeekScriptureRef && offWeekScriptureVersesObj) {
+						// Remove the off week data when it's an ON week.
+						localStorage.removeItem('offWeekScriptureRef');
+						localStorage.removeItem('offWeekScriptureVersesObj');
+					}
+
 					document.getElementById("install-dialog")?.addEventListener("ready", () => {
 						// Arc browser does not support PWA installs.
 						if (!this.isPWAInstalled && !this.isUsingArcBrowser) {

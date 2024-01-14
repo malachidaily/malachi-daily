@@ -28,6 +28,7 @@ const nowAndPastVersesFromApi = await getAllVerses({
             class="select btn-filled-contrast !btn-md !pr-10 w-fit"
         >
             <option disabled selected>Review a Past Verse</option>
+            <option id="option-clear-verse-off-week" x-show="isOffWeek">Show No Verse 🌴</option>
             {
                 nowAndPastVersesFromApi.results.map((verse: any) => {
                     const book = verse[verseTableHeaders.book];
@@ -123,6 +124,22 @@ const nowAndPastVersesFromApi = await getAllVerses({
 
     if (Boolean(selectInputEl)) {
         selectInputEl.addEventListener("change", async () => {
+            const selectedOption = selectInputEl.selectedOptions[0];
+
+            // If the option selected is to clear the verse for the off week,
+            // then clear all of the state and return.
+            if (selectedOption.id === "option-clear-verse-off-week") {
+                localStorage.removeItem('offWeekScriptureVersesObj');
+                localStorage.removeItem('offWeekScriptureRef');
+                setAlpineState("versesObj", {});
+                setAlpineState("scriptureRef", "");
+                setAlpineState("bookName", "");
+                setAlpineState("chapter", 0);
+                setAlpineState("hasPreviewVerse", false);
+                setAlpineState("fidelity", 0);
+                return;
+            }
+
             const {
                 bookId,
                 chapter,
