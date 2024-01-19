@@ -29,6 +29,10 @@ npm install
 npm run dev
 ```
 
+## [See Our Wiki](https://wiki.mutable.ai/cameronapak/malachi-daily)
+
+This will help you get more familiar with the codebase. 
+
 ## Deploy to Netlify
 
 This happens automatically when a GitHub PR is merged and/or when the `main` branch is pushed. It will deply to https://app.malachidaily.com. All changes should then be visible on any device with the app installed. 
