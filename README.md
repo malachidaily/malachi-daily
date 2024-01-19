@@ -1,4 +1,4 @@
-# Malachi Daily App
+# Malachi Daily App - OSS
 
 This is a Progressive Web App (PWA) to help comunity gather together and memorize scripture, in a fun and interactive way. The content is curated by the Malachi Daily team.
 
@@ -37,7 +37,13 @@ This will help you get more familiar with the codebase.
 
 This happens automatically when a GitHub PR is merged and/or when the `main` branch is pushed. It will deply to https://app.malachidaily.com. All changes should then be visible on any device with the app installed. 
 
-## Future Ideas
+## Contributing
+
+See the Issues Tab on GitHub for ways where you can contribute. All contributions must be submitted as a Pull Request (PR). Your contribution is welcomed. 
+
+_It is worth noting that we cannot promise your PR will be merged, but we will do our best to help and honor your help._
+
+### Ideas
 
 - Implement [`BibleScraper`](https://github.com/IonicaBizau/bible-scraper) instead of Bolls List Bible API, or as a backup, because it'll give us access to the entire Bible.com library of Bible Versions and verses.
 - Use PWABuilder to turn this into an app to be shipped to the Android Google Play Store and the iOS Apple App Store.
