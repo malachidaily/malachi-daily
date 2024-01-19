@@ -39,7 +39,7 @@ This happens automatically when a GitHub PR is merged and/or when the `main` bra
 
 ## Contributing
 
-See the [Issues Tab](/issues) on GitHub for ways where you can contribute. All contributions must be submitted as a Pull Request (PR). Your contribution is welcomed. 
+See the [Issues Tab](https://github.com/cameronapak/malachi-daily/issues) on GitHub for ways where you can contribute. All contributions must be submitted as a Pull Request (PR). Your contribution is welcomed. 
 
 _It is worth noting that we cannot promise your PR will be merged, but we will do our best to help and honor your help._
 
