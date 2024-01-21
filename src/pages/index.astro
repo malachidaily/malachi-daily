@@ -261,10 +261,10 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
   </style>
   <div
     style={{
-      paddingTop: 'env(safe-area-inset-top) !important',
+      paddingTop: "env(safe-area-inset-top) !important",
       paddingBottom: `env(safe-area-inset-bottom) !important`,
     }}
-    class="overflow-hidden h-[100svh] grid grid-rows-[1fr_auto] canvas-secondary max-sm:rounded-2xl overflow-x-hidden"
+    class="overflow-hidden h-[100svh] grid grid-rows-1 canvas-secondary max-sm:rounded-2xl overflow-x-hidden"
     x-init={`
 			versesObj = ${JSON.stringify(verses)};
 			bibleVersionData = ${JSON.stringify(bibleVersionData)};
@@ -290,7 +290,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
     vaul-drawer-wrapper=""
   >
     <main
-      class="overflow-y-scroll overflow-x-hidden w-screen h-full px-6 flex flex-col items-center"
+      class="overflow-y-scroll overflow-x-hidden w-screen h-full flex flex-col items-center"
       x-bind:class="{ 'min-h-screen': isFullscreen }"
     >
       <div
@@ -307,7 +307,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
         </p>
       </div>
       <div
-        class="max-w-[600px] w-full flex flex-col py-12 max-sm:pb-12 max-sm:pt-0 max-sm:py-6 gap-12 max-sm:gap-6"
+        class="px-6 max-w-[600px] w-full flex flex-col py-12 max-sm:pb-12 max-sm:pt-0 max-sm:py-6 gap-12 max-sm:gap-6"
       >
         <!-- LOGO Header -->
         <section
@@ -1112,12 +1112,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
         </div>
 
         <!-- OffWeek Section -->
-        <div
-          x-cloak
-          x-transition
-          x-show="isOffWeek"
-          class="w-full max-sm:mt-8"
-        >
+        <div x-cloak x-transition x-show="isOffWeek" class="w-full max-sm:mt-8">
           <OffWeek nextVerseComesInDays={nextVerseComesInDays} />
         </div>
 
@@ -1151,7 +1146,9 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
                       x-text="'Learn the context of ' + scriptureRef"
                     >
                     </p>
-                    <p class="text-wrap shrink w-full line-clamp-2 text-muted text-sm">
+                    <p
+                      class="text-wrap shrink w-full line-clamp-2 text-muted text-sm"
+                    >
                       New blog post every day, excluding Off Weeks
                     </p>
                   </div>
@@ -1324,13 +1321,14 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
           </svg>
         </div>
       </div>
+
+      <!-- Footer -->
+      <footer
+        class="w-full safe-area-bottom-padding !bg-opacity-10 bg-gray-800 dark:bg-gray-100"
+      >
+        <SectionLinks />
+      </footer>
     </main>
-    <!-- Footer -->
-    <footer
-      class="w-full safe-area-bottom-padding !bg-opacity-10 bg-gray-800 dark:bg-gray-100"
-    >
-      <SectionLinks />
-    </footer>
   </div>
 
   <script>
