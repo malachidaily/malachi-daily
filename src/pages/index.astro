@@ -1880,9 +1880,10 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 											return words.length;
 										},
 										calculateResults() {
-											// Get where data-solved exists
+                      // Get where data-solved exists
 											const words = Array.from(document.querySelectorAll('[data-solved]'));
-											if (words.length + 1 === this.numOfWordsToGuess) {
+                      const weHaveAWinner = words.length === this.numOfWordsToGuess;
+											if (weHaveAWinner) {
 												const duration = 2 * 1000;
 												const end = Date.now() + duration;
 
@@ -1908,6 +1909,8 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 														requestAnimationFrame(frame);
 													}
 												}());
+
+                        resetScriptureGuessInputs();
 											}
 										},
 										get hiddenWordElsAsArray() {
@@ -1991,7 +1994,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 										}, 100);
 									"
 									x-on:resize.window="recalculateWidth()"
-									x-on:blur="calculateResults()"
+									x-on:blur="$nextTick(() => calculateResults())"
 									x-on:input="validateWord(event)"
 									x-on:focus="$el.innerText = ''; wordIsCorrect = false;"
 								>${underscores}</span>
