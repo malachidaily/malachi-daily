@@ -52,6 +52,15 @@ function transformBibleVersesFromMultipleTranslations(data: Array<Array<Verse>>)
                 verseText.replace('<br/>', '\n')
             }
 
+            /**
+             * Remove Strongs's reference numbers, as they're not needed.
+             * 
+             * You will see a string like this:
+             * "For<S>1063</S> whosoever<S>3739</S> <S>302</S> will<S>2309</S> save<S>4982</S> his<S>846</S> life<S>5590</S> shall lose<S>622</S> it<S>846</S>; but<S>1161</S> whosoever<S>3739</S> <S>302</S> shall lose<S>622</S> his<S>846</S> life<S>5590</S> for<S>1752</S> my sake<S>1700</S> and<S>2532</S> the gospel's<S>2098</S>, the same<S>3778</S> shall save<S>4982</S> it<S>846</S>."
+             * Remove everything that starts with <S> and ends with </S>.
+             */
+            verseText = verseText.replace(/<S>[0-9]+<\/S>/g, '')
+
             // Remove anything that looks like HTML syntax in string
             verseText = verseText.replace(/(<([^>]+)>)/ig, ' ')
 
