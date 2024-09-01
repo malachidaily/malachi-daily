@@ -605,7 +605,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
               <p x-show="passageNum > 0" x-cloak x-transition>{" • "}</p>
               <p
                 class="pointer-events-none whitespace-nowrap inline"
-                x-text="daysUntilNextVerse + ' days until next verse'"
+                x-text="daysUntilNextVerse + ` day${daysUntilNextVerse === 1 ? '' : 's'} until next verse`"
               >
                 Next verse coming on
               </p>
