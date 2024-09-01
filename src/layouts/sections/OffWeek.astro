@@ -16,7 +16,7 @@ import PoppyVacationSvg from "../../components/astro/illustration/poppy-vacation
             <h2 class="text-center text-2xl text-primary font-bold">It's an Off Week</h2>
             <p
                 class="text-center text-muted whitespace-nowrap inline"
-                x-text="daysUntilNextVerse + ' days until next verse'"
+                x-text="daysUntilNextVerse + ` day${daysUntilNextVerse < 2 ? '' : 's'} until next verse`"
             >
                 -
             </p>
