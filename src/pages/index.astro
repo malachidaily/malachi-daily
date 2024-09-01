@@ -29,7 +29,7 @@ const searchParamStartVerse = urlSearchParams.get("start-verse");
 const searchParamEndVerse = urlSearchParams.get("end-verse");
 let verseToUse;
 const getVerseFromUrlParams = Boolean(
-  searchParamBook && searchParamChapter && searchParamStartVerse,
+  searchParamBook && searchParamChapter && searchParamStartVerse
 );
 
 let errorText = "";
@@ -85,39 +85,42 @@ if (getVerseFromUrlParams) {
     });
 
     function getMostCurrentVerse() {
-      const firstVerseFromApi = nowAndPastVersesFromApi.results[0];
+      const now = Date.now() / 1000; // Convert to seconds
+      const mostRecentVerseFromApi = nowAndPastVersesFromApi.results[0];
+      const nextUpcomingVerseFromApi = futureVersesFromApi.results?.[0] || null;
+      const nextNextUpcomingVerseFromApi =
+        futureVersesFromApi.results?.[1] || null;
 
-      const firstFutureVerseFromApi = futureVersesFromApi.results[0];
-      const secondFutureVerseFromApi = futureVersesFromApi.results?.[1] || null;
+      // If there's no upcoming verse, we'll use the most recent verse from the API.
+      if (mostRecentVerseFromApi && !nextUpcomingVerseFromApi) {
+        return mostRecentVerseFromApi;
+      }
 
-      const firstFutureVerseStartTime =
+      const nextUpcomingVerseFromApiStartTime =
         new Date(
-          firstFutureVerseFromApi[verseTableHeaders.startDate],
+          nextUpcomingVerseFromApi[verseTableHeaders.startDate]
         ).getTime() / 1000;
-      const secondFutureVerseStartTime = secondFutureVerseFromApi
+      const nextNextUpcomingVerseFromApiStartTime = nextNextUpcomingVerseFromApi
         ? new Date(
-            secondFutureVerseFromApi[verseTableHeaders.startDate],
+            nextNextUpcomingVerseFromApi[verseTableHeaders.startDate]
           ).getTime() / 1000
         : null;
 
-      let isFutureVerseActuallyNow = firstFutureVerseStartTime >= Date.now();
-
-      // This could happen due to cacheing, because I have a 1 day cache on most API calls.
-      if (
-        isFutureVerseActuallyNow &&
-        (secondFutureVerseStartTime
-          ? secondFutureVerseStartTime <= Date.now()
-          : false)
-      ) {
-        whenIsNextVerse = secondFutureVerseFromApi[verseTableHeaders.startDate];
-        return secondFutureVerseFromApi;
-      } else if (isFutureVerseActuallyNow) {
-        whenIsNextVerse = firstFutureVerseFromApi[verseTableHeaders.startDate];
-        return firstFutureVerseFromApi;
-      } else {
-        whenIsNextVerse = firstFutureVerseFromApi[verseTableHeaders.startDate];
-        return firstVerseFromApi;
+      // If there's an upcoming verse and it's somehow today or in the past, we'll use the next upcoming verse.
+      if (nextUpcomingVerseFromApiStartTime <= now) {
+        return nextUpcomingVerseFromApi;
       }
+
+      // If there's an upcoming verse and it's in the future, we'll use the next upcoming verse.
+      if (
+        nextNextUpcomingVerseFromApiStartTime &&
+        nextNextUpcomingVerseFromApiStartTime <= now
+      ) {
+        return nextNextUpcomingVerseFromApi;
+      }
+
+      // Return something
+      return mostRecentVerseFromApi;
     }
 
     verseToUse = getMostCurrentVerse();
@@ -191,8 +194,12 @@ try {
 const scriptureText = verses[translation];
 const scriptureRef = verseRef;
 
+let isOffWeek = false;
+
 // Off weeks are every other week. Therefore, it'll be one week before the next verse.
-const isOffWeek = Boolean(nextVerseComesInDays <= 7);
+if (nextVerseComesInDays && nextVerseComesInDays <= 7) {
+  isOffWeek = true;
+}
 ---
 
 <Layout title="Malachi Daily: Memorize Bible Verses & Learn Their Context">
@@ -448,7 +455,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
                                 ))}
                               </optgroup>
                             );
-                          },
+                          }
                         )
                       }
                     </select>
@@ -605,7 +612,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
               <p x-show="passageNum > 0" x-cloak x-transition>{" • "}</p>
               <p
                 class="pointer-events-none whitespace-nowrap inline"
-                x-text="daysUntilNextVerse + ` day${daysUntilNextVerse === 1 ? '' : 's'} until next verse`"
+                x-text="daysUntilNextVerse + ` day${daysUntilNextVerse < 2 ? '' : 's'} until next verse`"
               >
                 Next verse coming on
               </p>
@@ -1368,7 +1375,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
     console.log(
       "🙏".repeat(15) +
         "\n\nWelcome to the console! Jesus loves you.\n\n" +
-        "🙏".repeat(15),
+        "🙏".repeat(15)
     );
 
     function toggleDarkMode() {
@@ -1401,27 +1408,27 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
     const showSerifFont = getFromLocalStorage("showSerifFont", false);
     const showSubscribeSection = getFromLocalStorage(
       "showSubscribeSection",
-      true,
+      true
     );
     const shouldRandomizeOrderOfHiddenWords = getFromLocalStorage(
       "shouldRandomizeOrderOfHiddenWords",
-      false,
+      false
     );
     const isDarkMode = getFromLocalStorage(
       "isDarkMode",
       Boolean(
         window.matchMedia &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches,
-      ),
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+      )
     );
     const bibleVersionPreference = getFromLocalStorage(
       "bibleVersionPreference",
-      "NIV",
+      "NIV"
     );
     const offWeekScriptureRef = getFromLocalStorage("offWeekScriptureRef", "");
     const offWeekScriptureVersesObj = getFromLocalStorage(
       "offWeekScriptureVersesObj",
-      undefined,
+      undefined
     );
 
     if (isDarkMode) {
@@ -1442,10 +1449,10 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
         .toLowerCase()
         .match(/(iphone|ipad|ipod)/);
       const iOSVersionMatch = /CPU iPhone OS (\d+_\d+)/.exec(
-        window.navigator.userAgent,
+        window.navigator.userAgent
       );
       iOSVersionNumber = parseFloat(
-        iOSVersionMatch?.[1]?.replace("_", ".") || "0.0",
+        iOSVersionMatch?.[1]?.replace("_", ".") || "0.0"
       );
 
       if (!iOS) {
@@ -1515,7 +1522,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
         daysUntilNextVerse: 0,
         showPWAInstallDrawer() {
           const installDialogEl = document.getElementById(
-            "install-dialog",
+            "install-dialog"
           ) as HTMLElement & { show: () => void };
           installDialogEl?.show();
         },
@@ -1524,7 +1531,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
           return Boolean(
             window
               .getComputedStyle(document.documentElement)
-              .getPropertyValue("--arc-palette-background"),
+              .getPropertyValue("--arc-palette-background")
           );
         },
         init() {
@@ -1573,7 +1580,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
                 {
                   body: payload?.notification?.body,
                   icon: "apple-touch-icon.png",
-                },
+                }
               );
 
               setAppBadgeNative(1);
@@ -1586,7 +1593,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
           });
 
           getUserFirebaseNotificationToken().then(
-            (token) => (this.firebaseCMToken = token),
+            (token) => (this.firebaseCMToken = token)
           );
 
           removeAlpineAttributes();
@@ -1609,7 +1616,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
                 new Date().toDateString()
               : false;
             const isLastRefreshAnHourOrMoreAgo = Boolean(
-              lastRefresh && Date.now() - Number(lastRefresh) > 3600000,
+              lastRefresh && Date.now() - Number(lastRefresh) > 3600000
             );
 
             if (!isLastRefreshFromToday || isLastRefreshAnHourOrMoreAgo) {
@@ -1739,7 +1746,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
           return Boolean(
             ("Notification" in window &&
               Notification?.permission === "granted") ||
-              false,
+              false
           );
         },
         isFullscreen: false,
@@ -1761,7 +1768,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 									— ${this.scriptureRef}
 								`.trim(),
                 icon: "/logo.png",
-              },
+              }
             );
 
             return;
@@ -1829,7 +1836,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
           function convertWordToUnderscores(
             word: string,
             showFirstCharacter: boolean = false,
-            index: number,
+            index: number
           ): string {
             const wordToBeReplaced = word.match(/([A-Za-z]+)/gi)?.[0] || "";
 
@@ -1853,7 +1860,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 										index: ${index},
 										correctWord: '${wordToBeReplaced.substring(
                       showFirstCharacter && word.length > 1 ? 1 : 0,
-                      wordToBeReplaced.length,
+                      wordToBeReplaced.length
                     )}',
 										showWordIsCorrect() {
 											$el.classList.add('focus:outline');
@@ -2005,14 +2012,14 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
 
             const bookendsOfTheWord = word.replace(
               wordToBeReplaced,
-              "{INSERT_UNDERSCORES}",
+              "{INSERT_UNDERSCORES}"
             );
             const firstCharacter = showFirstCharacter
               ? wordToBeReplaced[0] || ""
               : "";
             let replacedWord = bookendsOfTheWord.replace(
               "{INSERT_UNDERSCORES}",
-              firstCharacter + makeUnderscoresVisible(),
+              firstCharacter + makeUnderscoresVisible()
             );
 
             if (word.length === 1) {
@@ -2038,13 +2045,13 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
                 return convertWordToUnderscores(
                   word,
                   this.showFirstLetter,
-                  index,
+                  index
                 );
               }
 
               const percentOfWordsHidden: number = fidelityAsNumber / 60;
               const numOfWordsToReplace: number = Math.round(
-                percentOfWordsHidden * words.length,
+                percentOfWordsHidden * words.length
               );
 
               const indicesToReplace: number[] = [];
@@ -2053,7 +2060,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
                 // This function evenly disperses the hidden words
                 for (let i = 0; i < words.length; i += 1) {
                   const index: number = Math.floor(
-                    (i * words.length) / numOfWordsToReplace,
+                    (i * words.length) / numOfWordsToReplace
                   );
                   indicesToReplace.push(index);
                 }
@@ -2070,7 +2077,7 @@ const isOffWeek = Boolean(nextVerseComesInDays <= 7);
                 return convertWordToUnderscores(
                   word,
                   this.showFirstLetter,
-                  index,
+                  index
                 );
               }
 
