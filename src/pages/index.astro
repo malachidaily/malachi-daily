@@ -86,12 +86,12 @@ if (getVerseFromUrlParams) {
     });
 
     if (nowAndPastVersesFromApi.results.length) {
-      // If the current date is in the past, we'll use the next upcoming verse.
-      const endDateOfVerse =
-        new Date(
-          nowAndPastVersesFromApi.results[0][verseTableHeaders.startDate]
-        ).getTime() / 1000;
-      if (endDateOfVerse >= Date.now()) {
+      const startDateOfVerse = new Date(nowAndPastVersesFromApi.results[0][verseTableHeaders.startDate]).getTime() / 1000;
+      // Off weeks are every other week. Therefore, it'll be one week before the next verse.
+      const endDateOfVerse = startDateOfVerse + 7 * 24 * 60 * 60;
+      const now = Date.now() / 1000;
+
+      if (startDateOfVerse <= now && now <= endDateOfVerse) {
         isThereACurrentVerse = true;
       }
     }
@@ -213,8 +213,7 @@ let isOffWeek = false;
 const scriptureText = verses[translation];
 const scriptureRef = verseRef;
 
-// Off weeks are every other week. Therefore, it'll be one week before the next verse.
-if (!isThereACurrentVerse && nextVerseComesInDays) {
+if (!isThereACurrentVerse) {
   isOffWeek = true;
 }
 ---
