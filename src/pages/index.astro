@@ -35,6 +35,7 @@ const getVerseFromUrlParams = Boolean(
 let errorText = "";
 let infoText = "";
 let whenIsNextVerse = "";
+let isThereACurrentVerse = false;
 
 if (getVerseFromUrlParams) {
   // Return the verse from the params...
@@ -83,6 +84,22 @@ if (getVerseFromUrlParams) {
       orderBy: verseTableHeaders.startDate,
       size: 2,
     });
+
+    if (nowAndPastVersesFromApi.results.length) {
+      // If the current date is in the past, we'll use the next upcoming verse.
+      const endDateOfVerse =
+        new Date(
+          nowAndPastVersesFromApi.results[0][verseTableHeaders.startDate]
+        ).getTime() / 1000;
+      if (endDateOfVerse >= Date.now()) {
+        isThereACurrentVerse = true;
+      }
+    }
+
+    if (futureVersesFromApi.results.length) {
+      whenIsNextVerse =
+        futureVersesFromApi.results[0][verseTableHeaders.startDate];
+    }
 
     function getMostCurrentVerse() {
       const now = Date.now() / 1000; // Convert to seconds
@@ -191,13 +208,13 @@ try {
   verseRef = "Matthew 4:4";
 }
 
+let isOffWeek = false;
+
 const scriptureText = verses[translation];
 const scriptureRef = verseRef;
 
-let isOffWeek = false;
-
 // Off weeks are every other week. Therefore, it'll be one week before the next verse.
-if (nextVerseComesInDays && nextVerseComesInDays <= 7) {
+if (!isThereACurrentVerse && nextVerseComesInDays) {
   isOffWeek = true;
 }
 ---
