@@ -111,7 +111,6 @@ export async function getBibleVersesFromMultipleTranslations({
         throw new Error("Verse does not exist.")
     }
 
-    console.log(JSON.stringify(data, null, 2))
 
     // Transform verse to readable data
     const returnObj = transformBibleVersesFromMultipleTranslations(data)
@@ -138,7 +137,6 @@ export async function getVerse({
         data.text = data.text.split('<br/>')[1]
     }
 
-    console.log(data)
 
     return data
 }
