@@ -61,6 +61,9 @@ function transformBibleVersesFromMultipleTranslations(data: Array<Array<Verse>>)
              */
             verseText = verseText.replace(/<S>[0-9]+<\/S>/g, '')
 
+            // Remove <sup> tags and their content, as they're notes.
+            verseText = verseText.replace(/<sup>.*?<\/sup>/g, '')
+
             // Remove anything that looks like HTML syntax in string
             verseText = verseText.replace(/(<([^>]+)>)/ig, ' ')
 
@@ -108,6 +111,7 @@ export async function getBibleVersesFromMultipleTranslations({
         throw new Error("Verse does not exist.")
     }
 
+
     // Transform verse to readable data
     const returnObj = transformBibleVersesFromMultipleTranslations(data)
     
@@ -132,6 +136,7 @@ export async function getVerse({
         // Remove br and everything before
         data.text = data.text.split('<br/>')[1]
     }
+
 
     return data
 }
