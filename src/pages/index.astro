@@ -2,13 +2,12 @@
 import { Image } from "astro:assets";
 
 import Layout from "../layouts/Layout.astro";
-import SelectPreviousVerse from "../components/astro/SelectPreviousVerse/index.astro";
-import OffWeek from "../layouts/sections/OffWeek.astro";
 import logoImgUrl from "../assets/logo.png";
 import { backupVerse } from "../utils/constants";
 import NativeFeelingDrawer from "../components/react/NativeFeelingDrawer";
 import SectionLinks from "../components/astro/SectionLinks/index.astro";
 import WithinAppPromo from "../components/astro/WithinAppPromo/index.astro";
+import VerseManager from "../components/astro/VerseManager/index.astro";
 import {
   type BibleVersesFromMultipleTranslations,
   getBibleVersesFromMultipleTranslations,
@@ -21,152 +20,67 @@ import {
   bibleVersionData,
   bibleVersionsByLanguage,
 } from "../api/bible/static/books";
-import { getAllVerses, verseTableHeaders } from "../api/verses";
 
 const urlSearchParams = Astro.url.searchParams;
 const searchParamBook = urlSearchParams.get("book");
 const searchParamChapter = urlSearchParams.get("chapter");
 const searchParamStartVerse = urlSearchParams.get("start-verse");
 const searchParamEndVerse = urlSearchParams.get("end-verse");
-let verseToUse;
-const getVerseFromUrlParams = Boolean(
-  searchParamBook && searchParamChapter && searchParamStartVerse
-);
-
 let errorText = "";
 let infoText = "";
-let whenIsNextVerse = "";
-let isThereACurrentVerse = false;
 
+// Deep links (?book=John&chapter=1&start-verse=1) are untrusted input, so
+// validate before trusting them: the book must be a known book, and the chapter
+// and verses must be sane whole numbers in range. Anything off — a typo'd book,
+// a NaN / negative / out-of-range number — falls back to a neutral backup verse
+// instead of throwing a server error. 176 = Psalm 119, the longest chapter in
+// any Bible; exact per-chapter verse counts aren't known here, so the fetch is
+// the final backstop for an in-range-but-nonexistent verse.
+const MAX_VERSES_IN_CHAPTER = 176;
+const isSaneVerse = (n: number) =>
+  Number.isInteger(n) && n >= 1 && n <= MAX_VERSES_IN_CHAPTER;
+
+const requestedBook = searchParamBook as BookName;
+const requestedBookMeta = searchParamBook ? books[requestedBook] : undefined;
+const requestedChapter = Number(searchParamChapter);
+const requestedStart = Number(searchParamStartVerse);
+const requestedEnd = searchParamEndVerse ? Number(searchParamEndVerse) : 0;
+
+const getVerseFromUrlParams =
+  Boolean(requestedBookMeta) &&
+  Number.isInteger(requestedChapter) &&
+  requestedChapter >= 1 &&
+  requestedChapter <= (requestedBookMeta?.chapters ?? 0) &&
+  isSaneVerse(requestedStart) &&
+  (requestedEnd === 0 ||
+    (isSaneVerse(requestedEnd) && requestedEnd >= requestedStart));
+
+// Shape varies (deep-link params vs. backup verse), so keep it loose.
+let verseToUse: any;
 if (getVerseFromUrlParams) {
-  // Return the verse from the params...
   verseToUse = {
-    [verseTableHeaders.book]: {
-      value: searchParamBook,
-    },
-    [verseTableHeaders.chapter]: searchParamChapter,
-    [verseTableHeaders.verseNumberStart]: searchParamStartVerse,
-    [verseTableHeaders.verseNumberEnd]: searchParamEndVerse,
+    Book: { value: requestedBook },
+    Chapter: requestedChapter,
+    "Verse Number Start": requestedStart,
+    "Verse Number End": requestedEnd,
   };
 } else {
-  // Nope, let's get the verse from the API!
-  try {
-    // This will get the most recent verse from the API that's live.
-    const nowAndPastVersesFromApi = await getAllVerses({
-      filters: JSON.stringify({
-        filter_type: "AND",
-        filters: [
-          {
-            type: "boolean",
-            field: verseTableHeaders.pastStartDate,
-            value: "1",
-          },
-        ],
-        groups: [],
-      }),
-      // The minus up front tells the API to order by the descending order.
-      orderBy: "-" + verseTableHeaders.startDate,
-      size: 1,
-    });
-
-    // This will get and cache the latest verses fom the API.
-    const futureVersesFromApi = await getAllVerses({
-      filters: JSON.stringify({
-        filter_type: "AND",
-        filters: [
-          {
-            type: "boolean",
-            field: verseTableHeaders.pastStartDate,
-            value: "0",
-          },
-        ],
-        groups: [],
-      }),
-      orderBy: verseTableHeaders.startDate,
-      size: 2,
-    });
-
-    if (nowAndPastVersesFromApi.results.length) {
-      const startDateOfVerse = new Date(nowAndPastVersesFromApi.results[0][verseTableHeaders.startDate]).getTime() / 1000;
-      // Off weeks are every other week. Therefore, it'll be one week before the next verse.
-      const endDateOfVerse = startDateOfVerse + 7 * 24 * 60 * 60;
-      const now = Date.now() / 1000;
-
-      if (startDateOfVerse <= now && now <= endDateOfVerse) {
-        isThereACurrentVerse = true;
-      }
-    }
-
-    if (futureVersesFromApi.results.length) {
-      whenIsNextVerse =
-        futureVersesFromApi.results[0][verseTableHeaders.startDate];
-    }
-
-    function getMostCurrentVerse() {
-      const now = Date.now() / 1000; // Convert to seconds
-      const mostRecentVerseFromApi = nowAndPastVersesFromApi.results[0];
-      const nextUpcomingVerseFromApi = futureVersesFromApi.results?.[0] || null;
-      const nextNextUpcomingVerseFromApi =
-        futureVersesFromApi.results?.[1] || null;
-
-      // If there's no upcoming verse, we'll use the most recent verse from the API.
-      if (mostRecentVerseFromApi && !nextUpcomingVerseFromApi) {
-        return mostRecentVerseFromApi;
-      }
-
-      const nextUpcomingVerseFromApiStartTime =
-        new Date(
-          nextUpcomingVerseFromApi[verseTableHeaders.startDate]
-        ).getTime() / 1000;
-      const nextNextUpcomingVerseFromApiStartTime = nextNextUpcomingVerseFromApi
-        ? new Date(
-            nextNextUpcomingVerseFromApi[verseTableHeaders.startDate]
-          ).getTime() / 1000
-        : null;
-
-      // If there's an upcoming verse and it's somehow today or in the past, we'll use the next upcoming verse.
-      if (nextUpcomingVerseFromApiStartTime <= now) {
-        return nextUpcomingVerseFromApi;
-      }
-
-      // If there's an upcoming verse and it's in the future, we'll use the next upcoming verse.
-      if (
-        nextNextUpcomingVerseFromApiStartTime &&
-        nextNextUpcomingVerseFromApiStartTime <= now
-      ) {
-        return nextNextUpcomingVerseFromApi;
-      }
-
-      // Return something
-      return mostRecentVerseFromApi;
-    }
-
-    verseToUse = getMostCurrentVerse();
-  } catch (error) {
-    errorText = "An error occured. Returning backup verse: Matthew 4:4";
-    verseToUse = backupVerse;
+  // No deep link: render a neutral backup verse on the server. The verse the
+  // user was last working on lives in localStorage, so the client hydrates
+  // over this on load (see the Alpine init()).
+  verseToUse = backupVerse;
+  // They tried to deep-link something we couldn't trust — say so gently.
+  if (searchParamBook || searchParamChapter || searchParamStartVerse) {
+    errorText = "That verse link didn't look right, so we loaded a default verse.";
   }
 }
 
-function getDiffBetweenDays() {
-  if (!whenIsNextVerse) {
-    return 0;
-  }
-
-  const date1 = new Date();
-  const date2 = new Date(whenIsNextVerse);
-  const diffTime: number = Math.abs(date2.getTime() - date1.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays;
-}
-
-const nextVerseComesInDays = getDiffBetweenDays() || 0;
 const translation: bibleVersion = "NLT";
 const bookName: BookName = verseToUse.Book.value;
 const bookId = books[bookName].bookid;
 const chapter = Number(verseToUse.Chapter);
-const verseNum = Number(verseToUse[verseTableHeaders.verseNumberStart]);
-const verseNumEnd = Number(verseToUse[verseTableHeaders.verseNumberEnd]);
+const verseNum = Number(verseToUse["Verse Number Start"]);
+const verseNumEnd = Number(verseToUse["Verse Number End"]);
 
 // Allow user to get multiple verses at once
 const verseNums: number[] = [];
@@ -177,8 +91,8 @@ if (verseNumEnd && verseNum < verseNumEnd) {
   }
 }
 
-// Anytime there's a new passage for Malachi Daily, this will increment by one.
-const passageNum = verseToUse[verseTableHeaders.passageNumber] || "0";
+// No Baserow curation means there is no longer a "scheduled passage".
+const passageNum = "0";
 
 let verseRef = `${bookName} ${chapter}:${verseNum}${
   verseNumEnd ? `-${verseNumEnd}` : ""
@@ -209,14 +123,8 @@ try {
   verseRef = "Matthew 4:4";
 }
 
-let isOffWeek = false;
-
 const scriptureText = verses[translation];
 const scriptureRef = verseRef;
-
-if (!isThereACurrentVerse) {
-  isOffWeek = true;
-}
 ---
 
 <Layout title="Malachi Daily: Memorize Bible Verses & Learn Their Context">
@@ -277,6 +185,44 @@ if (!isThereACurrentVerse) {
       @apply text-primary border border-gray-200 dark:border-gray-500 rounded-full hover:bg-gray-100 hover:text-gray-800 hover:border-gray-300 active:bg-gray-200 dark:hover:bg-gray-600 dark:hover:text-white dark:active:bg-gray-700;
     }
 
+    /* Form fields — quiet, surface-resting inputs (NOT buttons). The bold
+       filled style is reserved for the single primary action. */
+    .field {
+      @apply w-full h-12 px-4 rounded-xl border bg-white text-primary text-base outline-none transition-colors;
+      @apply border-gray-200 dark:bg-gray-800 dark:border-gray-600;
+      @apply placeholder:text-gray-400 dark:placeholder:text-gray-500;
+    }
+
+    .field:hover:not(:disabled) {
+      @apply border-gray-300 dark:border-gray-500;
+    }
+
+    .field:focus {
+      @apply border-blue-500 ring-4 ring-blue-500/10 dark:border-blue-400;
+    }
+
+    .field:disabled {
+      @apply opacity-50 cursor-not-allowed;
+    }
+
+    .field-select {
+      @apply pr-10 appearance-none cursor-pointer bg-no-repeat;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-position: right 0.85rem center;
+      background-size: 1.1rem;
+    }
+
+    .field[type="number"] {
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+
+    .field[type="number"]::-webkit-inner-spin-button,
+    .field[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
     .mask-underscores:after {
       /* I want the underscores to be visible. It's stored in a data attribute */
       content: attr(data-underscores);
@@ -292,23 +238,12 @@ if (!isThereACurrentVerse) {
     x-init={`
 			versesObj = ${JSON.stringify(verses)};
 			bibleVersionData = ${JSON.stringify(bibleVersionData)};
-			notificationAlert = '${errorText}';
-			notificationInfo = '${infoText}';
+			notificationAlert = ${JSON.stringify(errorText)};
+			notificationInfo = ${JSON.stringify(infoText)};
 			passageNum = ${passageNum};
 			bookName = '${bookName}';
 			chapter = ${chapter};
-			isOffWeek = ${isOffWeek};
-			daysUntilNextVerse = '${nextVerseComesInDays}';
-
-			$watch('daysUntilNextVerse', () => {
-				// While it looks like it's searching for 6 days, it's actually 7.
-				// Because, sometimes 7 can be 7 days and 23 hours.
-				// And, since I'm not getting the hours, this is th easiest way to know
-				// if it's 7 days until the next verse.
-				if (daysUntilNextVerse < 7) {
-					isOffWeek = true;
-				}
-			});
+			hasActiveVerse = ${getVerseFromUrlParams};
 		`.trim()}
     x-clear
     vaul-drawer-wrapper=""
@@ -337,14 +272,6 @@ if (!isThereACurrentVerse) {
         <section
           class="sticky max-sm:mx-[-24px] max-sm:w-screen max-sm:px-6 canvas-secondary z-20 py-4 top-0 w-full flex flex-col gap-2 items-start justify-start"
         >
-          <a
-            x-cloak
-            x-show="!isScheduledVerse && !isOffWeek"
-            class="mb-4 whitespace-nowrap badge canvas-tertiary text-primary py-3 dark:border-gray-700"
-            href="/old"
-          >
-            Go back to Main Verse
-          </a>
           <div class="w-full flex gap-2 justify-between">
             <div
               x-data={`{ clickCount: 0}`}
@@ -594,46 +521,11 @@ if (!isThereACurrentVerse) {
 								}, 500);
 							`.trim()}
               x-transition
-              x-show="showInfoSubtext && !isNotCurrentVerseOfWeek && !hasPreviewVerse"
-              class="cursor-pointer text-muted text-start"
+              x-show="!isNotCurrentVerseOfWeek && !hasPreviewVerse"
+              class="text-muted text-start"
             >
               Scripture memory, together.
             </p>
-            <div
-              x-cloak
-              x-transition
-              x-show="showPassageInfo && !isNotCurrentVerseOfWeek && !isOffWeek || (isOffWeek && hasPreviewVerse)"
-              class="gap-1 flex text-muted flex-wrap items-center"
-              x-on:click={`
-								showPassageInfo = false;
-								setTimeout(() => {
-									showInfoSubtext = true;
-								}, 500);
-							`.trim()}
-            >
-              <p
-                class="cursor-pointer whitespace-nowrap inline"
-                x-show="passageNum > 0 && !isOffWeek"
-                x-text="'Passage #' + passageNum"
-              >
-                Passage #--
-              </p>
-              <p
-                class="text-sm pointer-events-none px-3 py-1 whitespace-nowrap inline rounded-box bg-blue-100 dark:text-sky-300 dark:bg-sky-900 text-blue-600"
-                x-show="isOffWeek"
-                x-cloak
-                x-transition
-              >
-                Off Week Review
-              </p>
-              <p x-show="passageNum > 0" x-cloak x-transition>{" • "}</p>
-              <p
-                class="pointer-events-none whitespace-nowrap inline"
-                x-text="daysUntilNextVerse + ` day${daysUntilNextVerse < 2 ? '' : 's'} until next verse`"
-              >
-                Next verse coming on
-              </p>
-            </div>
             <p
               class="text-muted text-start"
               x-show="isNotCurrentVerseOfWeek"
@@ -647,15 +539,29 @@ if (!isThereACurrentVerse) {
 
         <WithinAppPromo />
 
+        <!-- Cold start: nothing picked yet -->
+        <section x-cloak x-show="!hasActiveVerse" x-transition class="w-full">
+          <div
+            class="surface-primary p-6 rounded-3xl flex flex-col items-center gap-2 text-center shadow-sm max-sm:rounded-2xl"
+          >
+            <h2 class="text-2xl font-bold text-primary">
+              Pick a verse to memorize
+            </h2>
+            <p class="text-muted max-w-[340px]">
+              Choose a passage below, or start with a classic. It's saved on
+              this device — no account needed.
+            </p>
+          </div>
+        </section>
+
         <!-- SCRIPTURE TO MEMORIZE -->
         <section
           id="scripture"
           x-init={`
 						scriptureRef = '${scriptureRef}';
-						fidelity = fidelityOfTheDay;
 					`}
           x-cloak
-          x-show="Boolean(!isOffWeek || hasPreviewVerse)"
+          x-show="hasActiveVerse"
           x-transition
           class="rounded-md text-start max-sm:mx-[-24px]"
         >
@@ -984,6 +890,7 @@ if (!isThereACurrentVerse) {
 
 											if (currentCount >= 60) {
 												clearInterval(this.timerInterval);
+												this.recordPractice();
 												alert("Congrats! You just spent one minute memorizing God's Word");
 												this.showProgressBar = false;
 											}
@@ -1030,64 +937,6 @@ if (!isThereACurrentVerse) {
 
           <!-- Scrubbing Input -->
           <section class="w-full mt-12 max-sm:mx-6 max-sm:w-auto max-sm:mt-8">
-            <div
-              class="w-[calc(100%+16px)] ms-[-8px] flex justify-between text-xs font-mono text-muted"
-              x-data="{ dayOfWeek: new Date().getDay() }"
-            >
-              <span
-                class="cursor-pointer p-1 px-2 rounded-md"
-                x-on:click="fidelity = 10 * 0"
-                x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 0 || dayOfWeek === 7 }"
-                >Sun</span
-              >
-              <span
-                class="cursor-pointer p-1 px-2 rounded-md"
-                x-on:click="fidelity = 10 * 1"
-                x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 1 }"
-                >Mon</span
-              >
-              <span
-                class="cursor-pointer p-1 px-2 rounded-md"
-                x-on:click="fidelity = 10 * 2"
-                x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 2 }"
-                >Tue</span
-              >
-              <span
-                class="cursor-pointer p-1 px-2 rounded-md"
-                x-on:click="fidelity = 10 * 3"
-                x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 3 }"
-                >Wed</span
-              >
-              <span
-                class="cursor-pointer p-1 px-2 rounded-md"
-                x-on:click="fidelity = 10 * 4"
-                x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 4 }"
-                >Thu</span
-              >
-              <span
-                class="cursor-pointer p-1 px-2 rounded-md"
-                x-on:click="fidelity = 10 * 5"
-                x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 5 }"
-                >Fri</span
-              >
-              <span
-                class="cursor-pointer p-1 px-2 rounded-md"
-                x-on:click="fidelity = 10 * 6"
-                x-bind:class="{ 'canvas-tertiary text-primary': dayOfWeek === 6 }"
-                >Sat</span
-              >
-            </div>
-            <div
-              class="mb-2 mt-1 w-full flex justify-between text-xs px-2 text-muted opacity-50"
-            >
-              <span>|</span>
-              <span>|</span>
-              <span>|</span>
-              <span>|</span>
-              <span>|</span>
-              <span>|</span>
-              <span>|</span>
-            </div>
             <input
               x-model="fidelity"
               type="range"
@@ -1111,7 +960,6 @@ if (!isThereACurrentVerse) {
             </div>
             <div
               class="w-[calc(100%+16px)] ms-[-8px] flex justify-between text-xs mt-1 font-mono text-muted"
-              x-data="{ dayOfWeek: new Date().getDay() }"
             >
               <span
                 class="cursor-pointer p-1 px-2 rounded-md"
@@ -1137,19 +985,14 @@ if (!isThereACurrentVerse) {
           </pre>
         </div>
 
-        <!-- OffWeek Section -->
-        <div x-cloak x-transition x-show="isOffWeek" class="w-full max-sm:mt-8">
-          <OffWeek nextVerseComesInDays={nextVerseComesInDays} />
-        </div>
-
         <!-- More Actions Bible Verse -->
         <section
           class="flex flex-col gap-2"
           x-transition
-          x-show="Boolean(hasPreviewVerse || !isOffWeek)"
+          x-show="hasActiveVerse"
           x-cloak
         >
-          <h3 class="text-base uppercase font-medium text-muted">Dig Deeper</h3>
+          <h3 class="text-xs font-semibold uppercase tracking-wider text-muted">Dig Deeper</h3>
           <ul
             class="menu text-primary pr-2 menu-lg surface-primary w-full rounded-box"
           >
@@ -1182,28 +1025,28 @@ if (!isThereACurrentVerse) {
                 <span x-html="iconRightArrowSVG"></span>
               </a>
             </li>
-            <div
-              class="ml-2 bg-gray-100 dark:bg-gray-600 h-[2px] w-full"
-              role="separator"
-            >
-            </div>
-            <!-- Bible.com -->
+            <!-- route.bible: open the passage in the user's preferred Bible app -->
             <li
               class="w-full !bg-[inherit] text-primary !text-[inherit]"
               role="button"
             >
               <a
                 class="grid grid-cols-[1fr_auto] gap-2 justify-between px-2 !bg-[inherit] !text-[inherit] text-base hover:!brightness-95 focus:!brightness-95 active:!brightness-85"
-                x-bind:href="bibleDotComUrl"
+                x-bind:href="routeBibleUrl"
                 target="_blank"
               >
                 <div class="w-full flex gap-4 items-center">
-                  <div x-html="iconYVBible"></div>
+                  <div x-html="iconOpenBible"></div>
                   <div class="w-full shrink">
                     <p
                       class="text-wrap shrink w-full line-clamp-2 text-primary font-medium"
-                      x-text="'Read ' + (scriptureRef ? scriptureRef.split(':')[0] : '') + ' on Bible.com'"
+                      x-text="'Open ' + scriptureRef + ' in your Bible app'"
                     >
+                    </p>
+                    <p
+                      class="text-wrap shrink w-full line-clamp-2 text-muted text-sm"
+                    >
+                      Opens in your preferred Bible app
                     </p>
                   </div>
                 </div>
@@ -1213,10 +1056,8 @@ if (!isThereACurrentVerse) {
           </ul>
         </section>
 
-        <!-- Select Previous Verse -->
-        <div class="w-full" x-cloak x-show="true" x-transition>
-          <SelectPreviousVerse />
-        </div>
+        <!-- My Verses + add-a-verse picker (localStorage collection) -->
+        <VerseManager />
 
         <!-- Notification Alert -->
         <div
@@ -1363,13 +1204,13 @@ if (!isThereACurrentVerse) {
       messaging,
       getUserFirebaseNotificationToken,
     } from "../messaging_init_on_client.js";
-    import {
-      constructBibleDotComChapterURL,
-      type BookName,
-      type bibleVersion,
-    } from "../api/bible/static/books";
     import { removeAlpineAttributes, setAlpineState } from "../utils";
-    import { MALACHI_BLOG_URL } from "../utils/constants";
+    import { MALACHI_BLOG_URL, ROUTE_BIBLE_URL } from "../utils/constants";
+    import {
+      getActiveVerse,
+      markPracticed,
+      migrateLegacyOffWeekVerse,
+    } from "../utils/collection";
 
     declare global {
       var setAlpineState: Function;
@@ -1445,11 +1286,6 @@ if (!isThereACurrentVerse) {
       "bibleVersionPreference",
       "NIV"
     );
-    const offWeekScriptureRef = getFromLocalStorage("offWeekScriptureRef", "");
-    const offWeekScriptureVersesObj = getFromLocalStorage(
-      "offWeekScriptureVersesObj",
-      undefined
-    );
 
     if (isDarkMode) {
       toggleDarkMode();
@@ -1492,7 +1328,6 @@ if (!isThereACurrentVerse) {
     document.addEventListener("alpine:init", () => {
       const Alpine = window["Alpine"] || {};
       window.Alpine.data("malachi", () => ({
-        isOffWeek: false,
         toggleDarkMode: toggleDarkMode,
         isDarkMode,
         isPWAInstalled: window.matchMedia("(display-mode: standalone)").matches,
@@ -1500,6 +1335,16 @@ if (!isThereACurrentVerse) {
         bookName: "",
         chapter: 0,
         hasPreviewVerse: false,
+        // True once a verse is loaded (URL deep-link, restored from the
+        // collection, or just added). Gates the card vs. the empty state.
+        hasActiveVerse: false,
+        // Record a completed practice session for the active verse: stamps
+        // recency (drives the freshness dot) and the hardest fidelity reached.
+        recordPractice() {
+          if (this.scriptureRef) {
+            markPracticed(this.scriptureRef, Number(this.fidelity) || 0);
+          }
+        },
         resetScriptureGuessInputs() {
           document.querySelectorAll("[data-underscores]").forEach((el: any) => {
             el.innerText = "";
@@ -1510,14 +1355,18 @@ if (!isThereACurrentVerse) {
             el.classList.remove("outline-red-400");
           });
         },
-        get bibleDotComUrl() {
-          const bibleDotComChapterUrl = constructBibleDotComChapterURL({
-            book: this.bookName as BookName,
-            chapter: this.chapter,
-            versionShortCode: this.bibleVersionPreference as bibleVersion,
-          });
-
-          return bibleDotComChapterUrl;
+        // route.bible deep-links the active passage to whatever Bible app the
+        // user prefers (or a launcher to pick one), instead of hardcoding one
+        // destination. It parses the human-readable ref via `q`, so there's no
+        // book-code mapping to maintain here.
+        get routeBibleUrl() {
+          const url = new URL(ROUTE_BIBLE_URL);
+          url.searchParams.set("q", this.scriptureRef);
+          if (this.bibleVersionPreference) {
+            url.searchParams.set("v", String(this.bibleVersionPreference));
+          }
+          url.searchParams.set("src", "malachi-daily");
+          return url.toString();
         },
         // This tells me the verse is not a one-off from a URL param,
         // which means it has devotional content created from Malachi Daily.
@@ -1539,7 +1388,6 @@ if (!isThereACurrentVerse) {
 
           return url;
         },
-        daysUntilNextVerse: 0,
         showPWAInstallDrawer() {
           const installDialogEl = document.getElementById(
             "install-dialog"
@@ -1555,14 +1403,27 @@ if (!isThereACurrentVerse) {
           );
         },
         init() {
-          if (
-            !this.isOffWeek &&
-            offWeekScriptureRef &&
-            offWeekScriptureVersesObj
-          ) {
-            // Remove the off week data when it's an ON week.
-            localStorage.removeItem("offWeekScriptureRef");
-            localStorage.removeItem("offWeekScriptureVersesObj");
+          // Import any pre-collection "last verse" (old offWeek* keys), then
+          // restore whatever verse the user was last working on. A deep-linked
+          // verse (?book=...) takes precedence, so we don't override it.
+          migrateLegacyOffWeekVerse();
+          const fromUrlParams = new URLSearchParams(
+            window.location.search
+          ).has("book");
+          const activeVerse = fromUrlParams ? null : getActiveVerse();
+          if (activeVerse) {
+            // Defer past the server-rendered x-init seeding. That x-init lives
+            // on a descendant element, so it runs AFTER this root init() and
+            // would otherwise clobber the restored verse with the SSR backup.
+            setTimeout(() => {
+              this.versesObj = activeVerse.versesObj as any;
+              this.scriptureRef = activeVerse.ref;
+              this.bookName = activeVerse.bookName;
+              this.chapter = activeVerse.chapter;
+              this.hasActiveVerse = true;
+              this.hasPreviewVerse = true;
+              this.fidelity = 0;
+            }, 0);
           }
 
           document
@@ -1645,43 +1506,7 @@ if (!isThereACurrentVerse) {
             }
           });
 
-          setTimeout(() => {
-            const allowedKeys = ["isOffWeek", "daysUntilNextVerse"];
-            // Get URL params and try to setAlpineState
-            const urlParams = new URLSearchParams(window.location.search);
-            for (const [key, value] of urlParams.entries()) {
-              if (!allowedKeys.includes(key)) {
-                continue;
-              }
 
-              setAlpineState(key, JSON.parse(value));
-            }
-          }, 500);
-
-          // Display the off week scripture when it's an off week.
-          this.$watch("isOffWeek", () => {
-            // If it's an off week, set the review scripture ref to what's been set.
-            if (
-              this.isOffWeek &&
-              offWeekScriptureRef &&
-              offWeekScriptureVersesObj &&
-              this.daysUntilNextVerse !== 7
-            ) {
-              this.scriptureRef = offWeekScriptureRef;
-              this.versesObj = offWeekScriptureVersesObj;
-              this.hasPreviewVerse = true;
-              this.fidelity = 0;
-            } else if (
-              (!this.isOffWeek &&
-                offWeekScriptureRef &&
-                offWeekScriptureVersesObj) ||
-              this.daysUntilNextVerse === 7
-            ) {
-              // Remove the off week data when it's an on week.
-              localStorage.removeItem("offWeekScriptureRef");
-              localStorage.removeItem("offWeekScriptureVersesObj");
-            }
-          });
 
           // This is like garbage collection for the expensive operation to get underscores
           // for a verse.
@@ -1700,8 +1525,8 @@ if (!isThereACurrentVerse) {
         },
         iconArticle:
           '<svg class="text-muted inline-flex" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zm4 2h10M7 12h10M7 16h10"/></svg>',
-        iconYVBible:
-          '<svg class="text-muted inline-flex" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.344 21.836c-1.31-.177-2.567-.574-3.587-1.593-1.019-1.02-1.416-2.276-1.593-3.587C2 15.432 2 13.905 2 12.132v-.264c0-1.773 0-3.3.164-4.524.177-1.31.574-2.567 1.593-3.587 1.02-1.019 2.276-1.416 3.587-1.593C8.568 2 10.095 2 11.868 2h.264c1.773 0 3.3 0 4.524.164 1.31.177 2.567.574 3.587 1.593 1.019 1.02 1.416 2.276 1.593 3.587C22 8.568 22 10.095 22 11.868v.264c0 1.773 0 3.3-.164 4.524-.177 1.31-.574 2.567-1.593 3.587-1.02 1.019-2.276 1.416-3.587 1.593-1.224.164-2.751.164-4.524.164h-.264c-1.773 0-3.3 0-4.524-.164ZM5.172 5.172C4 6.343 4 8.229 4 12c0 3.771 0 5.657 1.172 6.828C6.343 20 8.229 20 12 20c3.771 0 5.657 0 6.828-1.172C20 17.657 20 15.771 20 12c0-3.771 0-5.657-1.172-6.828C17.657 4 15.771 4 12 4 8.229 4 6.343 4 5.172 5.172Z" fill="currentColor"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M7.978 18h6.404c1.317 0 2.169.057 2.956-.861.676-.782.62-2.097.662-3.139-.762 1.323-2.161 1.278-3.242 1.278H7.095c-1.89.004-1.163 2.721.883 2.721Z" fill="currentColor"></path></svg>',
+        iconOpenBible:
+          '<svg class="text-muted inline-flex" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>',
         iconRightArrowSVG:
           '<svg class="text-muted" width="24px" height="24px" stroke-width="2.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
         showDebug: (() => {
@@ -1738,19 +1563,6 @@ if (!isThereACurrentVerse) {
           }
 
           return true;
-        },
-        // TODO fix this and make it show fidelity per day of week
-        get fidelityOfTheDay() {
-          // Get day of the week as a number from 0 to 6
-          const dayOfWeek = new Date().getDay();
-          // Turn that into a number from 0 to 6
-          let dayOfWeekAsNumber = 0;
-          if (dayOfWeek === 7) {
-            dayOfWeekAsNumber = 0;
-          } else {
-            dayOfWeekAsNumber = dayOfWeek;
-          }
-          return dayOfWeekAsNumber * 10;
         },
         fidelity: 0,
         showFirstLetter,

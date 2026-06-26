@@ -1,0 +1,630 @@
+---
+import { NLT_BOOKS } from "../../../api/bible/static/books";
+import {
+  starterVerses,
+  starterRef,
+} from "../../../api/bible/static/starterVerses";
+---
+
+<section x-data="verseManager" x-cloak class="w-full flex flex-col gap-8">
+  <!-- Add any verse -->
+  <div class="flex flex-col gap-3">
+    <h3 class="text-xs font-semibold uppercase tracking-wider text-muted">
+      Add a verse
+    </h3>
+
+    <div class="flex flex-col gap-2.5">
+      <div class="grid grid-cols-3 sm:grid-cols-[2fr_1fr_1fr_1fr] gap-2">
+        <select
+          x-model="picker.bookId"
+          x-on:change="picker.chapter = '0'; picker.startVerse = ''; picker.endVerse = '';"
+          x-bind:style="picker.bookId === '0' ? 'color: rgb(156 163 175)' : ''"
+          class="field field-select col-span-3 sm:col-span-1"
+          aria-label="Book of the Bible"
+        >
+          <option value="0" disabled>Book</option>
+          {NLT_BOOKS.map((book) => <option value={book.bookid}>{book.name}</option>)}
+        </select>
+
+        <select
+          x-model="picker.chapter"
+          x-bind:disabled="!Number(picker.bookId)"
+          x-bind:style="picker.chapter === '0' ? 'color: rgb(156 163 175)' : ''"
+          class="field field-select"
+          aria-label="Chapter"
+        >
+          <option value="0" disabled>Chapter</option>
+          <template x-for="n in chapterOptions" :key="n">
+            <option x-bind:value="n" x-text="n"></option>
+          </template>
+        </select>
+
+        <input
+          x-model="picker.startVerse"
+          type="number"
+          min="1"
+          max="176"
+          step="1"
+          inputmode="numeric"
+          placeholder="From"
+          class="field text-center"
+          aria-label="Start verse"
+        />
+
+        <input
+          x-model="picker.endVerse"
+          type="number"
+          min="1"
+          max="176"
+          step="1"
+          inputmode="numeric"
+          placeholder="To"
+          class="field text-center"
+          aria-label="End verse (optional)"
+        />
+      </div>
+      <p class="text-xs text-muted px-0.5">
+        Leave “To” empty to memorize a single verse.
+      </p>
+    </div>
+
+    <div class="flex items-center gap-3 flex-wrap">
+      <button
+        type="button"
+        x-on:click="addFromPicker()"
+        x-bind:disabled="isLoading"
+        class="btn-filled-contrast !btn-md"
+        x-text="isLoading ? 'Adding…' : 'Add & memorize'"
+      >
+        Add & memorize
+      </button>
+      <p
+        x-show="errorMsg"
+        x-text="errorMsg"
+        x-cloak
+        class="text-sm text-red-500"
+      >
+      </p>
+    </div>
+  </div>
+
+  <!-- Starter verses: a cold-start on-ramp. Always available, but open by
+       default only on an empty collection (see showStarters init). -->
+  <div class="flex flex-col gap-3">
+    <button
+      type="button"
+      x-on:click="showStarters = !showStarters"
+      class="flex items-center justify-between gap-2 text-left"
+      x-bind:aria-expanded="showStarters"
+    >
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-muted">
+        Start with a classic
+      </h3>
+      <span class="text-muted text-lg leading-none" x-text="showStarters ? '−' : '+'"></span>
+    </button>
+
+    <div x-show="showStarters" x-cloak class="flex flex-wrap gap-2">
+      {
+        starterVerses.map((v) => (
+          <button
+            type="button"
+            data-book={v.bookName}
+            data-chapter={v.chapter}
+            data-start={v.startVerse}
+            data-end={v.endVerse ?? 0}
+            x-on:click="addStarter($el.dataset)"
+            x-bind:disabled="isLoading"
+            class="rounded-full px-4 py-2 text-sm font-medium surface-primary border border-gray-200 text-primary transition-colors hover:border-blue-400 hover:text-blue-600 dark:border-gray-600 dark:hover:border-blue-400 dark:hover:text-blue-300 disabled:opacity-50 disabled:pointer-events-none"
+          >
+            {starterRef(v)}
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- My Verses -->
+  <div class="flex flex-col gap-3" x-show="verses.length" x-cloak>
+    <h3 class="text-xs font-semibold uppercase tracking-wider text-muted">
+      My verses
+    </h3>
+    <ul
+      class="surface-primary rounded-2xl overflow-hidden divide-y divide-gray-100 dark:divide-gray-700"
+    >
+      <template x-for="entry in verses" :key="entry.ref">
+        <li class="flex items-center gap-2 pl-4 pr-2">
+          <button
+            type="button"
+            x-on:click="selectVerse(entry.ref)"
+            class="flex grow items-center gap-3 py-3 text-left transition-opacity hover:opacity-70"
+          >
+            <span
+              class="h-2.5 w-2.5 rounded-full shrink-0 ring-2 ring-inset ring-black/5 dark:ring-white/10"
+              x-bind:class="freshnessClass(entry)"
+              x-bind:title="freshnessLabel(entry)"
+            ></span>
+            <span class="text-primary font-medium" x-text="entry.ref"></span>
+            <span
+              x-show="entry.ref === activeRef"
+              class="text-[10px] font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-300"
+            >
+              Active
+            </span>
+          </button>
+          <!-- Removing a verse drops its practice history, so confirm in two steps. -->
+          <div class="shrink-0 flex items-center gap-1">
+            <button
+              x-show="pendingDeleteRef === entry.ref"
+              type="button"
+              x-on:click="confirmDelete(entry.ref)"
+              class="px-2.5 h-9 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-100 dark:text-red-300 dark:hover:bg-red-500/10"
+            >
+              Remove
+            </button>
+            <button
+              x-show="pendingDeleteRef === entry.ref"
+              type="button"
+              x-on:click="pendingDeleteRef = null"
+              class="px-2.5 h-9 rounded-lg text-sm font-medium text-muted hover:bg-gray-100 dark:hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+            <button
+              x-show="pendingDeleteRef !== entry.ref"
+              type="button"
+              x-on:click="pendingDeleteRef = entry.ref"
+              class="grid place-items-center h-9 w-9 rounded-lg text-gray-400 transition-colors hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
+              aria-label="Remove verse"
+              title="Remove from my verses"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <path d="M18 6 6 18M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </li>
+      </template>
+    </ul>
+  </div>
+
+  <!-- Import the old curated weekly verses (one-time recovery from the Baserow era).
+       Disappears once everything has been imported. -->
+  <div class="flex flex-col gap-3" x-show="legacyImportableCount > 0" x-cloak>
+    <button
+      type="button"
+      x-on:click="showImport = !showImport"
+      class="flex items-center justify-between gap-2 text-left"
+      x-bind:aria-expanded="showImport"
+    >
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-muted">
+        Import past Malachi Daily verses
+      </h3>
+      <span class="text-muted text-lg leading-none" x-text="showImport ? '−' : '+'"></span>
+    </button>
+
+    <div x-show="showImport" x-cloak class="flex flex-col gap-3">
+      <p class="text-xs text-muted">
+        The weekly verses Malachi Daily featured over the years. Add the ones you
+        were learning so you don’t lose them.
+      </p>
+
+      <div>
+        <button
+          type="button"
+          x-on:click="importAll()"
+          x-bind:disabled="importing"
+          class="btn-filled-contrast !btn-sm"
+          x-text="importing
+            ? 'Importing ' + importDone + ' of ' + importTotal + '…'
+            : 'Add all ' + legacyImportableCount + ' verses'"
+        >
+        </button>
+        <p
+          x-show="!importing && importFailed > 0"
+          x-cloak
+          x-text="importFailed + ' verse(s) couldn’t be fetched. Try again.'"
+          class="text-sm text-red-500 mt-2"
+        >
+        </p>
+      </div>
+
+      <ul
+        class="surface-primary rounded-2xl overflow-hidden divide-y divide-gray-100 dark:divide-gray-700 max-h-72 overflow-y-auto"
+      >
+        <template x-for="v in legacyList" :key="v.ref">
+          <li class="flex items-center gap-2 pl-4 pr-2">
+            <span class="grow py-3 text-primary font-medium" x-text="v.ref"></span>
+            <span
+              x-show="isImported(v.ref)"
+              class="shrink-0 pr-2 text-xs font-semibold uppercase tracking-wide text-green-600 dark:text-green-300"
+            >
+              Added
+            </span>
+            <button
+              x-show="!isImported(v.ref)"
+              type="button"
+              x-on:click="importOne(v)"
+              x-bind:disabled="importing"
+              class="shrink-0 grid place-items-center h-9 w-9 rounded-lg text-gray-400 transition-colors hover:text-blue-600 hover:bg-blue-50 dark:hover:text-blue-300 dark:hover:bg-blue-500/10 disabled:opacity-40 disabled:pointer-events-none"
+              aria-label="Add this verse to my verses"
+              title="Add to my verses"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <path d="M12 5v14M5 12h14"></path>
+              </svg>
+            </button>
+          </li>
+        </template>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { fetchAndCache } from "../../../api";
+  import { setAlpineState } from "../../../utils";
+  import { books, NLT_BOOKS } from "../../../api/bible/static/books";
+  import {
+    getVerses,
+    getVerse,
+    getActiveRef,
+    getActiveVerse,
+    setActiveRef,
+    upsertVerse,
+    removeVerse,
+    buildEntry,
+    freshness,
+    type VerseEntry,
+  } from "../../../utils/collection";
+  import { legacyVerses } from "../../../api/bible/static/legacyVerses";
+  import { starterRef } from "../../../api/bible/static/starterVerses";
+
+  type AddArgs = {
+    bookName: string;
+    chapter: number;
+    startVerse: number;
+    endVerse: number;
+  };
+
+  // A legacy verse plus its precomputed display reference.
+  type LegacyListItem = {
+    bookName: string;
+    chapter: number;
+    startVerse: number;
+    endVerse?: number;
+    ref: string;
+  };
+
+  // Verse numbers are typed by hand, so accept only whole numbers within the
+  // longest chapter in any Bible (Psalm 119 has 176 verses). We can't know each
+  // chapter's real verse count client-side, so an in-range-but-nonexistent verse
+  // (e.g. John 3:99) is left to the fetch, which surfaces "Couldn't find that
+  // verse." This just blocks the impossible input: 0, negatives, decimals, junk.
+  const MAX_VERSES_IN_CHAPTER = 176;
+
+  function parseVerse(raw: unknown): number | null {
+    const n = Number(raw);
+    if (!Number.isInteger(n) || n < 1 || n > MAX_VERSES_IN_CHAPTER) return null;
+    return n;
+  }
+
+  async function fetchVersesObj({
+    bookId,
+    chapter,
+    startVerse,
+    endVerse,
+  }: {
+    bookId: number;
+    chapter: number;
+    startVerse: number;
+    endVerse: number;
+  }): Promise<Record<string, string>> {
+    const verseNums: number[] = [startVerse];
+    if (endVerse && endVerse > startVerse) {
+      for (let i = startVerse + 1; i <= endVerse; i++) verseNums.push(i);
+    }
+    const url =
+      "/api/verses?" +
+      new URLSearchParams({
+        bookId: String(bookId),
+        chapter: String(chapter),
+        verses: verseNums.join(","),
+      });
+    return await fetchAndCache({ url, cacheKey: url });
+  }
+
+  document.addEventListener("alpine:init", () => {
+    window.Alpine.data("verseManager", () => ({
+      verses: getVerses() as VerseEntry[],
+      activeRef: getActiveRef() as string | null,
+      picker: { bookId: "0", chapter: "0", startVerse: "", endVerse: "" },
+      isLoading: false,
+      errorMsg: "",
+      // Starters accordion: open by default only when the collection is empty.
+      showStarters: getVerses().length === 0,
+      // Which verse (if any) is armed for the two-step delete confirm.
+      pendingDeleteRef: null as string | null,
+      // Legacy-verse import (one-time recovery of the old curated weekly verses).
+      legacyList: legacyVerses.map((v) => ({ ...v, ref: starterRef(v) })),
+      showImport: false,
+      importing: false,
+      importDone: 0,
+      importTotal: 0,
+      importFailed: 0,
+
+      get chapterOptions(): number[] {
+        const book = NLT_BOOKS.find((b) => b.bookid === Number(this.picker.bookId));
+        if (!book) return [];
+        return Array.from({ length: book.chapters }, (_, i) => i + 1);
+      },
+
+      refresh() {
+        this.verses = getVerses();
+        this.activeRef = getActiveRef();
+      },
+
+      // Push a verse into the root Alpine state so it renders in the card.
+      displayVerse(entry: VerseEntry) {
+        setAlpineState("versesObj", entry.versesObj);
+        setAlpineState("scriptureRef", entry.ref);
+        setAlpineState("bookName", entry.bookName);
+        setAlpineState("chapter", entry.chapter);
+        setAlpineState("hasActiveVerse", true);
+        setAlpineState("hasPreviewVerse", true);
+        setAlpineState("fidelity", 0);
+        this.activeRef = entry.ref;
+      },
+
+      async addAndActivate({ bookName, chapter, startVerse, endVerse }: AddArgs) {
+        this.isLoading = true;
+        this.errorMsg = "";
+        try {
+          const bookId = books[bookName as keyof typeof books]?.bookid;
+          if (!bookId) throw new Error("Unknown book");
+          const versesObj = await fetchVersesObj({
+            bookId,
+            chapter,
+            startVerse,
+            endVerse,
+          });
+          if (!versesObj || !Object.keys(versesObj).length) {
+            throw new Error("No text returned");
+          }
+          const entry = buildEntry({
+            bookName,
+            chapter,
+            startVerse,
+            endVerse,
+            versesObj,
+          });
+          upsertVerse(entry);
+          setActiveRef(entry.ref);
+          this.refresh();
+          this.displayVerse(entry);
+        } catch {
+          this.errorMsg = "Couldn't find that verse. Double-check the reference.";
+        } finally {
+          this.isLoading = false;
+        }
+      },
+
+      // Book + chapter come from <select>s and are always valid. The verse
+      // fields are free-form, so validate them hard before we fetch.
+      addFromPicker() {
+        const book = NLT_BOOKS.find(
+          (b) => b.bookid === Number(this.picker.bookId)
+        );
+        if (!book) {
+          this.errorMsg = "Choose a book.";
+          return;
+        }
+
+        const chapter = Number(this.picker.chapter);
+        if (!chapter) {
+          this.errorMsg = "Choose a chapter.";
+          return;
+        }
+
+        const startVerse = parseVerse(this.picker.startVerse);
+        if (startVerse === null) {
+          this.errorMsg = "Enter a start verse — a whole number from 1 to 176.";
+          return;
+        }
+
+        // "To" is optional (single-verse memorization); only validate if filled.
+        let endVerse = 0;
+        if (String(this.picker.endVerse).trim() !== "") {
+          const parsedEnd = parseVerse(this.picker.endVerse);
+          if (parsedEnd === null) {
+            this.errorMsg = "The “To” verse must be a whole number from 1 to 176.";
+            return;
+          }
+          if (parsedEnd < startVerse) {
+            this.errorMsg = "The “To” verse can’t come before the “From” verse.";
+            return;
+          }
+          endVerse = parsedEnd;
+        }
+
+        return this.addAndActivate({
+          bookName: book.name,
+          chapter,
+          startVerse,
+          endVerse,
+        });
+      },
+
+      addStarter(dataset: DOMStringMap) {
+        return this.addAndActivate({
+          bookName: dataset.book || "",
+          chapter: Number(dataset.chapter),
+          startVerse: Number(dataset.start),
+          endVerse: Number(dataset.end) || 0,
+        });
+      },
+
+      selectVerse(ref: string) {
+        const entry = getVerse(ref);
+        if (!entry) return;
+        setActiveRef(ref);
+        this.displayVerse(entry);
+        this.refresh();
+      },
+
+      deleteVerse(ref: string) {
+        const wasActive = getActiveRef() === ref;
+        removeVerse(ref);
+        this.refresh();
+        if (!wasActive) return;
+
+        const next = getActiveVerse();
+        if (next) {
+          this.displayVerse(next);
+        } else {
+          // Collection is empty — drop back to the cold-start empty state.
+          setAlpineState("hasActiveVerse", false);
+          setAlpineState("hasPreviewVerse", false);
+          setAlpineState("scriptureRef", "");
+          setAlpineState("versesObj", {});
+          this.activeRef = null;
+        }
+      },
+
+      // Second step of the confirm: actually remove, then disarm.
+      confirmDelete(ref: string) {
+        this.deleteVerse(ref);
+        this.pendingDeleteRef = null;
+      },
+
+      // --- Legacy verse import -------------------------------------------------
+
+      isImported(ref: string): boolean {
+        return this.verses.some((v) => v.ref === ref);
+      },
+
+      get legacyImportableCount(): number {
+        return this.legacyList.filter((v) => !this.isImported(v.ref)).length;
+      },
+
+      // If nothing is active (e.g. importing into an empty collection), show the
+      // newest verse so the card isn't blank.
+      activateFirstIfNone() {
+        if (getActiveRef()) return;
+        const first = getVerses()[0];
+        if (first) {
+          setActiveRef(first.ref);
+          this.displayVerse(first);
+        }
+      },
+
+      // Fetch + store one legacy verse without stealing the active selection.
+      // Returns false if the text couldn't be fetched. Already-added verses are
+      // a no-op success.
+      async importVerse(v: LegacyListItem): Promise<boolean> {
+        if (getVerse(v.ref)) return true;
+        const book = books[v.bookName as keyof typeof books];
+        if (!book) return false;
+        try {
+          const versesObj = await fetchVersesObj({
+            bookId: book.bookid,
+            chapter: v.chapter,
+            startVerse: v.startVerse,
+            endVerse: v.endVerse || 0,
+          });
+          if (!versesObj || !Object.keys(versesObj).length) return false;
+          upsertVerse(
+            buildEntry({
+              bookName: v.bookName,
+              chapter: v.chapter,
+              startVerse: v.startVerse,
+              endVerse: v.endVerse || 0,
+              versesObj,
+            })
+          );
+          return true;
+        } catch {
+          return false;
+        }
+      },
+
+      async importOne(v: LegacyListItem) {
+        if (this.importing) return;
+        await this.importVerse(v);
+        this.refresh();
+        this.activateFirstIfNone();
+      },
+
+      async importAll() {
+        if (this.importing) return;
+        const pending = this.legacyList.filter((v) => !getVerse(v.ref));
+        if (!pending.length) return;
+
+        this.importing = true;
+        this.importTotal = pending.length;
+        this.importDone = 0;
+        this.importFailed = 0;
+
+        // Polite fan-out: a few at a time so we don't hammer bolls.life.
+        const CONCURRENCY = 4;
+        let cursor = 0;
+        const worker = async () => {
+          while (cursor < pending.length) {
+            const v = pending[cursor++];
+            const ok = await this.importVerse(v);
+            if (!ok) this.importFailed++;
+            this.importDone++;
+            this.refresh();
+          }
+        };
+        await Promise.all(
+          Array.from({ length: Math.min(CONCURRENCY, pending.length) }, worker)
+        );
+
+        this.activateFirstIfNone();
+        this.importing = false;
+      },
+
+      freshnessClass(entry: VerseEntry): string {
+        switch (freshness(entry)) {
+          case "fresh":
+            return "bg-green-500";
+          case "fading":
+            return "bg-amber-500";
+          case "stale":
+            return "bg-red-500";
+          default:
+            return "bg-gray-400";
+        }
+      },
+
+      freshnessLabel(entry: VerseEntry): string {
+        switch (freshness(entry)) {
+          case "fresh":
+            return "Practiced recently";
+          case "fading":
+            return "Starting to fade — review soon";
+          case "stale":
+            return "Needs review";
+          default:
+            return "Not practiced yet";
+        }
+      },
+    }));
+  });
+</script>

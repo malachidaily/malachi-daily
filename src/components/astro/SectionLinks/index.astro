@@ -22,29 +22,6 @@
         How to
       </button>
     </li>
-    <li
-      class="leading-3 flex items-center"
-      x-cloak
-      x-show="!isPWAInstalled && !isUsingArcBrowser"
-    >
-      <button
-        class="flex gap-1 items-center link whitespace-nowrap text-xs"
-        x-on:click="showPWAInstallDrawer()"
-      >
-        <svg
-          width={16}
-          height={16}
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            fill="currentColor"
-            d="M6 22V2h8.077v1H7v1.5h7.077v1H7v13h10v-2h1V22zm12-8.711L13.692 8.98l.708-.708l3.1 3.1V3.5h1v7.873l3.1-3.1l.708.708zM14.077 4.5H7V3h7.077z"
-          ></path>
-        </svg>
-        Install App
-      </button>
-    </li>
     <li class="leading-3 flex items-center">
       <a
         class="flex gap-1 items-center link whitespace-nowrap text-xs"
@@ -79,25 +56,20 @@
       <a
         x-data={`{
           createEmailLink() {
-            // Set up the email link for getting help
-            const helpEmailLink = new URL('mailto:cameronandrewpak+malachidaily@gmail.com');
-            helpEmailLink.searchParams.set('cc', 'hello@malachidaily.com');
-            helpEmailLink.searchParams.set('subject', encodeURIComponent('Malachi Daily Help Request'));
+            // Build a mailto link for getting help
+            const subject = 'Malachi Daily Help Request';
             let emailBody = '';
             emailBody += 'I want help with the following:\\n\\n';
             emailBody += '{Write about what you need help with here}\\n\\n';
             emailBody += '—Below is some necessary data to help debug any issues:—'
-            emailBody += '\\n• Scripture Ref: ' + scriptureRef;
-            emailBody += '\\n• Scripture: ' + scriptureTextOriginal;
+            if (scriptureRef) emailBody += '\\n• Scripture Ref: ' + scriptureRef;
+            if (scriptureTextOriginal) emailBody += '\\n• Scripture: ' + scriptureTextOriginal;
             emailBody += '\\n• User Agent: ' + window.navigator.userAgent;
-            helpEmailLink.searchParams.set('body', encodeURIComponent(emailBody));
-            return decodeURIComponent(helpEmailLink.href)
-          },
-          emailLink: ''
+            return 'mailto:hello@malachidaily.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(emailBody);
+          }
         }`}
         x-clear
-        x-init="emailLink = createEmailLink()"
-        x-bind:href="emailLink"
+        x-bind:href="createEmailLink()"
         target="_blank"
         class="flex gap-1 items-center link whitespace-nowrap text-xs"
       >

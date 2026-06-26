@@ -1,4 +1,4 @@
-import { defineConfig, envField } from "astro/config";
+import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import alpinejs from "@astrojs/alpinejs";
 import sitemap from "@astrojs/sitemap";
@@ -10,14 +10,6 @@ import partytown from "@astrojs/partytown";
 // https://astro.build/config
 export default defineConfig({
   site: "https://app.malachidaily.com",
-  env: {
-    schema: {
-      BASEROW_TOKEN: envField.string({
-        context: "server",
-        access: "secret",
-      }),
-    },
-  },
   integrations: [
     tailwind(),
     alpinejs(),
@@ -31,8 +23,7 @@ export default defineConfig({
     }),
   ],
   redirects: {
-    "/admin": "https://baserow.io/database/81919/table/222976/365623",
-    "/example": "/old?book=John&chapter=1&start-verse=1",
+    "/example": "/?book=John&chapter=1&start-verse=1",
   },
   output: "server",
   adapter: netlify({
