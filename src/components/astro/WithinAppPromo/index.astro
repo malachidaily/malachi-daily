@@ -1,0 +1,37 @@
+---
+import { Image } from "astro:assets";
+
+import withinIcon from "../../../assets/within-image.webp";
+
+const withinUrl =
+  "https://blog.malachidaily.com/within-app--memorize-scripture";
+---
+
+<a
+  href={withinUrl}
+  target="_blank"
+  rel="noopener noreferrer"
+  class="block hover:rotate-0 -rotate-1 rounded-xl surface-primary p-4 shadow-xl max-sm:shadow-sm max-sm:rounded-3xl border border-gray-200 dark:border-gray-600 hover:brightness-[1.02] active:brightness-[0.98] transition-all"
+>
+  <div class="flex items-center justify-between gap-4">
+    <Image
+      src={withinIcon}
+      alt="Within app icon"
+      class="h-16 w-16 shrink-0 rounded-2xl shadow-sm"
+    />
+    <div class="flex flex-col gap-1 min-w-0 flex-1">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="font-bold text-lg text-beautiful-gradient">Within</span>
+        <span
+          class="text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-blue-100 dark:bg-sky-900 text-blue-600 dark:text-sky-300"
+        >
+          New app
+        </span>
+      </div>
+      <p class="text-sm text-muted">
+        Memorize scripture with our upgraded app experience.
+      </p>
+    </div>
+    <span class="btn btn-sm btn-filled-contrast shrink-0">Get Within</span>
+  </div>
+</a>

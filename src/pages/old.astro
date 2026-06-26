@@ -8,6 +8,7 @@ import logoImgUrl from "../assets/logo.png";
 import { backupVerse } from "../utils/constants";
 import NativeFeelingDrawer from "../components/react/NativeFeelingDrawer";
 import SectionLinks from "../components/astro/SectionLinks/index.astro";
+import WithinAppPromo from "../components/astro/WithinAppPromo/index.astro";
 import {
   type BibleVersesFromMultipleTranslations,
   getBibleVersesFromMultipleTranslations,
@@ -643,6 +644,8 @@ if (!isThereACurrentVerse) {
             </p>
           </div>
         </section>
+
+        <WithinAppPromo />
 
         <!-- SCRIPTURE TO MEMORIZE -->
         <section
