@@ -24,8 +24,8 @@ BASEROW_TOKEN="..."
 ```
 
 ```bash
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 ## [See Our Wiki](https://wiki.mutable.ai/cameronapak/malachi-daily)

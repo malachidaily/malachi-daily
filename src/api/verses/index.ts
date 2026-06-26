@@ -1,6 +1,7 @@
+import { BASEROW_TOKEN } from "astro:env/server";
 import { fetchAndCache } from "../index.ts";
 
-const BASEROW_AUTH_TOKEN = `Token ${import.meta.env.BASEROW_TOKEN}`;
+const BASEROW_AUTH_TOKEN = `Token ${BASEROW_TOKEN}`;
 const VERSES_TABLE_ID = 222976;
 const GET_VERSES_ENDPOINT = `https://api.baserow.io/api/database/rows/table/${VERSES_TABLE_ID}/?user_field_names=true`;
 
