@@ -1,4 +1,4 @@
-import { defineConfig } from 'astro/config';
+import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import alpinejs from "@astrojs/alpinejs";
 import sitemap from "@astrojs/sitemap";
@@ -10,23 +10,28 @@ import partytown from "@astrojs/partytown";
 // https://astro.build/config
 export default defineConfig({
   integrations: [
-    tailwind(), 
-    alpinejs(), 
-    sitemap(), 
-    react(), 
+    tailwind(),
+    alpinejs(),
+    sitemap(),
+    react(),
     partytown({
       // https://docs.astro.build/en/guides/integrations-guide/partytown/#configforward
       config: {
-        forward: ['dataLayer.push'],
+        forward: ["dataLayer.push"],
       },
-    })
+    }),
   ],
   redirects: {
-    '/admin': 'https://baserow.io/database/81919/table/222976/365623',
-    '/old': '/',
-    '/example': '/old?book=John&chapter=1&start-verse=1',
-    '/android-beta': 'https://play.google.com/store/apps/details?id=com.malachidaily.app.twa',
+    "/admin": "https://baserow.io/database/81919/table/222976/365623",
+    "/old": "/",
+    "/example": "/old?book=John&chapter=1&start-verse=1",
+    "/android-beta":
+      "https://play.google.com/store/apps/details?id=com.malachidaily.app.twa",
   },
-  output: 'server',
-  adapter: netlify()
+  output: "server",
+  adapter: netlify({
+    experimental: {
+      environmentVariables: true,
+    },
+  }),
 });
