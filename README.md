@@ -8,7 +8,6 @@ This is a Progressive Web App (PWA) to help comunity gather together and memoriz
 - [Tailwind CSS](https://tailwindcss.com/) - CSS framework.
 - [Alpine.js](https://alpinejs.dev/) - Interactive layer and state management.
 - [Daisy UI](https://daisyui.com/) - UI CSS library.
-- [PWA Install Dialog](https://github.com/storedotapp/pwa-install-dialog) - Makes it easy where people can install the app on their device.
 - [Netlify](https://www.netlify.com/) - Where I host the site.
 - [Google Analytics](https://analytics.google.com/) - This is for analytics.
 - [Google Tag Manager](https://www.google.com/tagmanager/) - This is for analytics.
