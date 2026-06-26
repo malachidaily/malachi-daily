@@ -1,6 +1,6 @@
 ---
 const includesDebugMode = Astro.url.searchParams.get("debug");
-const originUrl = Astro.url.origin;
+const originUrl = Astro.url.origin + "/old";
 const webmanifest = {
   name: "Malachi Daily | Simple Scripture Memorization, Together",
   short_name: "Malachi Daily",
@@ -20,7 +20,7 @@ const webmanifest = {
   shortcuts: [
     {
       name: "Open Malachi Daily",
-      url: "/",
+      url: "/old",
       description: "Let's memorize today's verse",
     },
   ],

@@ -16,7 +16,7 @@
   "shortcuts": [
     {
       "name": "Open Malachi Daily",
-      "url": "/",
+      "url": "/old",
       "description": "Let's memorize today's verse"
     }
   ],
@@ -57,7 +57,7 @@
   "background_color": "#1f2937",
   "display": "standalone",
   "gcm_sender_id": "44879717629",
-  "start_url": "https://app.malachidaily.com",
+  "start_url": "https://app.malachidaily.com/old",
   "dir": "ltr",
   "lang": "en",
   "orientation": "portrait-primary",
