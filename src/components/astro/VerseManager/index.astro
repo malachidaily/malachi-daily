@@ -141,28 +141,128 @@ import {
               Active
             </span>
           </button>
-          <button
-            type="button"
-            x-on:click="deleteVerse(entry.ref)"
-            class="shrink-0 grid place-items-center h-9 w-9 rounded-lg text-gray-400 transition-colors hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
-            aria-label="Remove verse"
-            title="Remove from my verses"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
+          <!-- Removing a verse drops its practice history, so confirm in two steps. -->
+          <div class="shrink-0 flex items-center gap-1">
+            <button
+              x-show="pendingDeleteRef === entry.ref"
+              type="button"
+              x-on:click="confirmDelete(entry.ref)"
+              class="px-2.5 h-9 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-100 dark:text-red-300 dark:hover:bg-red-500/10"
             >
-              <path d="M18 6 6 18M6 6l12 12"></path>
-            </svg>
-          </button>
+              Remove
+            </button>
+            <button
+              x-show="pendingDeleteRef === entry.ref"
+              type="button"
+              x-on:click="pendingDeleteRef = null"
+              class="px-2.5 h-9 rounded-lg text-sm font-medium text-muted hover:bg-gray-100 dark:hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+            <button
+              x-show="pendingDeleteRef !== entry.ref"
+              type="button"
+              x-on:click="pendingDeleteRef = entry.ref"
+              class="grid place-items-center h-9 w-9 rounded-lg text-gray-400 transition-colors hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
+              aria-label="Remove verse"
+              title="Remove from my verses"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <path d="M18 6 6 18M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
         </li>
       </template>
     </ul>
+  </div>
+
+  <!-- Import the old curated weekly verses (one-time recovery from the Baserow era).
+       Disappears once everything has been imported. -->
+  <div class="flex flex-col gap-3" x-show="legacyImportableCount > 0" x-cloak>
+    <button
+      type="button"
+      x-on:click="showImport = !showImport"
+      class="flex items-center justify-between gap-2 text-left"
+      x-bind:aria-expanded="showImport"
+    >
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-muted">
+        Import past Malachi Daily verses
+      </h3>
+      <span class="text-muted text-lg leading-none" x-text="showImport ? '−' : '+'"></span>
+    </button>
+
+    <div x-show="showImport" x-cloak class="flex flex-col gap-3">
+      <p class="text-xs text-muted">
+        The weekly verses Malachi Daily featured over the years. Add the ones you
+        were learning so you don’t lose them.
+      </p>
+
+      <div>
+        <button
+          type="button"
+          x-on:click="importAll()"
+          x-bind:disabled="importing"
+          class="btn-filled-contrast !btn-sm"
+          x-text="importing
+            ? 'Importing ' + importDone + ' of ' + importTotal + '…'
+            : 'Add all ' + legacyImportableCount + ' verses'"
+        >
+        </button>
+        <p
+          x-show="!importing && importFailed > 0"
+          x-cloak
+          x-text="importFailed + ' verse(s) couldn’t be fetched. Try again.'"
+          class="text-sm text-red-500 mt-2"
+        >
+        </p>
+      </div>
+
+      <ul
+        class="surface-primary rounded-2xl overflow-hidden divide-y divide-gray-100 dark:divide-gray-700 max-h-72 overflow-y-auto"
+      >
+        <template x-for="v in legacyList" :key="v.ref">
+          <li class="flex items-center gap-2 pl-4 pr-2">
+            <span class="grow py-3 text-primary font-medium" x-text="v.ref"></span>
+            <span
+              x-show="isImported(v.ref)"
+              class="shrink-0 pr-2 text-xs font-semibold uppercase tracking-wide text-green-600 dark:text-green-300"
+            >
+              Added
+            </span>
+            <button
+              x-show="!isImported(v.ref)"
+              type="button"
+              x-on:click="importOne(v)"
+              x-bind:disabled="importing"
+              class="shrink-0 grid place-items-center h-9 w-9 rounded-lg text-gray-400 transition-colors hover:text-blue-600 hover:bg-blue-50 dark:hover:text-blue-300 dark:hover:bg-blue-500/10 disabled:opacity-40 disabled:pointer-events-none"
+              aria-label="Add this verse to my verses"
+              title="Add to my verses"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <path d="M12 5v14M5 12h14"></path>
+              </svg>
+            </button>
+          </li>
+        </template>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -182,12 +282,23 @@ import {
     freshness,
     type VerseEntry,
   } from "../../../utils/collection";
+  import { legacyVerses } from "../../../api/bible/static/legacyVerses";
+  import { starterRef } from "../../../api/bible/static/starterVerses";
 
   type AddArgs = {
     bookName: string;
     chapter: number;
     startVerse: number;
     endVerse: number;
+  };
+
+  // A legacy verse plus its precomputed display reference.
+  type LegacyListItem = {
+    bookName: string;
+    chapter: number;
+    startVerse: number;
+    endVerse?: number;
+    ref: string;
   };
 
   // Verse numbers are typed by hand, so accept only whole numbers within the
@@ -235,6 +346,15 @@ import {
       picker: { bookId: "0", chapter: "0", startVerse: "", endVerse: "" },
       isLoading: false,
       errorMsg: "",
+      // Which verse (if any) is armed for the two-step delete confirm.
+      pendingDeleteRef: null as string | null,
+      // Legacy-verse import (one-time recovery of the old curated weekly verses).
+      legacyList: legacyVerses.map((v) => ({ ...v, ref: starterRef(v) })),
+      showImport: false,
+      importing: false,
+      importDone: 0,
+      importTotal: 0,
+      importFailed: 0,
 
       get chapterOptions(): number[] {
         const book = NLT_BOOKS.find((b) => b.bookid === Number(this.picker.bookId));
@@ -372,6 +492,100 @@ import {
           setAlpineState("versesObj", {});
           this.activeRef = null;
         }
+      },
+
+      // Second step of the confirm: actually remove, then disarm.
+      confirmDelete(ref: string) {
+        this.deleteVerse(ref);
+        this.pendingDeleteRef = null;
+      },
+
+      // --- Legacy verse import -------------------------------------------------
+
+      isImported(ref: string): boolean {
+        return this.verses.some((v) => v.ref === ref);
+      },
+
+      get legacyImportableCount(): number {
+        return this.legacyList.filter((v) => !this.isImported(v.ref)).length;
+      },
+
+      // If nothing is active (e.g. importing into an empty collection), show the
+      // newest verse so the card isn't blank.
+      activateFirstIfNone() {
+        if (getActiveRef()) return;
+        const first = getVerses()[0];
+        if (first) {
+          setActiveRef(first.ref);
+          this.displayVerse(first);
+        }
+      },
+
+      // Fetch + store one legacy verse without stealing the active selection.
+      // Returns false if the text couldn't be fetched. Already-added verses are
+      // a no-op success.
+      async importVerse(v: LegacyListItem): Promise<boolean> {
+        if (getVerse(v.ref)) return true;
+        const book = books[v.bookName as keyof typeof books];
+        if (!book) return false;
+        try {
+          const versesObj = await fetchVersesObj({
+            bookId: book.bookid,
+            chapter: v.chapter,
+            startVerse: v.startVerse,
+            endVerse: v.endVerse || 0,
+          });
+          if (!versesObj || !Object.keys(versesObj).length) return false;
+          upsertVerse(
+            buildEntry({
+              bookName: v.bookName,
+              chapter: v.chapter,
+              startVerse: v.startVerse,
+              endVerse: v.endVerse || 0,
+              versesObj,
+            })
+          );
+          return true;
+        } catch {
+          return false;
+        }
+      },
+
+      async importOne(v: LegacyListItem) {
+        if (this.importing) return;
+        await this.importVerse(v);
+        this.refresh();
+        this.activateFirstIfNone();
+      },
+
+      async importAll() {
+        if (this.importing) return;
+        const pending = this.legacyList.filter((v) => !getVerse(v.ref));
+        if (!pending.length) return;
+
+        this.importing = true;
+        this.importTotal = pending.length;
+        this.importDone = 0;
+        this.importFailed = 0;
+
+        // Polite fan-out: a few at a time so we don't hammer bolls.life.
+        const CONCURRENCY = 4;
+        let cursor = 0;
+        const worker = async () => {
+          while (cursor < pending.length) {
+            const v = pending[cursor++];
+            const ok = await this.importVerse(v);
+            if (!ok) this.importFailed++;
+            this.importDone++;
+            this.refresh();
+          }
+        };
+        await Promise.all(
+          Array.from({ length: Math.min(CONCURRENCY, pending.length) }, worker)
+        );
+
+        this.activateFirstIfNone();
+        this.importing = false;
       },
 
       freshnessClass(entry: VerseEntry): string {
