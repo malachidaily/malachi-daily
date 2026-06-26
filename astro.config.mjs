@@ -23,14 +23,11 @@ export default defineConfig({
   ],
   redirects: {
     "/admin": "https://baserow.io/database/81919/table/222976/365623",
-    "/old": "/",
     "/example": "/old?book=John&chapter=1&start-verse=1",
-    "/android-beta":
-      "https://play.google.com/store/apps/details?id=com.malachidaily.app.twa",
   },
   output: "server",
   adapter: netlify({
-    experimental: {
+    devFeatures: {
       environmentVariables: true,
     },
   }),
