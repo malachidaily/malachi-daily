@@ -88,12 +88,22 @@ import {
     </div>
   </div>
 
-  <!-- Starter verses: the cold-start on-ramp (only while the collection is empty) -->
-  <div class="flex flex-col gap-3" x-show="!verses.length" x-cloak>
-    <h3 class="text-xs font-semibold uppercase tracking-wider text-muted">
-      Or start with a classic
-    </h3>
-    <div class="flex flex-wrap gap-2">
+  <!-- Starter verses: a cold-start on-ramp. Always available, but open by
+       default only on an empty collection (see showStarters init). -->
+  <div class="flex flex-col gap-3">
+    <button
+      type="button"
+      x-on:click="showStarters = !showStarters"
+      class="flex items-center justify-between gap-2 text-left"
+      x-bind:aria-expanded="showStarters"
+    >
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-muted">
+        Start with a classic
+      </h3>
+      <span class="text-muted text-lg leading-none" x-text="showStarters ? '−' : '+'"></span>
+    </button>
+
+    <div x-show="showStarters" x-cloak class="flex flex-wrap gap-2">
       {
         starterVerses.map((v) => (
           <button
@@ -346,6 +356,8 @@ import {
       picker: { bookId: "0", chapter: "0", startVerse: "", endVerse: "" },
       isLoading: false,
       errorMsg: "",
+      // Starters accordion: open by default only when the collection is empty.
+      showStarters: getVerses().length === 0,
       // Which verse (if any) is armed for the two-step delete confirm.
       pendingDeleteRef: null as string | null,
       // Legacy-verse import (one-time recovery of the old curated weekly verses).
