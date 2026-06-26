@@ -1366,6 +1366,7 @@ if (!isThereACurrentVerse) {
     import {
       constructBibleDotComChapterURL,
       type BookName,
+      type bibleVersion,
     } from "../api/bible/static/books";
     import { removeAlpineAttributes, setAlpineState } from "../utils";
     import { MALACHI_BLOG_URL } from "../utils/constants";
@@ -1513,7 +1514,7 @@ if (!isThereACurrentVerse) {
           const bibleDotComChapterUrl = constructBibleDotComChapterURL({
             book: this.bookName as BookName,
             chapter: this.chapter,
-            versionShortCode: this.bibleVersionPreference,
+            versionShortCode: this.bibleVersionPreference as bibleVersion,
           });
 
           return bibleDotComChapterUrl;
