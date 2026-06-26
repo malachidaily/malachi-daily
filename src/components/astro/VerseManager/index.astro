@@ -43,6 +43,8 @@ import {
           x-model="picker.startVerse"
           type="number"
           min="1"
+          max="176"
+          step="1"
           inputmode="numeric"
           placeholder="From"
           class="field text-center"
@@ -53,6 +55,8 @@ import {
           x-model="picker.endVerse"
           type="number"
           min="1"
+          max="176"
+          step="1"
           inputmode="numeric"
           placeholder="To"
           class="field text-center"
@@ -186,6 +190,19 @@ import {
     endVerse: number;
   };
 
+  // Verse numbers are typed by hand, so accept only whole numbers within the
+  // longest chapter in any Bible (Psalm 119 has 176 verses). We can't know each
+  // chapter's real verse count client-side, so an in-range-but-nonexistent verse
+  // (e.g. John 3:99) is left to the fetch, which surfaces "Couldn't find that
+  // verse." This just blocks the impossible input: 0, negatives, decimals, junk.
+  const MAX_VERSES_IN_CHAPTER = 176;
+
+  function parseVerse(raw: unknown): number | null {
+    const n = Number(raw);
+    if (!Number.isInteger(n) || n < 1 || n > MAX_VERSES_IN_CHAPTER) return null;
+    return n;
+  }
+
   async function fetchVersesObj({
     bookId,
     chapter,
@@ -275,25 +292,44 @@ import {
         }
       },
 
+      // Book + chapter come from <select>s and are always valid. The verse
+      // fields are free-form, so validate them hard before we fetch.
       addFromPicker() {
         const book = NLT_BOOKS.find(
           (b) => b.bookid === Number(this.picker.bookId)
         );
-        const chapter = Number(this.picker.chapter);
-        const startVerse = Number(this.picker.startVerse);
-        const endVerse = Number(this.picker.endVerse) || 0;
         if (!book) {
           this.errorMsg = "Choose a book.";
           return;
         }
+
+        const chapter = Number(this.picker.chapter);
         if (!chapter) {
           this.errorMsg = "Choose a chapter.";
           return;
         }
-        if (!startVerse) {
-          this.errorMsg = "Enter a start verse.";
+
+        const startVerse = parseVerse(this.picker.startVerse);
+        if (startVerse === null) {
+          this.errorMsg = "Enter a start verse — a whole number from 1 to 176.";
           return;
         }
+
+        // "To" is optional (single-verse memorization); only validate if filled.
+        let endVerse = 0;
+        if (String(this.picker.endVerse).trim() !== "") {
+          const parsedEnd = parseVerse(this.picker.endVerse);
+          if (parsedEnd === null) {
+            this.errorMsg = "The “To” verse must be a whole number from 1 to 176.";
+            return;
+          }
+          if (parsedEnd < startVerse) {
+            this.errorMsg = "The “To” verse can’t come before the “From” verse.";
+            return;
+          }
+          endVerse = parsedEnd;
+        }
+
         return this.addAndActivate({
           bookName: book.name,
           chapter,

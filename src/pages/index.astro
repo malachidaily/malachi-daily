@@ -26,30 +26,53 @@ const searchParamBook = urlSearchParams.get("book");
 const searchParamChapter = urlSearchParams.get("chapter");
 const searchParamStartVerse = urlSearchParams.get("start-verse");
 const searchParamEndVerse = urlSearchParams.get("end-verse");
-// Shape varies (deep-link params vs. backup verse), so keep it loose.
-let verseToUse: any;
-const getVerseFromUrlParams = Boolean(
-  searchParamBook && searchParamChapter && searchParamStartVerse
-);
-
 let errorText = "";
 let infoText = "";
 
+// Deep links (?book=John&chapter=1&start-verse=1) are untrusted input, so
+// validate before trusting them: the book must be a known book, and the chapter
+// and verses must be sane whole numbers in range. Anything off — a typo'd book,
+// a NaN / negative / out-of-range number — falls back to a neutral backup verse
+// instead of throwing a server error. 176 = Psalm 119, the longest chapter in
+// any Bible; exact per-chapter verse counts aren't known here, so the fetch is
+// the final backstop for an in-range-but-nonexistent verse.
+const MAX_VERSES_IN_CHAPTER = 176;
+const isSaneVerse = (n: number) =>
+  Number.isInteger(n) && n >= 1 && n <= MAX_VERSES_IN_CHAPTER;
+
+const requestedBook = searchParamBook as BookName;
+const requestedBookMeta = searchParamBook ? books[requestedBook] : undefined;
+const requestedChapter = Number(searchParamChapter);
+const requestedStart = Number(searchParamStartVerse);
+const requestedEnd = searchParamEndVerse ? Number(searchParamEndVerse) : 0;
+
+const getVerseFromUrlParams =
+  Boolean(requestedBookMeta) &&
+  Number.isInteger(requestedChapter) &&
+  requestedChapter >= 1 &&
+  requestedChapter <= (requestedBookMeta?.chapters ?? 0) &&
+  isSaneVerse(requestedStart) &&
+  (requestedEnd === 0 ||
+    (isSaneVerse(requestedEnd) && requestedEnd >= requestedStart));
+
+// Shape varies (deep-link params vs. backup verse), so keep it loose.
+let verseToUse: any;
 if (getVerseFromUrlParams) {
-  // Deep-linked verse, e.g. ?book=John&chapter=1&start-verse=1
   verseToUse = {
-    Book: {
-      value: searchParamBook,
-    },
-    Chapter: searchParamChapter,
-    "Verse Number Start": searchParamStartVerse,
-    "Verse Number End": searchParamEndVerse,
+    Book: { value: requestedBook },
+    Chapter: requestedChapter,
+    "Verse Number Start": requestedStart,
+    "Verse Number End": requestedEnd,
   };
 } else {
   // No deep link: render a neutral backup verse on the server. The verse the
   // user was last working on lives in localStorage, so the client hydrates
   // over this on load (see the Alpine init()).
   verseToUse = backupVerse;
+  // They tried to deep-link something we couldn't trust — say so gently.
+  if (searchParamBook || searchParamChapter || searchParamStartVerse) {
+    errorText = "That verse link didn't look right, so we loaded a default verse.";
+  }
 }
 
 const translation: bibleVersion = "NLT";
@@ -215,8 +238,8 @@ const scriptureRef = verseRef;
     x-init={`
 			versesObj = ${JSON.stringify(verses)};
 			bibleVersionData = ${JSON.stringify(bibleVersionData)};
-			notificationAlert = '${errorText}';
-			notificationInfo = '${infoText}';
+			notificationAlert = ${JSON.stringify(errorText)};
+			notificationInfo = ${JSON.stringify(infoText)};
 			passageNum = ${passageNum};
 			bookName = '${bookName}';
 			chapter = ${chapter};
