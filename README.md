@@ -1,6 +1,6 @@
 # Malachi Daily App - OSS
 
-This is a Progressive Web App (PWA) to help comunity gather together and memorize scripture, in a fun and interactive way. The content is curated by the Malachi Daily team.
+This is a Progressive Web App (PWA) to help people memorize scripture in a fun and interactive way. Pick any passage (or start with a curated list of classics); your verses are saved locally in the browser, with no account or backend required.
 
 ## Toolkit / Stack
 
@@ -13,15 +13,10 @@ This is a Progressive Web App (PWA) to help comunity gather together and memoriz
 - [Google Tag Manager](https://www.google.com/tagmanager/) - This is for analytics.
 - [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/) - This is for notifications.
 - [Bolls Life Bible API](https://bolls.life/) - This is where we get our verses from.
-- [Baserow.io](https://baserow.io/) - This is where we store our data for upcoming verses.
 
 ## Get Started
 
-To get this working properly, you will need to set up your own environment variable. Email Cam for it.
-
-```bash
-BASEROW_TOKEN="..."
-```
+No environment variables are required. Verse text comes from the public bolls.life API, and each person's verses are stored in their browser's localStorage.
 
 ```bash
 bun install

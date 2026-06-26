@@ -12,3 +12,8 @@ export const backupVerse = {
 
 // Can be paired with 'q' query param to help search
 export const MALACHI_BLOG_URL = 'https://blog.malachidaily.com';
+
+// route.bible routes a passage to the user's preferred Bible app (YouVersion,
+// Logos, web reader, etc.) or shows a launcher to pick one. Pair with the `q`
+// query param for human-readable references like "Exodus 2:4-5". https://route.bible
+export const ROUTE_BIBLE_URL = 'https://route.bible/';
