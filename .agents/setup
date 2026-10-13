@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+node_version="$(<.nvmrc)"
+bun_version="$(<.bun-version)"
+# Netlify's dev adapter passes --allow-scripts, which Deno 2.9 no longer accepts.
+deno_version="2.4.2"
+toolchain_root="$HOME/.local/share/malachi-orb"
+node_root="$toolchain_root/node-$node_version"
+bun_root="$toolchain_root/bun-$bun_version"
+deno_root="$toolchain_root/deno-$deno_version"
+SECONDS=0
+
+echo "Preparing Node $node_version, Bun $bun_version, and Deno $deno_version"
+if [[ ! -x "$node_root/bin/node" || ! -x "$deno_root/bin/deno" ]]; then
+  case "$(uname -m)" in
+    x86_64) arch=x64; deno_arch=x86_64 ;;
+    aarch64) arch=arm64; deno_arch=aarch64 ;;
+    *) echo "Unsupported orb architecture: $(uname -m)" >&2; exit 1 ;;
+  esac
+  download_dir="$(mktemp -d)"
+  trap 'rm -rf "$download_dir"' EXIT
+fi
+
+if [[ ! -x "$node_root/bin/node" ]]; then
+  archive="node-v$node_version-linux-$arch.tar.xz"
+  curl --fail --silent --show-error --location "https://nodejs.org/dist/v$node_version/$archive" -o "$download_dir/$archive"
+  curl --fail --silent --show-error --location "https://nodejs.org/dist/v$node_version/SHASUMS256.txt" -o "$download_dir/SHASUMS256.txt"
+  (cd "$download_dir"; grep " $archive\$" SHASUMS256.txt | sha256sum --check)
+  tar -xJf "$download_dir/$archive" -C "$download_dir"
+  mkdir -p "$toolchain_root"
+  mv "$download_dir/node-v$node_version-linux-$arch" "$node_root"
+fi
+
+if [[ ! -x "$bun_root/bin/bun" ]]; then
+  curl --fail --silent --show-error --location https://bun.sh/install | BUN_INSTALL="$bun_root" bash -s -- "bun-v$bun_version"
+fi
+
+if [[ ! -x "$deno_root/bin/deno" ]]; then
+  curl --fail --silent --show-error --location "https://github.com/denoland/deno/releases/download/v$deno_version/deno-$deno_arch-unknown-linux-gnu.zip" -o "$download_dir/deno.zip"
+  unzip -q "$download_dir/deno.zip" -d "$download_dir/deno"
+  mkdir -p "$deno_root/bin"
+  mv "$download_dir/deno/deno" "$deno_root/bin/deno"
+fi
+
+# Supervised services and Amp use new login shells, not this setup process.
+profile_marker="# Malachi Daily orb toolchain"
+if ! grep -Fqx "$profile_marker" "$HOME/.bash_profile" 2>/dev/null; then
+  cat >> "$HOME/.bash_profile" <<EOF
+
+$profile_marker
+case "\$PWD" in
+  "$repo_root"|"$repo_root"/*)
+    export PATH="$toolchain_root/node-\$(cat "$repo_root/.nvmrc")/bin:$toolchain_root/bun-\$(cat "$repo_root/.bun-version")/bin:$toolchain_root/deno/bin:\$PATH"
+    ;;
+esac
+EOF
+fi
+
+ln -sfn "deno-$deno_version" "$toolchain_root/deno"
+export PATH="$node_root/bin:$bun_root/bin:$deno_root/bin:$PATH"
+node --version
+bun --version
+deno --version
+echo "Toolchains ready in ${SECONDS}s"
+
+install_started=$SECONDS
+echo "Installing dependencies from bun.lock"
+bun install --frozen-lockfile
+echo "Dependencies ready in $((SECONDS - install_started))s; setup finished in ${SECONDS}s"

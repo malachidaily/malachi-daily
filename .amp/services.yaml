@@ -1,0 +1,8 @@
+services:
+  malachi:
+    command: bun run dev:host --port "$PORT"
+    port: 4321
+    health: /
+    portal:
+      title: Malachi Daily
+      description: Requires BASEROW_TOKEN in Amp secrets or a local .env file.

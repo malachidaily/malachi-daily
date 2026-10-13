@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # Netlify build files
 .netlify/
+
+# Generated orb portal links
+.amp/portals/

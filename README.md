@@ -28,6 +28,29 @@ bun install
 bun run dev
 ```
 
+## Development in Amp orbs
+
+`.agents/setup` installs the Node and Bun versions pinned in `.nvmrc` and
+`.bun-version`, plus Deno 2.4.2 for Netlify's local dev runtime. Newer Deno versions
+reject a flag used by the current Netlify adapter. Setup then installs dependencies
+with `bun install --frozen-lockfile`.
+Amp can snapshot the installed tools and dependencies for reuse in fresh orbs.
+Setup is safe to rerun and does not require `BASEROW_TOKEN`.
+
+To run the app, add `BASEROW_TOKEN` to your Amp project secrets, then run:
+
+```bash
+amp orb services ensure
+```
+
+Open the portal URL printed by the command. The supervised service uses port 4321
+and checks that the homepage responds. No resume hook is needed because the app
+has no local database, tunnel, or authentication session to repair after waking.
+
+If you add the secret to an existing orb, run `amp orb restart-processes` to refresh
+its environment, then run `amp orb services ensure` again. Do not put secret values
+in setup scripts or commit them to the repository.
+
 ## [See Our Wiki](https://wiki.mutable.ai/cameronapak/malachi-daily)
 
 This will help you get more familiar with the codebase. 
