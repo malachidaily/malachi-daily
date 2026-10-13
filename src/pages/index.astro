@@ -217,6 +217,12 @@ const scriptureRef = verseRef;
 if (!isThereACurrentVerse) {
   isOffWeek = true;
 }
+
+// October 13 through 19, 2026, in America/Chicago (CDT).
+const nivNoticeStartsAt = new Date("2026-10-13T00:00:00-05:00").getTime();
+const nivNoticeExpiresAt = "2026-10-20T00:00:00-05:00";
+const now = Date.now();
+const showNivNotice = now >= nivNoticeStartsAt && now < new Date(nivNoticeExpiresAt).getTime();
 ---
 
 <Layout title="Malachi Daily: Memorize Bible Verses & Learn Their Context">
@@ -317,6 +323,20 @@ if (!isThereACurrentVerse) {
       class="overflow-y-scroll overflow-x-hidden w-screen h-full flex flex-col items-center"
       x-bind:class="{ 'min-h-screen': isFullscreen }"
     >
+      {showNivNotice && (
+        <aside
+          aria-label="NIV availability"
+          data-expires-at={nivNoticeExpiresAt}
+          x-init="setTimeout(() => $el.remove(), Math.max(0, new Date($el.dataset.expiresAt).getTime() - Date.now()))"
+          class="w-full border-b border-amber-200 bg-amber-50 text-amber-950 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100"
+        >
+          <p class="mx-auto max-w-[600px] px-6 py-4 text-sm leading-relaxed">
+            The NIV is temporarily unavailable because our Bible text provider lost
+            access. The provider displayed a message criticizing the NIV publisher
+            that we do not agree with. We're working to restore NIV access.
+          </p>
+        </aside>
+      )}
       <div
         class="p-6 rounded-xl canvas-tertiary max-w-[600px] w-full"
         x-show="showDebug"
