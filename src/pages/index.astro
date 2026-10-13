@@ -161,7 +161,7 @@ function getDiffBetweenDays() {
 }
 
 const nextVerseComesInDays = getDiffBetweenDays() || 0;
-const translation: bibleVersion = "NLT";
+const translation: bibleVersion = "BSB";
 const bookName: BookName = verseToUse.Book.value;
 const bookId = books[bookName].bookid;
 const chapter = Number(verseToUse.Chapter);
@@ -1441,15 +1441,25 @@ if (!isThereACurrentVerse) {
           window.matchMedia("(prefers-color-scheme: dark)").matches
       )
     );
-    const bibleVersionPreference = getFromLocalStorage(
+    let bibleVersionPreference = getFromLocalStorage(
       "bibleVersionPreference",
-      "NIV"
+      "BSB"
     );
+    if (bibleVersionPreference === "NIV" || bibleVersionPreference === "NVI") {
+      bibleVersionPreference = bibleVersionPreference === "NVI" ? "NTV" : "BSB";
+      localStorage.setItem("bibleVersionPreference", JSON.stringify(bibleVersionPreference));
+    }
     const offWeekScriptureRef = getFromLocalStorage("offWeekScriptureRef", "");
-    const offWeekScriptureVersesObj = getFromLocalStorage(
+    let offWeekScriptureVersesObj = getFromLocalStorage(
       "offWeekScriptureVersesObj",
       undefined
     );
+    // Old review passages contain NIV instead of BSB. Reload them through the picker.
+    if (offWeekScriptureVersesObj && !offWeekScriptureVersesObj.BSB) {
+      localStorage.removeItem("offWeekScriptureRef");
+      localStorage.removeItem("offWeekScriptureVersesObj");
+      offWeekScriptureVersesObj = undefined;
+    }
 
     if (isDarkMode) {
       toggleDarkMode();

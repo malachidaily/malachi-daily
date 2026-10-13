@@ -1,7 +1,7 @@
 // Book data provided by https://bolls.life/api
 
-const englishBibleVersions = ["NIV", "ESV", "NLT", "KJV", "MSG", "NET", "NKJV"];
-const spanishBibleVersions = ["RV1960", "NVI", "NTV"];
+const englishBibleVersions = ["BSB", "ESV", "NLT", "KJV", "MSG", "NET", "NKJV"];
+const spanishBibleVersions = ["RV1960", "NTV"];
 
 type BibleVersionsByLanguage = {
   [key: string]: {
@@ -37,11 +37,11 @@ export const bibleVersionData: {
     attribution:
       "Scripture taken from the New King James Version®. Copyright © 1982 by Thomas Nelson. Used by permission. All rights reserved.",
   },
-  NIV: {
+  BSB: {
     language: "en",
-    readableName: "NIV - New International Version",
+    readableName: "BSB - Berean Standard Bible",
     attribution:
-      "Scriptures taken from the Holy Bible, New International Version®, NIV®. Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.™ Used by permission of Zondervan. All rights reserved worldwide. www.zondervan.com The “NIV” and “New International Version” are trademarks registered in the United States Patent and Trademark Office by Biblica, Inc.™",
+      "Scripture taken from the Berean Standard Bible. Public domain. https://berean.bible/",
   },
   ESV: {
     language: "en",
@@ -78,12 +78,6 @@ export const bibleVersionData: {
     readableName: "RV1960 - Reina Valera 1960",
     attribution:
       "© Sociedades Bíblicas Unidas, 1960. Todos los derechos reservados. Sociedades Bíblicas Unidas (SBU): https://unitedbiblesocieties.org/es/casa/",
-  },
-  NVI: {
-    language: "es",
-    readableName: "NVI - Nueva Versión Internacional",
-    attribution:
-      "Nueva Versión Internacional® © 2015 por Biblica, Inc.® Todos los derechos reservados. Biblica, Inc.: https://www.biblica.com/",
   },
   NTV: {
     language: "es",
@@ -320,13 +314,12 @@ NLT_BOOKS.forEach((book) => {
 });
 
 const bibleDotComVersionsAndIDs: { [key in bibleVersion]: number } = {
-  NIV: 111,
+  BSB: 3034,
   NLT: 116,
   ESV: 59,
   MSG: 97,
   KJV: 1,
   RVR1960: 149,
-  NVI: 128,
   NTV: 127,
 };
 

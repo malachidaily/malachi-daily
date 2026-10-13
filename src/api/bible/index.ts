@@ -120,7 +120,7 @@ export async function getBibleVersesFromMultipleTranslations({
 
 // Get the verse using this API https://bolls.life/get-text/<slug:translation>/<int:book>/<int:chapter>/<int:verse>/
 export async function getVerse({
-    translation = 'NIV',
+    translation = 'BSB',
     bookId,
     chapter,
     verse
