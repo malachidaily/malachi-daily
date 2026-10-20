@@ -1,0 +1,4 @@
+---
+// Keep existing PWA installs and shared verse links working at the legacy URL.
+return Astro.redirect(`/${Astro.url.search}`, 301);
+---
